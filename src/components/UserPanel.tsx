@@ -1,9 +1,12 @@
 import { useMemo, useState } from 'react';
-import type { BirthInput, ChartOptions } from '../types';
+import type { BirthInput, ChartOptions, Relation, UserProfile, UserSummary } from '../types';
 import { CITIES, PROVINCES, searchCities, type City } from '../lib/cities';
 import { trueSolarTimeMinutes, minutesToTimeIndex, formatMinutes } from '../lib/truesolar';
 import { parseDateInput, parseTimeInput } from '../lib/datetime';
 import { encodeChart, decodeChart } from '../lib/chartcode';
+import { FLOW_PROFILES, PROFILE_STATS } from '../lib/knowledge/starProfiles';
+
+const RELATIONS: Relation[] = ['本人', '父亲', '母亲', '配偶', '子女', '兄弟', '姐妹', '朋友', '同事', '客户', '其他'];
 
 const TIME_OPTIONS: { value: number; label: string }[] = [
   { value: 0, label: '早子时 00:00–01:00' },
@@ -22,27 +25,50 @@ const TIME_OPTIONS: { value: number; label: string }[] = [
 ];
 
 function toMinutes(timeStr: string): number {
-  const [h, m] = timeStr.split(':').map(Number);
+  const raw = (timeStr ?? '').trim();
+  if (!raw) return 720;
+  const [h, m] = raw.split(':').map(Number);
   if (Number.isNaN(h)) return 720;
   return h * 60 + (m || 0);
 }
 
-export default function BirthForm({
+export default function UserPanel({
   initial,
+  initialProfile,
+  users,
+  activeUserId,
   options,
+  saveMsg,
   onGenerate,
+  onSave,
+  onNew,
+  onSelectUser,
+  onDeleteUser,
   onImport,
+  onExportStars,
 }: {
   initial: BirthInput;
+  initialProfile: UserProfile;
+  users: UserSummary[];
+  activeUserId: string | null;
   options: ChartOptions;
-  onGenerate: (input: BirthInput) => void;
+  saveMsg: string | null;
+  onGenerate: (input: BirthInput, profile: UserProfile) => void;
+  onSave: (input: BirthInput, profile: UserProfile) => void;
+  onNew: () => void;
+  onSelectUser: (id: string) => void;
+  onDeleteUser: (id: string) => void;
   onImport: (input: BirthInput, options: ChartOptions) => void;
+  onExportStars: () => void;
 }) {
   const initialCity = useMemo(
     () => CITIES.find((c) => Math.abs(c.longitude - initial.longitude) < 0.05),
     [initial.longitude],
   );
 
+  const [name, setName] = useState(initialProfile.name);
+  const [relation, setRelation] = useState<Relation>(initialProfile.relation);
+  const [note, setNote] = useState(initialProfile.note);
   const [birthday, setBirthday] = useState(initial.birthday);
   const [birthdayText, setBirthdayText] = useState(initial.birthday);
   const [birthdayErr, setBirthdayErr] = useState<string | null>(null);
@@ -64,17 +90,17 @@ export default function BirthForm({
 
   const timeInfo = useMemo(() => {
     const clock = toMinutes(clockTime);
-    if (!useTrueSolar) {
-      const idx = minutesToTimeIndex(clock);
-      return { idx, label: TIME_OPTIONS.find((t) => t.value === idx)?.label ?? '', tsText: '' };
-    }
     const [y, m, d] = birthday.split('-').map(Number);
+    if (!clockTime.trim()) return { idx: -1, label: '', tsText: '' };
+    const idx = minutesToTimeIndex(clock);
+    const label = TIME_OPTIONS.find((t) => t.value === idx)?.label ?? '';
+    if (!useTrueSolar || !y) return { idx, label, tsText: '' };
     const date = new Date(y, (m || 1) - 1, d || 1);
     const ts = trueSolarTimeMinutes(clock, longitude, date);
-    const idx = minutesToTimeIndex(ts);
+    const tsIdx = minutesToTimeIndex(ts);
     return {
-      idx,
-      label: TIME_OPTIONS.find((t) => t.value === idx)?.label ?? '',
+      idx: tsIdx,
+      label: TIME_OPTIONS.find((t) => t.value === tsIdx)?.label ?? '',
       tsText: `真太阳时 ${formatMinutes(ts)}`,
     };
   }, [clockTime, useTrueSolar, longitude, birthday]);
@@ -85,28 +111,51 @@ export default function BirthForm({
   );
   const showCityList = cityOpen && (cityQuery.trim().length > 0 || Boolean(province));
 
-  const commitDate = (): boolean => {
-    const r = parseDateInput(birthdayText, birthdayType);
-    if (!r.ok) {
-      setBirthdayErr(r.error);
-      return false;
+  const profile = (): UserProfile => ({
+    name: name.trim(),
+    relation,
+    note: note.trim(),
+  });
+
+  const parseForm = () => {
+    const d = parseDateInput(birthdayText, birthdayType);
+    const t = parseTimeInput(clockText);
+    if (!d.ok) setBirthdayErr(d.error);
+    else {
+      setBirthday(d.value);
+      setBirthdayText(d.value);
+      setBirthdayErr(null);
     }
-    setBirthday(r.value);
-    setBirthdayText(r.value);
-    setBirthdayErr(null);
-    return true;
+    if (!t.ok) setClockErr(t.error);
+    else {
+      setClockTime(t.value);
+      setClockText(t.value);
+      setClockErr(null);
+    }
+    if (!d.ok || !t.ok) return null;
+    const input: BirthInput = {
+      birthday: d.value,
+      clockTime: t.value,
+      gender,
+      birthdayType,
+      isLeapMonth,
+      fixLeap,
+      useTrueSolar,
+      longitude,
+    };
+    return input;
   };
 
-  const commitTime = (): boolean => {
-    const r = parseTimeInput(clockText);
-    if (!r.ok) {
-      setClockErr(r.error);
-      return false;
-    }
-    setClockTime(r.value);
-    setClockText(r.value);
-    setClockErr(null);
-    return true;
+  const submit = () => {
+    const input = parseForm();
+    if (!input) return;
+    onGenerate(input, profile());
+  };
+
+  const save = () => {
+    const input = parseForm();
+    if (!input) return;
+    onSave(input, profile());
   };
 
   const pickCity = (c: City) => {
@@ -117,38 +166,10 @@ export default function BirthForm({
     setCityOpen(false);
   };
 
-  const buildInput = (): BirthInput => ({
-    birthday,
-    clockTime,
-    gender,
-    birthdayType,
-    isLeapMonth,
-    fixLeap,
-    useTrueSolar,
-    longitude,
-  });
-
-  const submit = () => {
-    const dateOk = commitDate();
-    const timeOk = commitTime();
-    if (!dateOk || !timeOk) return;
-    const d = parseDateInput(birthdayText, birthdayType);
-    const t = parseTimeInput(clockText);
-    if (!d.ok || !t.ok) return;
-    onGenerate({ ...buildInput(), birthday: d.value, clockTime: t.value });
-  };
-
   const copyCode = async () => {
     try {
-      const d = parseDateInput(birthdayText, birthdayType);
-      const t = parseTimeInput(clockText);
-      const base = buildInput();
-      const code = encodeChart({
-        ...base,
-        birthday: d.ok ? d.value : base.birthday,
-        clockTime: t.ok ? t.value : base.clockTime,
-        ...options,
-      });
+      const input = parseForm();
+      const code = encodeChart({ ...(input ?? { birthday, clockTime, gender, birthdayType, isLeapMonth, fixLeap, useTrueSolar, longitude }), ...options });
       await navigator.clipboard.writeText(code);
       setCodeMsg('✓ 安星码已复制');
     } catch {
@@ -184,24 +205,81 @@ export default function BirthForm({
   };
 
   return (
-    <div className="panel">
-      <h2>出生信息</h2>
+    <div className="panel user-panel">
+      <div className="user-panel-head">
+        <h2>用户信息</h2>
+        <span className="dim">{name.trim() || '未命名'} · {relation}</span>
+      </div>
 
-      <div className="field">
-        <label>历法</label>
+      <div className="user-load">
         <select
-          value={birthdayType}
+          value={activeUserId ?? ''}
           onChange={(e) => {
-            const next = e.target.value as 'solar' | 'lunar';
-            setBirthdayType(next);
-            setBirthdayErr(null);
-            const r = parseDateInput(birthdayText, next);
-            if (r.ok) setBirthday(r.value);
+            if (e.target.value) onSelectUser(e.target.value);
           }}
         >
-          <option value="solar">公历（阳历）</option>
-          <option value="lunar">农历（阴历）</option>
+          <option value="">已保存用户（{users.length}）</option>
+          {users.map((u) => (
+            <option key={u.id} value={u.id}>
+              {u.name} · {u.relation} · {u.birthday}
+            </option>
+          ))}
         </select>
+        <button
+          className="btn ghost small"
+          disabled={!activeUserId}
+          onClick={() => {
+            if (activeUserId && window.confirm('删除这位用户的档案？')) onDeleteUser(activeUserId);
+          }}
+        >
+          删除
+        </button>
+      </div>
+
+      <div className="user-row">
+        <div className="field">
+          <label>姓名</label>
+          <input value={name} placeholder="如 张三" onChange={(e) => setName(e.target.value)} />
+        </div>
+        <div className="field">
+          <label>关系</label>
+          <select value={relation} onChange={(e) => setRelation(e.target.value as Relation)}>
+            {RELATIONS.map((r) => (
+              <option key={r} value={r}>{r}</option>
+            ))}
+          </select>
+        </div>
+      </div>
+
+      <div className="field">
+        <label>备注（可选）</label>
+        <input value={note} placeholder="客户来源 / 关注点" onChange={(e) => setNote(e.target.value)} />
+      </div>
+
+      <div className="row">
+        <div className="field">
+          <label>性别</label>
+          <select value={gender} onChange={(e) => setGender(e.target.value as '男' | '女')}>
+            <option value="男">男</option>
+            <option value="女">女</option>
+          </select>
+        </div>
+        <div className="field">
+          <label>历法</label>
+          <select
+            value={birthdayType}
+            onChange={(e) => {
+              const next = e.target.value as 'solar' | 'lunar';
+              setBirthdayType(next);
+              setBirthdayErr(null);
+              const r = parseDateInput(birthdayText, next);
+              if (r.ok) setBirthday(r.value);
+            }}
+          >
+            <option value="solar">公历</option>
+            <option value="lunar">农历</option>
+          </select>
+        </div>
       </div>
 
       <div className="field">
@@ -215,19 +293,24 @@ export default function BirthForm({
             setBirthdayText(e.target.value);
             setBirthdayErr(null);
           }}
-          onBlur={commitDate}
+          onBlur={() => {
+            const r = parseDateInput(birthdayText, birthdayType);
+            if (r.ok) {
+              setBirthday(r.value);
+              setBirthdayText(r.value);
+              setBirthdayErr(null);
+            } else if (birthdayText.trim()) {
+              setBirthdayErr(r.error);
+            }
+          }}
           onKeyDown={(e) => {
             if (e.key === 'Enter') {
               e.preventDefault();
-              commitDate();
+              submit();
             }
           }}
         />
-        {birthdayErr ? (
-          <p className="field-error">{birthdayErr}</p>
-        ) : (
-          <p className="hint" style={{ marginTop: 4 }}>支持 19980527 / 1998-05-27 / 1998年5月27日，离开输入框自动识别</p>
-        )}
+        {birthdayErr ? <p className="field-error">{birthdayErr}</p> : null}
       </div>
 
       {birthdayType === 'lunar' && (
@@ -235,6 +318,10 @@ export default function BirthForm({
           <label>
             <input type="checkbox" checked={isLeapMonth} onChange={(e) => setIsLeapMonth(e.target.checked)} style={{ width: 'auto', marginRight: 6 }} />
             是闰月出生
+          </label>
+          <label style={{ marginTop: 6 }}>
+            <input type="checkbox" checked={fixLeap} onChange={(e) => setFixLeap(e.target.checked)} style={{ width: 'auto', marginRight: 6 }} />
+            闰月修正（前 15 天算上月）
           </label>
         </div>
       )}
@@ -249,19 +336,24 @@ export default function BirthForm({
             setClockText(e.target.value);
             setClockErr(null);
           }}
-          onBlur={commitTime}
+          onBlur={() => {
+            const r = parseTimeInput(clockText);
+            if (r.ok) {
+              setClockTime(r.value);
+              setClockText(r.value);
+              setClockErr(null);
+            } else if (clockText.trim()) {
+              setClockErr(r.error);
+            }
+          }}
           onKeyDown={(e) => {
             if (e.key === 'Enter') {
               e.preventDefault();
-              commitTime();
+              submit();
             }
           }}
         />
-        {clockErr ? (
-          <p className="field-error">{clockErr}</p>
-        ) : (
-          <p className="hint" style={{ marginTop: 4 }}>支持 0930 / 9:30 / 9点30 / 下午3点 / 9:30 PM，统一转 24 小时</p>
-        )}
+        {clockErr ? <p className="field-error">{clockErr}</p> : null}
       </div>
 
       <div className="field">
@@ -342,38 +434,34 @@ export default function BirthForm({
       )}
 
       <div className="hint">
-        推算为 <b>{timeInfo.label}</b>
+        推算为 <b>{timeInfo.label || '—'}</b>
         {timeInfo.tsText && <> · {timeInfo.tsText}</>}
       </div>
 
-      <div className="row">
-        <div className="field">
-          <label>性别</label>
-          <select value={gender} onChange={(e) => setGender(e.target.value as '男' | '女')}>
-            <option value="男">男</option>
-            <option value="女">女</option>
-          </select>
-        </div>
-        <div className="field">
-          <label>闰月修正</label>
-          <select value={fixLeap ? '1' : '0'} onChange={(e) => setFixLeap(e.target.value === '1')}>
-            <option value="1">修正（前15天算上月）</option>
-            <option value="0">不修正</option>
-          </select>
-        </div>
+      <div className="user-actions">
+        <button className="btn" onClick={submit}>排盘</button>
+        <button className="btn ghost" onClick={save}>保存命盘</button>
+        <button className="btn ghost" onClick={onNew}>新建</button>
       </div>
+      {saveMsg && <p className="hint" style={{ color: 'var(--ok)' }}>{saveMsg}</p>}
 
-      <button className="btn" onClick={submit}>排盘</button>
-
-      <div style={{ marginTop: 16, paddingTop: 12, borderTop: '1px dashed var(--border)' }}>
-        <label>安星码（分享 / 导入排盘）</label>
-        <div style={{ display: 'flex', gap: 8, marginBottom: 8 }}>
-          <input value={codeInput} placeholder="粘贴安星码" onChange={(e) => setCodeInput(e.target.value)} />
-          <button className="btn ghost" style={{ width: 'auto', whiteSpace: 'nowrap' }} onClick={importCode}>导入</button>
+      <details className="user-more">
+        <summary>更多操作（安星码 / 数据）</summary>
+        <div className="stack-sm">
+          <div style={{ display: 'flex', gap: 8 }}>
+            <input value={codeInput} placeholder="粘贴安星码" onChange={(e) => setCodeInput(e.target.value)} />
+            <button className="btn ghost small" onClick={importCode}>导入</button>
+          </div>
+          <button className="btn ghost small" onClick={copyCode}>复制当前安星码</button>
+          {codeMsg && <p className="hint">{codeMsg}</p>}
+          <button className="btn ghost small" onClick={onExportStars}>导出星曜库 JSON</button>
+          <p className="hint" style={{ margin: 0 }}>
+            星曜库 {PROFILE_STATS.total} 颗（完整 {PROFILE_STATS.full}）＋ 运限派生 {FLOW_PROFILES.length}
+          </p>
         </div>
-        <button className="btn ghost" onClick={copyCode}>复制当前安星码</button>
-        {codeMsg && <p className="hint" style={{ color: codeMsg.startsWith('✓') ? 'var(--ok)' : 'var(--warn)' }}>{codeMsg}</p>}
-      </div>
+      </details>
+
+
     </div>
   );
 }

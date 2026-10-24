@@ -34,9 +34,10 @@ export function computeTimeIndex(input: {
   useTrueSolar: boolean;
   longitude: number;
 }): number {
-  const [h, m] = input.clockTime.split(':').map(Number);
-  const minutes = (Number.isNaN(h) ? 12 : h) * 60 + (Number.isNaN(m) ? 0 : m);
-  if (input.useTrueSolar) {
+  const raw = (input.clockTime ?? '').trim();
+  const [h, m] = raw.split(':').map(Number);
+  const minutes = raw ? (Number.isNaN(h) ? 12 : h) * 60 + (Number.isNaN(m) ? 0 : m) : 720;
+  if (input.useTrueSolar && input.birthday) {
     const [y, mo, d] = input.birthday.split('-').map(Number);
     const date = new Date(y, (mo || 1) - 1, d || 1);
     return minutesToTimeIndex(trueSolarTimeMinutes(minutes, input.longitude, date));

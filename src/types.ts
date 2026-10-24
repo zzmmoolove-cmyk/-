@@ -63,6 +63,44 @@ export type ChartOptions = {
   dayDivide: 'current' | 'forward';
 };
 
+export type Relation =
+  | '本人'
+  | '父亲'
+  | '母亲'
+  | '配偶'
+  | '子女'
+  | '兄弟'
+  | '姐妹'
+  | '朋友'
+  | '同事'
+  | '客户'
+  | '其他';
+
+export type UserProfile = {
+  name: string;
+  relation: Relation;
+  note: string;
+};
+
+/** 一条用户档案：姓名/关系 + 出生信息 + 排盘设置 */
+export type UserRecord = {
+  id: string;
+  name: string;
+  relation: Relation;
+  note: string;
+  savedAt: string;
+  updatedAt: string;
+  payload: BirthInput & ChartOptions;
+};
+
+export type UserSummary = {
+  id: string;
+  name: string;
+  relation: Relation;
+  birthday: string;
+  savedAt: string;
+};
+
 export type HistoryItem = {
   id: string;
   savedAt: string;

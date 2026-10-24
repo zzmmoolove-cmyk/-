@@ -21,7 +21,8 @@
 - **AI 兜底（第 3 层）**：填写自己的 API Key（DeepSeek / OpenAI / 通义千问 / 自定义），对整盘或单个宫位进行 AI 综合解读。Key 仅存本机 localStorage。
 - **安星码**：一键复制 / 导入排盘配置，可分享复现同一命盘。
 - **万年历**：公历 ↔ 农历、干支、生肖、八字、节气、宜忌查询。
-- **排盘记录**：保存 / 加载 / 删除历史命盘（本地存储）。
+- **用户档案**：姓名 + 关系（本人/父母/配偶/子女/客户等）+ 出生信息 + 备注，保存 / 切换 / 删除；旧版排盘记录自动迁移。
+- **三页签**：命盘 / 宫位卡 / 综述，一次只看一件事；流派、AI、万年历收进「更多工具」，保存与导出收进用户信息。
 
 ## 快速开始
 
@@ -37,7 +38,8 @@ npm run build      # 生产构建到 dist/
 src/
 ├── App.tsx                    # 主界面与状态
 ├── components/
-│   ├── BirthForm.tsx          # 出生信息 + 真太阳时 + 安星码
+│   ├── UserPanel.tsx          # 用户信息 + 出生信息 + 真太阳时 + 保存/新建
+│   ├── ToolBox.tsx            # 折叠工具：流派 / AI / 万年历
 │   ├── ScopeBar.tsx           # 盘面层级切换（本命/大限/小限/流年/流月/流日/流时）
 │   ├── ChartPanel.tsx         # 本命盘 + 十二宫卡片（运限叠加，星曜可点）
 │   ├── PalaceDetail.tsx       # 宫位解读 + 三方四正/飞星 + AI
@@ -45,8 +47,7 @@ src/
 │   ├── StarProfilePanel.tsx   # 星曜档案弹层
 │   ├── SummaryPanel.tsx       # 命格综述 + 格局 + 四化 + AI
 │   ├── SettingsPanel.tsx      # 排盘流派/算法设置
-│   ├── CalendarPanel.tsx      # 万年历
-│   └── HistoryPanel.tsx       # 排盘记录
+│   └── CalendarPanel.tsx      # 万年历
 ├── lib/
 │   ├── ai.ts                  # AI 兜底层（OpenAI 兼容接口）
 │   ├── report.ts              # 宫位卡 1.0：快照 / 文本 / Prompt 生成

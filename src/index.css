@@ -268,7 +268,8 @@ textarea:focus {
 .cc-title {
   display: flex;
   align-items: baseline;
-  gap: 8px;
+  flex-wrap: wrap;
+  gap: 4px 8px;
   font-size: 17px;
   font-weight: 700;
   letter-spacing: 2px;
@@ -1394,3 +1395,129 @@ button.syn-row:hover { background: #fdf6e3; }
 .city-option b { font-weight: 600; }
 .city-option span { color: var(--text-dim); font-size: 11px; white-space: nowrap; }
 .city-empty { padding: 10px; font-size: 12px; color: var(--text-dim); }
+
+/* —— 用户信息（左侧主入口） —— */
+.user-panel-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+.user-panel-head h2 { margin: 0; }
+.user-panel-head .dim { font-size: 11.5px; }
+.user-load { display: flex; gap: 6px; margin-bottom: 10px; }
+.user-load select { flex: 1; min-width: 0; }
+.user-load .btn.small { width: auto; padding: 6px 9px; letter-spacing: 0; }
+.user-row { display: grid; grid-template-columns: 1.15fr 1fr; gap: 8px; }
+.user-row .field { margin-bottom: 8px; }
+.user-actions { display: flex; gap: 6px; margin-top: 8px; }
+.user-actions .btn { flex: 1; width: auto; padding: 8px 6px; letter-spacing: 1px; font-size: 13.5px; }
+.user-more { margin-top: 10px; border-top: 1px dashed var(--border); padding-top: 8px; }
+.user-more summary { cursor: pointer; font-size: 12px; color: var(--text-dim); }
+.user-more summary:hover { color: var(--accent); }
+.stack-sm { display: flex; flex-direction: column; gap: 6px; margin-top: 8px; }
+.stack-sm input { font-size: 12.5px; }
+
+/* —— 中央标签页 —— */
+.center-tabs {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 6px;
+  position: sticky;
+  top: 8px;
+  z-index: 5;
+  box-shadow: 0 1px 3px rgba(120, 100, 60, 0.05);
+}
+.tab {
+  background: none;
+  border: 1px solid transparent;
+  color: var(--text-dim);
+  padding: 7px 12px;
+  border-radius: 7px;
+  font-size: 13.5px;
+  cursor: pointer;
+}
+.tab:hover:not(:disabled) { color: var(--accent); background: var(--panel-2); }
+.tab.active {
+  background: #fdf6e3;
+  color: var(--accent-soft);
+  border-color: var(--accent);
+  font-weight: 700;
+}
+.tab:disabled { opacity: 0.4; cursor: not-allowed; }
+.current-user {
+  margin-left: auto;
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--text-dim);
+  padding-right: 6px;
+}
+.current-user b { color: var(--text); font-size: 13px; }
+.current-user em {
+  font-style: normal;
+  padding: 1px 6px;
+  border-radius: 4px;
+  background: rgba(184, 134, 11, 0.12);
+  color: var(--accent-soft);
+}
+.current-user i { font-style: normal; font-size: 10.5px; }
+.current-user.saved i { color: var(--ok); }
+
+/* —— 折叠工具 —— */
+.tool-box { padding: 0; }
+.tool-box > summary {
+  padding: 12px 14px;
+  cursor: pointer;
+  font-size: 13px;
+  color: var(--accent);
+  letter-spacing: 0.5px;
+  list-style: none;
+}
+.tool-box > summary::-webkit-details-marker { display: none; }
+.tool-box > summary::before { content: '▸ '; }
+.tool-box[open] > summary::before { content: '▾ '; }
+.tool-box[open] > summary { border-bottom: 1px solid var(--border); }
+.tool-stack { padding: 12px 14px 4px; }
+.tool-stack .panel {
+  border: 0;
+  padding: 0;
+  margin: 0 0 14px !important;
+  box-shadow: none;
+  background: transparent;
+}
+.tool-stack .panel h2 { font-size: 13px; margin-bottom: 8px; }
+.tool-block h3 { font-size: 13px; color: var(--accent); margin: 0 0 8px; letter-spacing: 1px; }
+.tool-stack .field { margin-bottom: 8px; }
+
+/* —— 旧版解读折叠 —— */
+.legacy-wrap { padding: 0; }
+.legacy-wrap > summary {
+  padding: 12px 14px;
+  cursor: pointer;
+  font-size: 13px;
+  color: var(--accent);
+  list-style: none;
+}
+.legacy-wrap > summary::-webkit-details-marker { display: none; }
+.legacy-wrap > summary::before { content: '▸ '; }
+.legacy-wrap[open] > summary::before { content: '▾ '; }
+.legacy-wrap[open] > summary { border-bottom: 1px solid var(--border); }
+.legacy-wrap > .panel { border: 0; padding: 14px; box-shadow: none; margin: 0; }
+.empty-state { text-align: center; color: var(--text-dim); padding: 40px 10px; }
+
+@media (max-width: 1200px) {
+  .current-user { margin-left: 0; width: 100%; justify-content: flex-end; }
+}
+
+@media (max-width: 760px) {
+  .center-tabs { flex-wrap: wrap; }
+  .current-user { justify-content: flex-start; }
+  .user-row { grid-template-columns: 1fr; }
+}

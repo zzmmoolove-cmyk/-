@@ -74,7 +74,7 @@ export default function PalaceDetail({
   return (
     <div className="panel detail-panel">
       <h2>
-        {palace.name}宫解读
+        {palace.name.endsWith('宫') ? palace.name : `${palace.name}宫`}解读
         {palace.isBodyPalace && <span className="badge badge-body">身宫</span>}
         <span className="dim">　{palace.heavenlyStem}{palace.earthlyBranch}</span>
       </h2>

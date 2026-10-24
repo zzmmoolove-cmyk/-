@@ -59,6 +59,7 @@ export default function ChartPanel({
   timeIndex,
   layered,
   selectedPalace,
+  userLabel,
   onSelectPalace,
   onSelectStar,
 }: {
@@ -68,6 +69,7 @@ export default function ChartPanel({
   timeIndex: number;
   layered: LayeredData | null;
   selectedPalace: string | null;
+  userLabel?: string;
   onSelectPalace: (name: string) => void;
   onSelectStar: (name: string, palace?: string) => void;
 }) {
@@ -448,7 +450,8 @@ export default function ChartPanel({
 
             <div className="chart-center">
               <div className="cc-title">
-                本命盘<span>{astrolabe.gender} · 属{astrolabe.zodiac} · {astrolabe.fiveElementsClass}</span>
+                {userLabel ? `${userLabel} · 本命盘` : '本命盘'}
+                <span>{astrolabe.gender} · 属{astrolabe.zodiac} · {astrolabe.fiveElementsClass}</span>
               </div>
               <div className="cc-grid">
                 <div className="cc-item">
