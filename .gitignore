@@ -1,0 +1,6 @@
+node_modules
+dist
+.npmcache
+_evaluation
+*.log
+.DS_Store
