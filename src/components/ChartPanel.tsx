@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { MouseEvent as ReactMouseEvent } from 'react';
 import { Iztrolabe } from 'react-iztro';
 import type { Astrolabe, BirthInput, ChartOptions, Palace } from '../types';
@@ -77,6 +77,9 @@ export default function ChartPanel({
 }) {
   const [tip, setTip] = useState<Tip | null>(null);
   const [concept, setConcept] = useState<ConceptView | null>(null);
+  const [links, setLinks] = useState<{ x1: number; y1: number; x2: number; y2: number }[]>([]);
+  const chartInnerRef = useRef<HTMLDivElement | null>(null);
+  const hoverIdxRef = useRef<number | null>(null);
 
   useEffect(() => {
     const hide = () => setTip(null);
@@ -99,6 +102,57 @@ export default function ChartPanel({
 
   const palaceObj = (name?: string): Palace | undefined =>
     name ? astrolabe.palaces.find((p) => p.name === name) : undefined;
+
+  const selectedIdx = () => astrolabe.palaces.findIndex((p) => p.name === selectedPalace);
+
+  /** 计算选中宫到对宫、两个三合宫的虚线（以宫格朝向盘心的边缘为端点） */
+  const updateLinks = (idx: number | null) => {
+    const container = chartInnerRef.current;
+    if (!container || idx == null || idx < 0) {
+      setLinks([]);
+      return;
+    }
+    const cells = Array.from(container.querySelectorAll('.iztro-palace')) as HTMLElement[];
+    if (cells.length < 12) return;
+    const cRect = container.getBoundingClientRect();
+    const center = { x: cRect.width / 2, y: cRect.height / 2 };
+    const point = (i: number) => {
+      const r = cells[i].getBoundingClientRect();
+      const cx = r.left - cRect.left + r.width / 2;
+      const cy = r.top - cRect.top + r.height / 2;
+      const dx = center.x - cx;
+      const dy = center.y - cy;
+      const halfW = r.width / 2 - 3;
+      const halfH = r.height / 2 - 3;
+      const scale = Math.min(
+        Math.abs(dx) > 0.01 ? halfW / Math.abs(dx) : 1,
+        Math.abs(dy) > 0.01 ? halfH / Math.abs(dy) : 1,
+        1,
+      );
+      return { x: cx + dx * scale, y: cy + dy * scale };
+    };
+    const self = point(idx);
+    const targets = [(idx + 6) % 12, (idx + 4) % 12, (idx + 8) % 12];
+    setLinks(targets.map((t) => {
+      const p = point(t);
+      return { x1: self.x, y1: self.y, x2: p.x, y2: p.y };
+    }));
+  };
+
+  useEffect(() => {
+    if (!astrolabe) return;
+    const draw = () => updateLinks(hoverIdxRef.current ?? selectedIdx());
+    const timer = window.setTimeout(draw, 80);
+    const retry = window.setTimeout(draw, 360);
+    const onResize = () => draw();
+    window.addEventListener('resize', onResize);
+    return () => {
+      window.clearTimeout(timer);
+      window.clearTimeout(retry);
+      window.removeEventListener('resize', onResize);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [astrolabe, selectedPalace, options]);
 
   const palaceNameOf = (el: HTMLElement): string | undefined => {
     const pEl = el.closest('.iztro-palace');
@@ -368,6 +422,15 @@ export default function ChartPanel({
   };
 
   const handleChartOver = (e: ReactMouseEvent<HTMLDivElement>) => {
+    const palaceEl = (e.target as HTMLElement).closest('.iztro-palace') as HTMLElement | null;
+    if (palaceEl && chartInnerRef.current) {
+      const cells = Array.from(chartInnerRef.current.querySelectorAll('.iztro-palace'));
+      const idx = cells.indexOf(palaceEl);
+      if (idx >= 0 && idx !== hoverIdxRef.current) {
+        hoverIdxRef.current = idx;
+        updateLinks(idx);
+      }
+    }
     const hit = detectHit(e.target as HTMLElement);
     if (!hit) return;
     const next = tipForHit(hit);
@@ -378,6 +441,11 @@ export default function ChartPanel({
   const handleChartOut = (e: ReactMouseEvent<HTMLDivElement>) => {
     const to = e.relatedTarget as Node | null;
     if (!(to instanceof HTMLElement) || !detectHit(to)) setTip(null);
+  };
+
+  const handleChartLeave = () => {
+    hoverIdxRef.current = null;
+    updateLinks(selectedIdx());
   };
 
   const handleChartClick = (e: ReactMouseEvent<HTMLDivElement>) => {
@@ -448,8 +516,14 @@ export default function ChartPanel({
           </span>
         </div>
 
-        <div className="chart-scroll" onClick={handleChartClick} onMouseOver={handleChartOver} onMouseOut={handleChartOut}>
-          <div className="chart-inner">
+        <div
+          className="chart-scroll"
+          onClick={handleChartClick}
+          onMouseOver={handleChartOver}
+          onMouseOut={handleChartOut}
+          onMouseLeave={handleChartLeave}
+        >
+          <div className="chart-inner" ref={chartInnerRef}>
             <Iztrolabe
               birthday={input.birthday}
               birthTime={timeIndex}
@@ -460,6 +534,11 @@ export default function ChartPanel({
               lang="zh-CN"
               options={options}
             />
+            <svg className="palace-link" aria-hidden="true">
+              {links.map((l, i) => (
+                <line key={i} x1={l.x1} y1={l.y1} x2={l.x2} y2={l.y2} />
+              ))}
+            </svg>
           </div>
         </div>
         <div className="hint" style={{ marginTop: 6 }}>
