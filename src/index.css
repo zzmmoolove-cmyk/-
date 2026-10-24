@@ -195,11 +195,11 @@ textarea:focus {
 }
 
 .chart-scroll .iztro-star {
-  font-size: 14px !important;
+  font-size: 13px !important;
 }
 
 .chart-scroll .iztro-palace-major .iztro-star {
-  font-size: 16px !important;
+  font-size: 15px !important;
   font-weight: 600;
 }
 
@@ -214,30 +214,46 @@ textarea:focus {
 
 .chart-scroll .iztro-astrolabe {
   gap: 5px;
-  aspect-ratio: 1 / 1;
 }
 
 .chart-scroll .iztro-palace {
   padding: 6px 7px;
   border-radius: 7px;
   background: #fffdf8;
-  grid-template-rows: 1fr auto auto auto;
+  grid-template-rows: 1fr auto auto 50px;
 }
 
 .chart-scroll .iztro-palace-name {
-  font-size: 17px;
-  letter-spacing: 1.5px;
+  font-size: 15.5px;
+  letter-spacing: 1px;
   color: var(--accent-soft);
 }
 
 .chart-scroll .iztro-palace-gz {
-  font-size: 13.5px;
+  font-size: 12px;
   letter-spacing: 0.5px;
 }
 
 .chart-scroll .iztro-palace-name-body {
-  font-size: 10px;
-  letter-spacing: 0;
+  display: none;
+}
+
+.chart-scroll .iztro-palace-lft24,
+.chart-scroll .iztro-palace-rgt24 {
+  font-size: 10.5px;
+  line-height: 1.35;
+}
+
+.chart-scroll .iztro-palace-scope-age {
+  display: none;
+}
+
+.chart-scroll .iztro-palace-scope-decadal {
+  font-size: 10.5px;
+}
+
+.chart-scroll .iztro-palace-footer {
+  column-gap: 4px;
 }
 
 .chart-scroll .iztro-palace-name-taichi {
@@ -1463,6 +1479,12 @@ button.syn-row:hover { background: #fdf6e3; }
   display: none !important;
 }
 
+/* 盘心文字压在虚线之上，避免线穿过正文 */
+.chart-scroll .iztro-center-palace > * {
+  position: relative;
+  z-index: 4;
+}
+
 .palace-link {
   position: absolute;
   inset: 0;
@@ -1475,9 +1497,9 @@ button.syn-row:hover { background: #fdf6e3; }
 
 .palace-link line {
   stroke: var(--accent);
-  stroke-width: 1.5;
+  stroke-width: 1.7;
   stroke-dasharray: 7 5;
   stroke-linecap: round;
-  opacity: 0.7;
+  opacity: 0.78;
   vector-effect: non-scaling-stroke;
 }
