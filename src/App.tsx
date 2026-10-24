@@ -455,7 +455,8 @@ export default function App() {
               layered={layered}
               selectedPalace={selectedPalace}
               userLabel={currentProfile.name ? `${currentProfile.name} · ${currentProfile.relation}` : ''}
-              onSelectPalace={(name) => {
+              onSelectPalace={setSelectedPalace}
+              onOpenPalaceCard={(name) => {
                 setSelectedPalace(name);
                 setTab('card');
               }}

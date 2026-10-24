@@ -61,6 +61,7 @@ export default function ChartPanel({
   selectedPalace,
   userLabel,
   onSelectPalace,
+  onOpenPalaceCard,
   onSelectStar,
 }: {
   astrolabe: Astrolabe | null;
@@ -71,6 +72,7 @@ export default function ChartPanel({
   selectedPalace: string | null;
   userLabel?: string;
   onSelectPalace: (name: string) => void;
+  onOpenPalaceCard?: (name: string) => void;
   onSelectStar: (name: string, palace?: string) => void;
 }) {
   const [tip, setTip] = useState<Tip | null>(null);
@@ -390,11 +392,8 @@ export default function ChartPanel({
       return;
     }
     if (hit.type === 'palace') {
+      // 点盘上的宫名只切换选中宫，保留命盘与三方四正连线；要看卡请点「宫位卡」页签
       onSelectPalace(hit.name);
-      // 点宫名时把下方宫位卡带到视野里，给一个明确反馈
-      window.setTimeout(() => {
-        document.querySelector('.report-panel')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }, 60);
       return;
     }
     setConcept(conceptView(hit));
@@ -433,8 +432,22 @@ export default function ChartPanel({
     <>
       <div className="panel">
         <h2>
-          命盘<span className="dim">（悬停看批注，点击看档案）</span>
+          命盘
+          {userLabel && <span className="dim"> · {userLabel}</span>}
+          <span className="dim">（悬停看批注，点击看档案）</span>
         </h2>
+
+        <div className="chart-meta">
+          <span><em>五行局</em><button className="link-btn" onClick={openFiveElements}>{astrolabe.fiveElementsClass}</button></span>
+          <span><em>身宫</em>{bodyPalace ? LABEL(bodyPalace.name) : '—'}</span>
+          <span className="chart-meta-hua">
+            <em>生年四化</em>
+            {natalHua.map((h) => (
+              <i key={h.star + h.mutagen} className={`hua-${h.mutagen}`}>{h.star}{h.mutagen}</i>
+            ))}
+          </span>
+        </div>
+
         <div className="chart-scroll" onClick={handleChartClick} onMouseOver={handleChartOver} onMouseOut={handleChartOut}>
           <div className="chart-inner">
             <Iztrolabe
@@ -447,47 +460,10 @@ export default function ChartPanel({
               lang="zh-CN"
               options={options}
             />
-
-            <div className="chart-center">
-              <div className="cc-title">
-                {userLabel ? `${userLabel} · 本命盘` : '本命盘'}
-                <span>{astrolabe.gender} · 属{astrolabe.zodiac} · {astrolabe.fiveElementsClass}</span>
-              </div>
-              <div className="cc-grid">
-                <div className="cc-item">
-                  <em>命主</em>
-                  <button className="link-btn" onClick={() => onSelectStar(astrolabe.soul)}>{astrolabe.soul}</button>
-                </div>
-                <div className="cc-item">
-                  <em>身主</em>
-                  <button className="link-btn" onClick={() => onSelectStar(astrolabe.body)}>{astrolabe.body}</button>
-                </div>
-                <div className="cc-item">
-                  <em>五行局</em>
-                  <button className="link-btn" onClick={openFiveElements}>{astrolabe.fiveElementsClass}</button>
-                </div>
-                <div className="cc-item">
-                  <em>身宫</em>
-                  <span>{bodyPalace ? LABEL(bodyPalace.name) : '—'}</span>
-                </div>
-              </div>
-              <div className="cc-dates">
-                <div><em>阳历</em><span>{astrolabe.solarDate}</span></div>
-                <div><em>农历</em><span>{astrolabe.lunarDate}</span></div>
-              </div>
-              <div className="cc-hua">
-                <em>生年四化</em>
-                <span className="cc-hua-list">
-                  {natalHua.map((h) => (
-                    <span key={h.star + h.mutagen} className={`cc-hua-item hua-${h.mutagen}`}>
-                      {h.star}{h.mutagen}
-                    </span>
-                  ))}
-                </span>
-              </div>
-              <div className="cc-hint">悬停看批注 · 点击看档案 · 排盘 iztro</div>
-            </div>
           </div>
+        </div>
+        <div className="hint" style={{ marginTop: 6 }}>
+          悬停看批注，点击星曜/宫名/干支看详情 · 排盘 iztro
         </div>
       </div>
 
@@ -504,9 +480,9 @@ export default function ChartPanel({
                 role="button"
                 tabIndex={0}
                 className={`palace-card ${selectedPalace === p.name ? 'active' : ''}`}
-                onClick={() => onSelectPalace(p.name)}
+                onClick={() => (onOpenPalaceCard ?? onSelectPalace)(p.name)}
                 onKeyDown={(e) => {
-                  if (e.key === 'Enter' || e.key === ' ') onSelectPalace(p.name);
+                  if (e.key === 'Enter' || e.key === ' ') (onOpenPalaceCard ?? onSelectPalace)(p.name);
                 }}
               >
                 <div className="palace-card-head">
