@@ -1,0 +1,703 @@
+/* ============================================================
+   功能模块：运限报告 / 起名 / 择日 / 合盘
+   ============================================================ */
+
+/* —— 运限报告 —— */
+.scope-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-top: 12px;
+}
+
+.scope-block {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px;
+  background: var(--panel-2);
+}
+
+.scope-block-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 8px 10px;
+}
+
+.scope-block-head b {
+  font-size: 15px;
+  color: var(--text);
+  letter-spacing: 1px;
+}
+
+.scope-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 5px;
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+.scope-mutagens {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 11px 0;
+}
+
+.scope-mutagen {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 4px;
+  padding: 4px 8px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--panel);
+  color: var(--text);
+  font-size: 12px;
+  cursor: pointer;
+  text-align: left;
+}
+
+.scope-mutagen:hover {
+  border-color: var(--accent);
+}
+
+.scope-mutagen em {
+  font-style: normal;
+  font-size: 10.5px;
+  color: var(--text-dim);
+}
+
+.scope-mutagen.hua-禄 { border-color: rgba(46, 125, 79, 0.28); }
+.scope-mutagen.hua-禄 b { color: var(--ok); }
+.scope-mutagen.hua-权 { border-color: rgba(37, 99, 235, 0.28); }
+.scope-mutagen.hua-科 { border-color: rgba(14, 116, 144, 0.28); }
+.scope-mutagen.hua-忌 { border-color: rgba(192, 57, 43, 0.3); }
+
+.scope-palaces {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 8px;
+}
+
+.scope-palace {
+  display: block;
+  text-align: left;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--panel);
+  color: var(--text);
+  padding: 9px 10px;
+  cursor: pointer;
+  min-width: 0;
+}
+
+.scope-palace:hover {
+  border-color: var(--accent);
+}
+
+.scope-palace.is-scope {
+  border-color: var(--accent);
+  box-shadow: inset 0 0 0 1px var(--accent);
+}
+
+.scope-palace-flow {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--accent-soft);
+}
+
+.scope-palace-base {
+  margin-left: 6px;
+  font-size: 10.5px;
+  color: var(--text-dim);
+}
+
+.scope-palace-stars {
+  display: block;
+  margin-top: 4px;
+  font-size: 11.8px;
+  line-height: 1.6;
+  color: var(--text-dim);
+  white-space: normal;
+}
+
+.scope-note {
+  margin: 10px 0 0;
+  font-size: 12.5px;
+  line-height: 1.65;
+  color: var(--text-dim);
+}
+
+.scope-empty {
+  text-align: center;
+  padding: 38px 10px 22px;
+}
+
+.scope-foot {
+  margin-top: 16px;
+  padding-top: 10px;
+  border-top: 1px dashed var(--border);
+}
+
+/* 暗色主题下的四化/层级微调 */
+html[data-theme='mystic'] .scope-block {
+  background: rgba(201, 163, 92, 0.035);
+}
+
+html[data-theme='mystic'] .scope-mutagen.hua-禄 { background: rgba(118, 199, 162, 0.09); color: #93e4c1; }
+html[data-theme='mystic'] .scope-mutagen.hua-权 { background: rgba(162, 148, 255, 0.09); color: #c0b4ff; }
+html[data-theme='mystic'] .scope-mutagen.hua-科 { background: rgba(127, 199, 217, 0.09); color: #a6e0ec; }
+html[data-theme='mystic'] .scope-mutagen.hua-忌 { background: rgba(224, 120, 120, 0.09); color: #f2aaaa; }
+
+/* —— 工具箱 —— */
+.tools-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.tools-head h2 {
+  margin: 0;
+}
+
+.tool-nav {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+  margin-bottom: 14px;
+}
+
+.tool-nav-item {
+  text-align: left;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--panel-2);
+  color: var(--text);
+  padding: 8px 10px;
+  cursor: pointer;
+}
+
+.tool-nav-item b {
+  display: block;
+  font-size: 13.5px;
+  color: var(--accent-soft);
+  letter-spacing: 1px;
+}
+
+.tool-nav-item span {
+  display: block;
+  margin-top: 2px;
+  font-size: 10.5px;
+  color: var(--text-dim);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tool-nav-item:hover {
+  border-color: var(--accent);
+}
+
+.tool-nav-item.active {
+  border-color: var(--accent);
+  background: rgba(184, 134, 11, 0.08);
+  box-shadow: inset 0 0 0 1px rgba(184, 134, 11, 0.18);
+}
+
+.tool-pane {
+  animation: tool-in 0.28s ease both;
+}
+
+@keyframes tool-in {
+  from { opacity: 0; transform: translateY(5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.tool-intro h3 {
+  margin: 2px 0 6px;
+  font-family: var(--font-display);
+  font-size: 17px;
+  letter-spacing: 1.5px;
+  color: var(--accent-soft);
+}
+
+.tool-intro p {
+  margin: 0 0 14px;
+  font-size: 13px;
+  line-height: 1.75;
+  color: var(--text-dim);
+  text-wrap: pretty;
+}
+
+.tool-form {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.tool-form .field {
+  margin: 0;
+}
+
+.tool-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin: 12px 0;
+}
+
+.tool-actions .btn {
+  width: auto;
+  padding: 8px 16px;
+  font-size: 13.5px;
+}
+
+.tool-note {
+  margin: 14px 0 0;
+  padding-top: 10px;
+  border-top: 1px dashed var(--border);
+  font-size: 11.5px;
+  line-height: 1.65;
+  color: var(--text-dim);
+}
+
+.tool-empty {
+  padding: 28px 10px 14px;
+  text-align: center;
+}
+
+.tool-empty.slim {
+  padding: 20px 10px;
+}
+
+.tool-empty .empty-sigil {
+  width: 74px;
+  height: 74px;
+  margin-bottom: 12px;
+}
+
+.tool-empty .empty-kicker {
+  font-size: 14px;
+}
+
+.tool-balance {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 14px;
+  margin: 12px 0;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--panel-2);
+  font-size: 12px;
+  line-height: 1.7;
+  color: var(--text);
+}
+
+.tool-balance em {
+  font-style: normal;
+  margin-right: 5px;
+  font-size: 10.5px;
+  color: var(--accent);
+}
+
+.name-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 10px;
+}
+
+.name-card {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px 13px;
+  background: var(--panel-2);
+}
+
+.name-card-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.name-card-head b {
+  font-family: var(--font-display);
+  font-size: 25px;
+  letter-spacing: 3px;
+  color: var(--accent-soft);
+}
+
+.name-card-head span {
+  display: block;
+  margin-top: 2px;
+  font-size: 11.5px;
+  color: var(--text-dim);
+  letter-spacing: 1px;
+}
+
+.name-card-head > em {
+  font-style: normal;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.name-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin: 8px 0 6px;
+}
+
+.name-tags span {
+  font-size: 10.5px;
+  padding: 1px 6px;
+  border-radius: 4px;
+  background: rgba(184, 134, 11, 0.1);
+  color: var(--accent-soft);
+}
+
+.name-card p {
+  margin: 4px 0 0;
+  font-size: 12.5px;
+  line-height: 1.7;
+  color: var(--text);
+}
+
+.name-reasons {
+  color: var(--text-dim) !important;
+  font-size: 11.5px !important;
+}
+
+.date-summary {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 8px;
+  padding: 12px 14px;
+  margin: 12px 0;
+  border: 1px solid var(--accent);
+  border-radius: 10px;
+  background: rgba(184, 134, 11, 0.07);
+}
+
+.date-summary-label {
+  font-size: 11px;
+  letter-spacing: 2px;
+  color: var(--accent);
+}
+
+.date-summary b {
+  font-family: var(--font-display);
+  font-size: 22px;
+  color: var(--text);
+  letter-spacing: 1px;
+}
+
+.date-summary span {
+  font-size: 12.5px;
+  color: var(--text-dim);
+}
+
+.date-summary em {
+  margin-left: auto;
+  font-style: normal;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--ok);
+}
+
+.date-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 10px;
+}
+
+.date-card {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px;
+  background: var(--panel-2);
+}
+
+.date-card.level-上吉 { border-left: 3px solid var(--ok); }
+.date-card.level-吉 { border-left: 3px solid var(--accent); }
+.date-card.level-平 { border-left: 3px solid var(--border); }
+.date-card.level-慎 { border-left: 3px solid var(--danger); }
+
+.date-card-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.date-card-head b {
+  font-family: var(--font-display);
+  font-size: 19px;
+  color: var(--text);
+}
+
+.date-card-head span {
+  display: block;
+  margin-top: 2px;
+  font-size: 11.5px;
+  color: var(--text-dim);
+}
+
+.date-card-head em {
+  font-style: normal;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--accent-soft);
+}
+
+.date-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 10px;
+  margin: 7px 0;
+  font-size: 11px;
+  color: var(--text-dim);
+}
+
+.date-yiji p {
+  margin: 3px 0;
+  font-size: 12px;
+  line-height: 1.65;
+  color: var(--text);
+}
+
+.date-yiji em {
+  font-style: normal;
+  display: inline-block;
+  min-width: 20px;
+  margin-right: 4px;
+  color: var(--accent);
+}
+
+.date-reasons {
+  color: var(--text-dim) !important;
+  font-size: 11.2px !important;
+}
+
+.date-card .btn {
+  margin-top: 8px;
+}
+
+/* —— 合盘 —— */
+.synastry-form {
+  grid-template-columns: 1fr 1.2fr;
+}
+
+.synastry-fixed {
+  padding: 9px 11px;
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  background: var(--panel-2);
+  font-size: 13px;
+  color: var(--text);
+}
+
+.synastry-result {
+  margin-top: 14px;
+}
+
+.synastry-card {
+  border: 1px solid rgba(201, 163, 92, 0.35);
+  border-radius: 16px;
+  padding: 20px 18px 14px;
+  background:
+    radial-gradient(500px 220px at 50% -10%, rgba(201, 163, 92, 0.16), transparent 65%),
+    linear-gradient(160deg, #171b2c 0%, #0a0c15 70%);
+  color: #e7dfcc;
+  text-align: center;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+}
+
+.synastry-card-top {
+  font-size: 11px;
+  letter-spacing: 3px;
+  color: #c9a35c;
+}
+
+.synastry-names {
+  display: flex;
+  justify-content: center;
+  align-items: baseline;
+  gap: 12px;
+  margin: 8px 0 0;
+  font-family: var(--font-display);
+  font-size: 26px;
+  letter-spacing: 2px;
+  color: #f1e6cf;
+}
+
+.synastry-names em {
+  font-style: normal;
+  font-size: 16px;
+  color: #c9a35c;
+}
+
+.synastry-score {
+  font-family: var(--font-display);
+  font-size: 72px;
+  line-height: 1.05;
+  font-weight: 700;
+  color: #e8cc93;
+  text-shadow: 0 0 28px rgba(201, 163, 92, 0.28);
+}
+
+.synastry-kws {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px;
+  margin: 2px 0 8px;
+}
+
+.synastry-kws span {
+  font-size: 10.5px;
+  padding: 2px 8px;
+  border-radius: 20px;
+  background: rgba(201, 163, 92, 0.13);
+  color: #e8cc93;
+}
+
+.synastry-oneline {
+  max-width: 520px;
+  margin: 0 auto;
+  font-size: 12.5px;
+  line-height: 1.75;
+  color: rgba(231, 223, 204, 0.82);
+}
+
+.synastry-card-foot {
+  margin-top: 12px;
+  padding-top: 9px;
+  border-top: 1px solid rgba(201, 163, 92, 0.18);
+  font-size: 10.5px;
+  letter-spacing: 1px;
+  color: rgba(201, 163, 92, 0.65);
+}
+
+.synastry-sections {
+  margin-top: 14px;
+}
+
+.synastry-section {
+  padding: 12px 0;
+  border-bottom: 1px dashed var(--border);
+}
+
+.synastry-section:last-child {
+  border-bottom: 0;
+}
+
+.synastry-section h4 {
+  margin: 0 0 6px;
+  font-family: var(--font-display);
+  font-size: 14px;
+  letter-spacing: 1px;
+  color: var(--accent-soft);
+}
+
+.synastry-section p,
+.synastry-section li {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.8;
+  color: var(--text);
+  text-wrap: pretty;
+}
+
+.synastry-section ul {
+  margin: 0;
+  padding-left: 18px;
+}
+
+.synastry-section li {
+  margin-bottom: 5px;
+}
+
+.team-roadmap {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 12px 0;
+}
+
+.team-roadmap > div {
+  display: grid;
+  grid-template-columns: 32px 1fr;
+  gap: 10px;
+  align-items: start;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--panel-2);
+}
+
+.team-roadmap b {
+  font-size: 12px;
+  color: var(--accent);
+  letter-spacing: 1px;
+}
+
+.team-roadmap span {
+  font-size: 13px;
+  line-height: 1.7;
+  color: var(--text);
+}
+
+html[data-theme='mystic'] .tool-nav-item {
+  background: rgba(201, 163, 92, 0.04);
+}
+
+html[data-theme='mystic'] .tool-nav-item.active {
+  background: rgba(201, 163, 92, 0.1);
+  box-shadow: inset 0 0 0 1px rgba(201, 163, 92, 0.2), 0 0 16px rgba(201, 163, 92, 0.06);
+}
+
+html[data-theme='mystic'] .name-card,
+html[data-theme='mystic'] .date-card,
+html[data-theme='mystic'] .team-roadmap > div,
+html[data-theme='mystic'] .tool-balance,
+html[data-theme='mystic'] .synastry-fixed {
+  background: rgba(201, 163, 92, 0.035);
+}
+
+html[data-theme='mystic'] .date-summary {
+  background: rgba(201, 163, 92, 0.08);
+}
+
+@media (max-width: 760px) {
+  .tool-nav {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .synastry-form {
+    grid-template-columns: 1fr;
+  }
+
+  .synastry-names {
+    font-size: 21px;
+  }
+
+  .synastry-score {
+    font-size: 56px;
+  }
+
+  .date-list,
+  .name-list {
+    grid-template-columns: 1fr;
+  }
+}

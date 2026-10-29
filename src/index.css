@@ -1469,8 +1469,14 @@ button.syn-row:hover { background: #fdf6e3; }
 }
 
 @media (max-width: 760px) {
-  .center-tabs { flex-wrap: wrap; }
-  .current-user { justify-content: flex-start; }
+  .center-tabs {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .center-tabs::-webkit-scrollbar { display: none; }
+  .tab { flex: 0 0 auto; }
+  .current-user { display: none; }
   .user-row { grid-template-columns: 1fr; }
 }
 
@@ -1502,4 +1508,172 @@ button.syn-row:hover { background: #fdf6e3; }
   stroke-linecap: round;
   opacity: 0.78;
   vector-effect: non-scaling-stroke;
+}
+
+/* —— 页头（宣纸 / 新结构通用） —— */
+:root {
+  --font-display: 'Songti SC', 'STSong', 'Noto Serif SC', 'Source Han Serif SC', serif;
+}
+
+.app header.masthead {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 10px;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.app header.masthead .brand h1 {
+  font-family: var(--font-display);
+  font-size: 26px;
+  letter-spacing: 5px;
+  line-height: 1.1;
+  margin: 0;
+}
+
+.brand-sub {
+  display: block;
+  margin-top: 4px;
+  color: var(--text-dim);
+  font-size: 11px;
+  letter-spacing: 3px;
+}
+
+.masthead-right {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.masthead-chip {
+  font-size: 11px;
+  letter-spacing: 1px;
+  color: var(--text-dim);
+  padding: 5px 10px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: rgba(184, 134, 11, 0.04);
+}
+
+.theme-switch {
+  background: var(--panel-2);
+  color: var(--accent-soft);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 6px 14px;
+  font-size: 12px;
+  letter-spacing: 2px;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s, box-shadow 0.2s;
+}
+
+.theme-switch:hover {
+  border-color: var(--accent);
+  box-shadow: 0 0 14px rgba(184, 134, 11, 0.12);
+}
+
+.sigil {
+  width: 44px;
+  height: 44px;
+  flex: 0 0 auto;
+  color: var(--accent);
+}
+
+.sigil-ring {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1;
+  opacity: 0.55;
+}
+
+.sigil-dashed {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 0.8;
+  stroke-dasharray: 2 5;
+  opacity: 0.45;
+  transform-origin: 32px 32px;
+  animation: sigil-spin 90s linear infinite;
+}
+
+.sigil-star {
+  fill: currentColor;
+  opacity: 0.85;
+}
+
+.sigil-core {
+  fill: var(--accent);
+}
+
+.sigil-dot {
+  fill: currentColor;
+  opacity: 0.65;
+}
+
+@keyframes sigil-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* —— 空态印记 —— */
+.empty-sigil {
+  position: relative;
+  width: 88px;
+  height: 88px;
+  margin: 0 auto 18px;
+  display: grid;
+  place-items: center;
+}
+
+.empty-sigil-ring {
+  position: absolute;
+  inset: 0;
+  border: 1px solid var(--border);
+  border-radius: 50%;
+}
+
+.empty-sigil-ring::before {
+  content: '';
+  position: absolute;
+  inset: 12px;
+  border: 1px dashed var(--border);
+  border-radius: 50%;
+  animation: sigil-spin 60s linear infinite;
+}
+
+.empty-sigil-star {
+  font-size: 28px;
+  color: var(--accent);
+}
+
+.empty-kicker {
+  margin: 0 0 6px;
+  color: var(--accent-soft);
+  font-family: var(--font-display);
+  font-size: 13px;
+  letter-spacing: 4px;
+}
+
+@media (max-width: 760px) {
+  .app header.masthead {
+    flex-wrap: wrap;
+    align-items: flex-start;
+  }
+  .masthead-right {
+    width: 100%;
+    justify-content: space-between;
+  }
+  .masthead-chip {
+    display: none;
+  }
+  .app header.masthead .brand h1 {
+    font-size: 22px;
+    letter-spacing: 3px;
+  }
 }

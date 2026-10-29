@@ -108,8 +108,23 @@ export default function ChartPanel({
   const [tip, setTip] = useState<Tip | null>(null);
   const [concept, setConcept] = useState<ConceptView | null>(null);
   const [links, setLinks] = useState<{ x1: number; y1: number; x2: number; y2: number }[]>([]);
+  const [dense, setDense] = useState<boolean>(() => {
+    try {
+      return localStorage.getItem('ziwei-chart-density') === 'dense';
+    } catch {
+      return false;
+    }
+  });
   const chartInnerRef = useRef<HTMLDivElement | null>(null);
   const hoverIdxRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('ziwei-chart-density', dense ? 'dense' : 'simple');
+    } catch {
+      /* ignore */
+    }
+  }, [dense]);
 
   useEffect(() => {
     const hide = () => setTip(null);
@@ -141,13 +156,17 @@ export default function ChartPanel({
       window.clearTimeout(retry);
       window.removeEventListener('resize', onResize);
     };
-  }, [astrolabe, selectedPalace, options]);
+  }, [astrolabe, selectedPalace, options, dense]);
 
   if (!astrolabe) {
     return (
-      <div className="panel" style={{ textAlign: 'center', padding: '60px 20px' }}>
-        <div style={{ fontSize: 40, marginBottom: 12 }}>🔮</div>
-        <p style={{ color: 'var(--text-dim)' }}>填写左侧出生信息后点击「排盘」</p>
+      <div className="panel" style={{ textAlign: 'center', padding: '56px 20px' }}>
+        <div className="empty-sigil" aria-hidden="true">
+          <span className="empty-sigil-ring" />
+          <span className="empty-sigil-star">✦</span>
+        </div>
+        <p className="empty-kicker">择时 · 定盘 · 观象</p>
+        <p style={{ color: 'var(--text-dim)', fontSize: 13 }}>填写左侧出生信息后点击「排盘」</p>
       </div>
     );
   }
@@ -509,11 +528,17 @@ export default function ChartPanel({
   return (
     <>
       <div className="panel">
-        <h2>
-          命盘
-          {userLabel && <span className="dim"> · {userLabel}</span>}
-          <span className="dim">（悬停看批注，点击看档案）</span>
-        </h2>
+        <div className="chart-head">
+          <h2>
+            命盘
+            {userLabel && <span className="dim"> · {userLabel}</span>}
+            <span className="dim">（悬停看批注，点击看档案）</span>
+          </h2>
+          <div className="chart-density" role="group" aria-label="盘面详简">
+            <button className={!dense ? 'active' : ''} onClick={() => setDense(false)} title="只看主星、辅星、杂曜与宫位">简</button>
+            <button className={dense ? 'active' : ''} onClick={() => setDense(true)} title="显示长生、岁前、流曜与运限标签">详</button>
+          </div>
+        </div>
 
         <div className="chart-meta">
           <span><em>五行局</em><button className="link-btn" onClick={openFiveElements}>{astrolabe.fiveElementsClass}</button></span>
@@ -533,7 +558,7 @@ export default function ChartPanel({
           onMouseOut={handleChartOut}
           onMouseLeave={handleChartLeave}
         >
-          <div className="chart-inner" ref={chartInnerRef}>
+          <div className={`chart-inner ${dense ? 'chart-dense' : 'chart-simple'}`} ref={chartInnerRef}>
             <Iztrolabe
               birthday={input.birthday}
               birthTime={timeIndex}
@@ -552,7 +577,7 @@ export default function ChartPanel({
           </div>
         </div>
         <div className="hint" style={{ marginTop: 6 }}>
-          悬停看批注，点击星曜/宫名/干支看详情 · 排盘 iztro
+          {dense ? '详版：含长生、岁前、流曜与运限标签' : '简版：隐藏神煞与流曜，切「详」展开'} · 排盘 iztro
         </div>
       </div>
 

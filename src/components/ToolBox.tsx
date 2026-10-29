@@ -20,7 +20,7 @@ export default function ToolBox({
 }) {
   return (
     <details className="panel tool-box">
-      <summary>更多工具（流派 / AI / 万年历）</summary>
+      <summary>更多工具</summary>
       <div className="tool-stack">
         <SettingsPanel options={options} onChange={onOptionsChange} />
 

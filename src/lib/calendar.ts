@@ -14,6 +14,8 @@ export type CalendarInfo = {
   nextJieQi: string;
   dayYi: string[];
   dayJi: string[];
+  dayChong: string;
+  daySha: string;
 };
 
 export function solarToCalendar(dateStr: string): CalendarInfo {
@@ -35,6 +37,8 @@ export function solarToCalendar(dateStr: string): CalendarInfo {
     nextJieQi: next ? `${next.getName()} ${next.getSolar().toYmdHms().slice(0, 10)}` : '',
     dayYi: lunar.getDayYi(),
     dayJi: lunar.getDayJi(),
+    dayChong: lunar.getDayChongDesc(),
+    daySha: lunar.getDaySha(),
   };
 }
 

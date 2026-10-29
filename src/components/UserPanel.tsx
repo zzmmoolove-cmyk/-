@@ -105,10 +105,14 @@ export default function UserPanel({
     };
   }, [clockTime, useTrueSolar, longitude, birthday]);
 
-  const cityMatches = useMemo(
-    () => searchCities(cityQuery, province || undefined, 40),
-    [cityQuery, province],
-  );
+  const cityMatches = useMemo(() => {
+    const q = cityQuery.trim();
+    if (!q) return searchCities('', province || undefined, 40);
+    const scoped = searchCities(q, province || undefined, 40);
+    // 已选省份里找不到时退回全国搜索，避免「选了北京就搜不到杭州」
+    if (scoped.length === 0 && province) return searchCities(q, undefined, 40);
+    return scoped;
+  }, [cityQuery, province]);
   const showCityList = cityOpen && (cityQuery.trim().length > 0 || Boolean(province));
 
   const profile = (): UserProfile => ({
@@ -218,7 +222,7 @@ export default function UserPanel({
             if (e.target.value) onSelectUser(e.target.value);
           }}
         >
-          <option value="">已保存用户（{users.length}）</option>
+          <option value="">已保存用户 · {users.length}</option>
           {users.map((u) => (
             <option key={u.id} value={u.id}>
               {u.name} · {u.relation} · {u.birthday}
@@ -252,7 +256,7 @@ export default function UserPanel({
       </div>
 
       <div className="field">
-        <label>备注（可选）</label>
+        <label>备注</label>
         <input value={note} placeholder="客户来源 / 关注点" onChange={(e) => setNote(e.target.value)} />
       </div>
 
@@ -321,13 +325,13 @@ export default function UserPanel({
           </label>
           <label style={{ marginTop: 6 }}>
             <input type="checkbox" checked={fixLeap} onChange={(e) => setFixLeap(e.target.checked)} style={{ width: 'auto', marginRight: 6 }} />
-            闰月修正（前 15 天算上月）
+            闰月修正
           </label>
         </div>
       )}
 
       <div className="field">
-        <label>出生时间（24 小时制）</label>
+        <label>出生时间</label>
         <input
           type="text"
           value={clockText}
@@ -414,7 +418,7 @@ export default function UserPanel({
             </div>
           </div>
           <div style={{ marginTop: 8 }}>
-            <label>经度（可手动修正）</label>
+            <label>经度</label>
             <input
               type="number"
               step="0.01"
@@ -446,7 +450,7 @@ export default function UserPanel({
       {saveMsg && <p className="hint" style={{ color: 'var(--ok)' }}>{saveMsg}</p>}
 
       <details className="user-more">
-        <summary>更多操作（安星码 / 数据）</summary>
+        <summary>更多操作</summary>
         <div className="stack-sm">
           <div style={{ display: 'flex', gap: 8 }}>
             <input value={codeInput} placeholder="粘贴安星码" onChange={(e) => setCodeInput(e.target.value)} />

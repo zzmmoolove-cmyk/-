@@ -1,0 +1,996 @@
+/* ============================================================
+   玄夜 · Mystic theme
+   深空、星图、鎏金；默认主题，可切回「宣纸」浅色。
+   ============================================================ */
+
+html[data-theme='mystic'] {
+  --bg: #06070c;
+  --panel: #10131f;
+  --panel-2: #0c0f19;
+  --border: rgba(201, 163, 92, 0.17);
+  --text: #e7dfcc;
+  --text-dim: #948b78;
+  --accent: #c9a35c;
+  --accent-soft: #e8cc93;
+  --ok: #76c7a2;
+  --warn: #e0b15a;
+  --danger: #e07878;
+  --surface: #0b0e18;
+  --surface-hover: rgba(201, 163, 92, 0.09);
+  --chart-cell: #0c0f18;
+  --on-accent: #150f05;
+  --font-display: 'Songti SC', 'STSong', 'Noto Serif SC', 'Source Han Serif SC', serif;
+  color-scheme: dark;
+}
+
+html[data-theme='mystic'] body {
+  background:
+    radial-gradient(1100px 620px at 12% -10%, rgba(84, 68, 140, 0.3), transparent 62%),
+    radial-gradient(900px 520px at 100% 0%, rgba(160, 112, 48, 0.14), transparent 58%),
+    radial-gradient(1000px 720px at 50% 118%, rgba(26, 78, 84, 0.22), transparent 66%),
+    #06070c;
+  color: var(--text);
+}
+
+html[data-theme='mystic'] body::before {
+  content: '';
+  position: fixed;
+  inset: -20%;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.5;
+  background-image:
+    radial-gradient(1.2px 1.2px at 20% 30%, rgba(255, 246, 222, 0.85), transparent 60%),
+    radial-gradient(1px 1px at 68% 16%, rgba(232, 204, 147, 0.7), transparent 60%),
+    radial-gradient(1.4px 1.4px at 82% 62%, rgba(255, 246, 222, 0.65), transparent 60%),
+    radial-gradient(1px 1px at 38% 78%, rgba(201, 163, 92, 0.6), transparent 60%),
+    radial-gradient(1px 1px at 12% 88%, rgba(255, 246, 222, 0.5), transparent 60%),
+    radial-gradient(1.2px 1.2px at 92% 32%, rgba(232, 204, 147, 0.55), transparent 60%),
+    radial-gradient(1px 1px at 55% 48%, rgba(255, 246, 222, 0.4), transparent 60%),
+    radial-gradient(1px 1px at 30% 12%, rgba(201, 163, 92, 0.45), transparent 60%);
+  background-size:
+    260px 260px, 380px 380px, 520px 520px, 300px 300px,
+    440px 440px, 340px 340px, 620px 620px, 500px 500px;
+  animation: star-drift 160s linear infinite;
+}
+
+html[data-theme='mystic'] body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.035;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='0.7'/%3E%3C/svg%3E");
+  mix-blend-mode: soft-light;
+}
+
+html[data-theme='mystic'] #root {
+  position: relative;
+  z-index: 1;
+}
+
+@keyframes star-drift {
+  from { transform: translate3d(0, 0, 0); }
+  to { transform: translate3d(-120px, 90px, 0); }
+}
+
+@keyframes sigil-spin {
+  to { transform: rotate(360deg); }
+}
+
+html[data-theme='mystic'] ::selection {
+  background: rgba(201, 163, 92, 0.32);
+  color: #fff8e8;
+}
+
+/* —— 页头 —— */
+html[data-theme='mystic'] .masthead {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 10px 2px 16px;
+  margin-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+  position: relative;
+}
+
+html[data-theme='mystic'] .masthead::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: -3px;
+  width: 5px;
+  height: 5px;
+  transform: rotate(45deg);
+  background: var(--accent);
+  box-shadow: 0 0 12px rgba(201, 163, 92, 0.7);
+}
+
+html[data-theme='mystic'] .brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+html[data-theme='mystic'] .sigil {
+  width: 48px;
+  height: 48px;
+  flex: 0 0 auto;
+  color: var(--accent);
+  filter: drop-shadow(0 0 10px rgba(201, 163, 92, 0.25));
+}
+
+html[data-theme='mystic'] .sigil-ring {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 0.9;
+  opacity: 0.55;
+}
+
+html[data-theme='mystic'] .sigil-dashed {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 0.7;
+  stroke-dasharray: 2 5;
+  opacity: 0.45;
+  transform-origin: 32px 32px;
+  animation: sigil-spin 90s linear infinite;
+}
+
+html[data-theme='mystic'] .sigil-star {
+  fill: currentColor;
+  opacity: 0.9;
+}
+
+html[data-theme='mystic'] .sigil-core {
+  fill: #fff6dd;
+  filter: drop-shadow(0 0 6px rgba(255, 236, 190, 0.9));
+}
+
+html[data-theme='mystic'] .sigil-dot {
+  fill: currentColor;
+  opacity: 0.7;
+}
+
+html[data-theme='mystic'] .brand h1 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 29px;
+  font-weight: 700;
+  letter-spacing: 8px;
+  line-height: 1.1;
+  background: linear-gradient(180deg, #f7e7bd 0%, #c9a35c 58%, #8a6428 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 0 18px rgba(201, 163, 92, 0.18));
+}
+
+html[data-theme='mystic'] .brand-sub {
+  display: block;
+  margin-top: 5px;
+  font-size: 11px;
+  letter-spacing: 4px;
+  color: var(--text-dim);
+}
+
+html[data-theme='mystic'] .masthead-right {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+html[data-theme='mystic'] .masthead-chip {
+  font-size: 11px;
+  letter-spacing: 1.5px;
+  color: var(--text-dim);
+  padding: 5px 10px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: rgba(201, 163, 92, 0.04);
+}
+
+html[data-theme='mystic'] .theme-switch {
+  background: rgba(201, 163, 92, 0.06);
+  color: var(--accent-soft);
+  border: 1px solid rgba(201, 163, 92, 0.28);
+  border-radius: 999px;
+  padding: 6px 14px;
+  font-size: 12px;
+  letter-spacing: 2px;
+  cursor: pointer;
+  transition: background 0.2s, box-shadow 0.2s, border-color 0.2s;
+}
+
+html[data-theme='mystic'] .theme-switch:hover {
+  background: rgba(201, 163, 92, 0.13);
+  border-color: var(--accent);
+  box-shadow: 0 0 18px rgba(201, 163, 92, 0.15);
+}
+
+html[data-theme='mystic'] .disclaimer {
+  color: #857c6b;
+  background: rgba(201, 163, 92, 0.035);
+  border-left: 2px solid rgba(201, 163, 92, 0.35);
+  border-radius: 0 6px 6px 0;
+  margin-bottom: 16px;
+}
+
+/* —— 面板 —— */
+html[data-theme='mystic'] .panel {
+  background:
+    linear-gradient(162deg, rgba(23, 26, 42, 0.92) 0%, rgba(11, 13, 22, 0.94) 58%, rgba(9, 11, 18, 0.96) 100%);
+  border: 1px solid var(--border);
+  border-radius: 13px;
+  box-shadow:
+    0 20px 50px rgba(0, 0, 0, 0.42),
+    inset 0 1px 0 rgba(255, 236, 196, 0.045);
+}
+
+html[data-theme='mystic'] .panel h2 {
+  font-family: var(--font-display);
+  font-size: 16px;
+  letter-spacing: 2px;
+  color: var(--accent-soft);
+}
+
+html[data-theme='mystic'] .panel h2::before {
+  content: '✦';
+  display: inline-block;
+  margin-right: 7px;
+  font-size: 10px;
+  color: var(--accent);
+  opacity: 0.8;
+  transform: translateY(-1px);
+}
+
+html[data-theme='mystic'] .panel h2 .dim {
+  font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', sans-serif;
+  letter-spacing: 0;
+  font-size: 11.5px;
+  margin-left: 6px;
+}
+
+/* 折叠工具内部不再套一层边框 */
+html[data-theme='mystic'] .tool-stack .panel,
+html[data-theme='mystic'] .legacy-wrap > .panel {
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  border-radius: 0;
+}
+
+html[data-theme='mystic'] .tool-box {
+  background: rgba(12, 15, 24, 0.72);
+}
+
+html[data-theme='mystic'] .tool-box > summary,
+html[data-theme='mystic'] .legacy-wrap > summary {
+  color: var(--accent);
+  font-family: var(--font-display);
+  letter-spacing: 1.5px;
+}
+
+html[data-theme='mystic'] .user-more {
+  border-top-color: var(--border);
+}
+
+html[data-theme='mystic'] .user-more summary {
+  color: var(--text-dim);
+}
+
+html[data-theme='mystic'] .user-more summary:hover {
+  color: var(--accent-soft);
+}
+
+/* —— 表单 —— */
+html[data-theme='mystic'] label {
+  color: #9c927e;
+  letter-spacing: 0.5px;
+}
+
+html[data-theme='mystic'] input,
+html[data-theme='mystic'] select,
+html[data-theme='mystic'] textarea {
+  background: rgba(6, 8, 14, 0.72);
+  border: 1px solid rgba(201, 163, 92, 0.18);
+  color: var(--text);
+  border-radius: 7px;
+}
+
+html[data-theme='mystic'] input::placeholder,
+html[data-theme='mystic'] textarea::placeholder {
+  color: rgba(148, 139, 120, 0.55);
+}
+
+html[data-theme='mystic'] input:focus,
+html[data-theme='mystic'] select:focus,
+html[data-theme='mystic'] textarea:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(201, 163, 92, 0.1), 0 0 18px rgba(201, 163, 92, 0.08);
+}
+
+html[data-theme='mystic'] input[type='checkbox'] {
+  accent-color: var(--accent);
+}
+
+html[data-theme='mystic'] select option {
+  background: #0b0e18;
+  color: var(--text);
+}
+
+/* —— 按钮 —— */
+html[data-theme='mystic'] .btn {
+  background: linear-gradient(135deg, #e4c47e 0%, #c9a35c 42%, #9c732f 100%);
+  color: var(--on-accent);
+  border: 1px solid rgba(255, 228, 170, 0.25);
+  box-shadow: 0 8px 22px rgba(201, 163, 92, 0.16), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  text-shadow: 0 1px 0 rgba(255, 245, 220, 0.2);
+}
+
+html[data-theme='mystic'] .btn:hover {
+  filter: brightness(1.06);
+  box-shadow: 0 10px 30px rgba(201, 163, 92, 0.24), 0 0 24px rgba(201, 163, 92, 0.12);
+}
+
+html[data-theme='mystic'] .btn.ghost {
+  background: rgba(201, 163, 92, 0.05);
+  color: var(--accent-soft);
+  border: 1px solid rgba(201, 163, 92, 0.24);
+  box-shadow: none;
+}
+
+html[data-theme='mystic'] .btn.ghost:hover {
+  background: rgba(201, 163, 92, 0.11);
+  border-color: var(--accent);
+}
+
+html[data-theme='mystic'] .btn:disabled,
+html[data-theme='mystic'] .btn.ghost:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+/* —— 标签页 —— */
+html[data-theme='mystic'] .center-tabs {
+  background: rgba(10, 13, 21, 0.82);
+  border-color: var(--border);
+  backdrop-filter: blur(14px);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 236, 196, 0.04);
+}
+
+html[data-theme='mystic'] .tab {
+  color: var(--text-dim);
+  letter-spacing: 1px;
+}
+
+html[data-theme='mystic'] .tab:hover:not(:disabled) {
+  color: var(--accent-soft);
+  background: rgba(201, 163, 92, 0.07);
+}
+
+html[data-theme='mystic'] .tab.active {
+  background: linear-gradient(180deg, rgba(201, 163, 92, 0.18), rgba(201, 163, 92, 0.06));
+  border-color: rgba(201, 163, 92, 0.42);
+  color: #f0d9a4;
+  box-shadow: inset 0 0 18px rgba(201, 163, 92, 0.08), 0 0 16px rgba(201, 163, 92, 0.08);
+}
+
+html[data-theme='mystic'] .current-user {
+  color: var(--text-dim);
+}
+
+html[data-theme='mystic'] .current-user b {
+  color: var(--text);
+  font-family: var(--font-display);
+  letter-spacing: 1px;
+}
+
+html[data-theme='mystic'] .current-user em {
+  background: rgba(201, 163, 92, 0.12);
+  color: var(--accent-soft);
+}
+
+html[data-theme='mystic'] .current-user.saved i {
+  color: var(--ok);
+}
+
+/* —— 星盘 —— */
+html[data-theme='mystic'] .chart-meta {
+  color: var(--text);
+}
+
+html[data-theme='mystic'] .chart-meta em {
+  color: var(--text-dim);
+}
+
+html[data-theme='mystic'] .chart-meta .link-btn {
+  color: var(--accent-soft);
+}
+
+html[data-theme='mystic'] .chart-scroll {
+  background: radial-gradient(ellipse at 50% 45%, rgba(201, 163, 92, 0.04), transparent 62%);
+  border-radius: 12px;
+}
+
+html[data-theme='mystic'] .chart-scroll .iztro-astrolabe-theme-default {
+  --iztro-color-major: #eed9a5;
+  --iztro-color-focus: #e07878;
+  --iztro-color-quan: #a294ff;
+  --iztro-color-tough: #e0a07a;
+  --iztro-color-awesome: #e07878;
+  --iztro-color-active: #7fc7d9;
+  --iztro-color-happy: #d9a0c0;
+  --iztro-color-nice: #7fbfa8;
+  --iztro-color-decorator-1: #b8a06a;
+  --iztro-color-decorator-2: #c08a9a;
+  --iztro-color-text: #8f8778;
+  --iztro-color-border: rgba(201, 163, 92, 0.16);
+}
+
+html[data-theme='mystic'] .chart-scroll .iztro-palace {
+  background: linear-gradient(165deg, rgba(21, 24, 40, 0.94) 0%, rgba(9, 11, 19, 0.96) 100%);
+  border-color: rgba(201, 163, 92, 0.22);
+  box-shadow: inset 0 0 26px rgba(0, 0, 0, 0.32);
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+html[data-theme='mystic'] .chart-scroll .iztro-palace:hover {
+  border-color: rgba(201, 163, 92, 0.5);
+  box-shadow: inset 0 0 28px rgba(0, 0, 0, 0.28), 0 0 22px rgba(201, 163, 92, 0.09);
+}
+
+html[data-theme='mystic'] .chart-scroll .iztro-palace-name {
+  color: var(--accent-soft);
+  font-family: var(--font-display);
+  font-weight: 700;
+  text-shadow: 0 0 14px rgba(201, 163, 92, 0.3);
+}
+
+html[data-theme='mystic'] .chart-scroll .iztro-palace-gz {
+  color: #8fcbb8;
+}
+
+html[data-theme='mystic'] .chart-scroll .iztro-star-major {
+  color: #f2dfae;
+}
+
+html[data-theme='mystic'] .chart-scroll .iztro-star-brightness {
+  color: #b3a78f;
+  opacity: 0.65;
+}
+
+html[data-theme='mystic'] .chart-scroll .iztro-star-mutagen {
+  color: #0a0c12;
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.35);
+}
+
+html[data-theme='mystic'] .chart-scroll .iztro-center-palace {
+  background: radial-gradient(ellipse at 50% 50%, rgba(201, 163, 92, 0.055), transparent 68%);
+}
+
+html[data-theme='mystic'] .chart-scroll .iztro-center-palace .center-title {
+  color: var(--accent-soft);
+  font-family: var(--font-display);
+  letter-spacing: 1px;
+}
+
+html[data-theme='mystic'] .chart-scroll .iztro-palace-center-item {
+  color: var(--text);
+}
+
+html[data-theme='mystic'] .palace-link line {
+  stroke: #d8b46a;
+  filter: drop-shadow(0 0 5px rgba(201, 163, 92, 0.5));
+}
+
+/* —— 十二宫卡片 —— */
+html[data-theme='mystic'] .palace-card {
+  background: linear-gradient(165deg, rgba(21, 24, 39, 0.92), rgba(9, 11, 19, 0.94));
+  border-color: rgba(201, 163, 92, 0.14);
+}
+
+html[data-theme='mystic'] .palace-card:hover {
+  border-color: rgba(201, 163, 92, 0.42);
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.35), 0 0 20px rgba(201, 163, 92, 0.07);
+}
+
+html[data-theme='mystic'] .palace-card.active {
+  border-color: var(--accent);
+  box-shadow: inset 0 0 0 1px rgba(201, 163, 92, 0.45), 0 0 24px rgba(201, 163, 92, 0.14);
+}
+
+html[data-theme='mystic'] .star-tag.minor {
+  background: rgba(201, 163, 92, 0.07);
+  color: #a89c85;
+}
+
+html[data-theme='mystic'] .star-tag.clickable:hover {
+  background: var(--accent);
+  color: var(--on-accent);
+}
+
+html[data-theme='mystic'] .badge {
+  background: rgba(201, 163, 92, 0.08);
+  color: var(--text-dim);
+}
+
+html[data-theme='mystic'] .badge-body {
+  background: rgba(201, 163, 92, 0.18);
+  color: var(--accent-soft);
+}
+
+/* —— 运限配色（深色下提亮） —— */
+html[data-theme='mystic'] .layer-decadal { color: #f0b35e; background: rgba(240, 179, 94, 0.12); }
+html[data-theme='mystic'] .layer-yearly { color: #7fd6a4; background: rgba(127, 214, 164, 0.12); }
+html[data-theme='mystic'] .layer-monthly { color: #8fb7ff; background: rgba(143, 183, 255, 0.12); }
+html[data-theme='mystic'] .layer-daily { color: #c3a6ff; background: rgba(195, 166, 255, 0.12); }
+html[data-theme='mystic'] .layer-age { color: #7fd0e0; background: rgba(127, 208, 224, 0.12); }
+html[data-theme='mystic'] .layer-hourly { color: #f2a3c0; background: rgba(242, 163, 192, 0.12); }
+
+html[data-theme='mystic'] .mutagen.layer-decadal { color: #f0b35e; }
+html[data-theme='mystic'] .mutagen.layer-yearly { color: #7fd6a4; }
+html[data-theme='mystic'] .mutagen.layer-monthly { color: #8fb7ff; }
+html[data-theme='mystic'] .mutagen.layer-daily { color: #c3a6ff; }
+
+html[data-theme='mystic'] .dot.layer-decadal { background: #f0b35e; }
+html[data-theme='mystic'] .dot.layer-yearly { background: #7fd6a4; }
+html[data-theme='mystic'] .dot.layer-monthly { background: #8fb7ff; }
+html[data-theme='mystic'] .dot.layer-daily { background: #c3a6ff; }
+
+/* —— 运限导航 / chips —— */
+html[data-theme='mystic'] .chip {
+  background: rgba(201, 163, 92, 0.05);
+  border-color: rgba(201, 163, 92, 0.18);
+  color: var(--text);
+}
+
+html[data-theme='mystic'] .chip:hover {
+  border-color: var(--accent);
+  background: rgba(201, 163, 92, 0.1);
+}
+
+html[data-theme='mystic'] .chip.active {
+  background: linear-gradient(135deg, #e0bf78, #b1863c);
+  color: var(--on-accent);
+  border-color: rgba(255, 228, 170, 0.4);
+  box-shadow: 0 0 16px rgba(201, 163, 92, 0.16);
+}
+
+html[data-theme='mystic'] .chip-yearly.active { background: #2f7a55; color: #eafff2; }
+html[data-theme='mystic'] .chip-monthly.active { background: #2f5f9e; color: #eef5ff; }
+html[data-theme='mystic'] .chip-daily.active { background: #5a3f9e; color: #f5efff; }
+
+html[data-theme='mystic'] .scope-nav-title {
+  color: var(--accent-soft);
+  font-family: var(--font-display);
+  letter-spacing: 1.5px;
+}
+
+/* —— 宫位卡 / 解读 —— */
+html[data-theme='mystic'] .report-panel {
+  border-top-color: var(--accent);
+}
+
+html[data-theme='mystic'] .report-head h2 {
+  font-family: var(--font-display);
+  letter-spacing: 2px;
+}
+
+html[data-theme='mystic'] .score-pill.plus {
+  background: rgba(118, 199, 162, 0.12);
+  color: var(--ok);
+}
+
+html[data-theme='mystic'] .score-pill.minus {
+  background: rgba(224, 120, 120, 0.12);
+  color: var(--danger);
+}
+
+html[data-theme='mystic'] .index-cell {
+  background: rgba(201, 163, 92, 0.035);
+  border-color: rgba(201, 163, 92, 0.12);
+}
+
+html[data-theme='mystic'] .index-cell:hover {
+  background: rgba(201, 163, 92, 0.08);
+  border-color: rgba(201, 163, 92, 0.4);
+}
+
+html[data-theme='mystic'] .index-cell.active {
+  background: rgba(201, 163, 92, 0.12);
+  border-color: var(--accent);
+  box-shadow: inset 0 0 0 1px rgba(201, 163, 92, 0.45), 0 0 12px rgba(201, 163, 92, 0.08);
+}
+
+html[data-theme='mystic'] .index-cell.active .idx-name {
+  color: var(--accent-soft);
+}
+
+html[data-theme='mystic'] .star-row {
+  background: rgba(201, 163, 92, 0.03);
+  border-color: rgba(201, 163, 92, 0.12);
+}
+
+html[data-theme='mystic'] .star-row.kind-辅星 {
+  border-left-color: #9a8fb5;
+}
+
+html[data-theme='mystic'] .star-row.kind-杂曜 {
+  border-left-color: #6f6859;
+}
+
+html[data-theme='mystic'] .section-title {
+  font-family: var(--font-display);
+  color: var(--accent-soft);
+  border-left-color: var(--accent);
+  letter-spacing: 1.5px;
+}
+
+html[data-theme='mystic'] .combo-row,
+html[data-theme='mystic'] .proj-row,
+html[data-theme='mystic'] .syn-item,
+html[data-theme='mystic'] .syn-row,
+html[data-theme='mystic'] .surround-card,
+html[data-theme='mystic'] .chain-list li,
+html[data-theme='mystic'] .star-row,
+html[data-theme='mystic'] .rel-card,
+html[data-theme='mystic'] .pattern-card,
+html[data-theme='mystic'] .four-transform,
+html[data-theme='mystic'] .sihua-cell,
+html[data-theme='mystic'] .summary-text,
+html[data-theme='mystic'] .basic-grid > div,
+html[data-theme='mystic'] .star-block {
+  background: rgba(201, 163, 92, 0.035);
+  border-color: rgba(201, 163, 92, 0.13);
+}
+
+html[data-theme='mystic'] .combo-row.present,
+html[data-theme='mystic'] .proj-row.active,
+html[data-theme='mystic'] button.syn-row:hover {
+  background: rgba(201, 163, 92, 0.1);
+}
+
+html[data-theme='mystic'] .proj-row.active {
+  box-shadow: inset 0 0 0 1px rgba(201, 163, 92, 0.45);
+}
+
+html[data-theme='mystic'] .star-name-btn,
+html[data-theme='mystic'] .star-link {
+  color: var(--accent-soft);
+  border-bottom-color: rgba(201, 163, 92, 0.4);
+}
+
+html[data-theme='mystic'] .star-name-btn:hover,
+html[data-theme='mystic'] .star-link:hover {
+  color: var(--accent);
+}
+
+html[data-theme='mystic'] .syn-rel {
+  background: rgba(148, 139, 120, 0.1);
+  color: var(--text-dim);
+}
+
+html[data-theme='mystic'] .syn-rel.rel-我生 {
+  background: rgba(143, 183, 255, 0.12);
+  color: #8fb7ff;
+}
+
+html[data-theme='mystic'] .combo-with em {
+  color: var(--on-accent);
+}
+
+html[data-theme='mystic'] .ai-result {
+  background: rgba(201, 163, 92, 0.05);
+  border-color: rgba(201, 163, 92, 0.15);
+}
+
+/* —— 弹层 —— */
+html[data-theme='mystic'] .modal-backdrop {
+  background: rgba(2, 3, 7, 0.72);
+  backdrop-filter: blur(9px);
+}
+
+html[data-theme='mystic'] .modal {
+  background: linear-gradient(165deg, #151829 0%, #0a0c15 100%);
+  border-color: rgba(201, 163, 92, 0.22);
+  box-shadow: 0 40px 100px rgba(0, 0, 0, 0.65), 0 0 0 1px rgba(201, 163, 92, 0.06);
+}
+
+html[data-theme='mystic'] .modal-head {
+  background: linear-gradient(180deg, rgba(201, 163, 92, 0.09), rgba(10, 12, 21, 0.2));
+  border-bottom-color: rgba(201, 163, 92, 0.18);
+}
+
+html[data-theme='mystic'] .modal-head h2 {
+  font-family: var(--font-display);
+  color: var(--accent-soft);
+  letter-spacing: 2px;
+}
+
+html[data-theme='mystic'] .modal-head h2::before {
+  content: '✦';
+  margin-right: 8px;
+  font-size: 12px;
+  color: var(--accent);
+}
+
+html[data-theme='mystic'] .modal-close {
+  color: var(--text-dim);
+  border-color: rgba(201, 163, 92, 0.2);
+}
+
+html[data-theme='mystic'] .modal-close:hover {
+  color: var(--danger);
+  border-color: var(--danger);
+}
+
+html[data-theme='mystic'] .essence {
+  background: rgba(201, 163, 92, 0.06);
+  border-left-color: var(--accent);
+}
+
+html[data-theme='mystic'] .kw {
+  background: rgba(201, 163, 92, 0.1);
+  color: var(--accent-soft);
+}
+
+html[data-theme='mystic'] .motto {
+  background: rgba(201, 163, 92, 0.06);
+  color: var(--accent-soft);
+}
+
+/* —— 城市下拉 / 工具提示 —— */
+html[data-theme='mystic'] .city-pop {
+  background: #0d101b;
+  border-color: rgba(201, 163, 92, 0.24);
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.6);
+}
+
+html[data-theme='mystic'] .city-option {
+  color: var(--text);
+  border-bottom-color: rgba(201, 163, 92, 0.1);
+}
+
+html[data-theme='mystic'] .city-option:hover {
+  background: rgba(201, 163, 92, 0.1);
+}
+
+html[data-theme='mystic'] .city-option span {
+  color: var(--text-dim);
+}
+
+html[data-theme='mystic'] .city-empty {
+  color: var(--text-dim);
+}
+
+html[data-theme='mystic'] .chart-tip {
+  background: #0a0c14;
+  border: 1px solid rgba(201, 163, 92, 0.25);
+  color: var(--text);
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.65), 0 0 24px rgba(201, 163, 92, 0.06);
+}
+
+html[data-theme='mystic'] .chart-tip::after {
+  border-top-color: #0a0c14;
+  border-bottom-color: #0a0c14;
+}
+
+html[data-theme='mystic'] .chart-tip-head b {
+  color: var(--accent-soft);
+  font-family: var(--font-display);
+}
+
+html[data-theme='mystic'] .chart-tip p {
+  color: #d9d0bd;
+}
+
+/* —— 空态 —— */
+html[data-theme='mystic'] .empty-sigil {
+  position: relative;
+  width: 96px;
+  height: 96px;
+  margin: 0 auto 20px;
+  display: grid;
+  place-items: center;
+}
+
+html[data-theme='mystic'] .empty-sigil-ring,
+html[data-theme='mystic'] .empty-sigil-ring::before {
+  position: absolute;
+  border-radius: 50%;
+  border: 1px solid rgba(201, 163, 92, 0.3);
+}
+
+html[data-theme='mystic'] .empty-sigil-ring {
+  inset: 0;
+}
+
+html[data-theme='mystic'] .empty-sigil-ring::before {
+  content: '';
+  inset: 12px;
+  border-style: dashed;
+  border-color: rgba(201, 163, 92, 0.22);
+  animation: sigil-spin 50s linear infinite;
+}
+
+html[data-theme='mystic'] .empty-sigil-star {
+  font-size: 30px;
+  color: var(--accent);
+  text-shadow: 0 0 24px rgba(201, 163, 92, 0.65);
+}
+
+html[data-theme='mystic'] .empty-state,
+html[data-theme='mystic'] .panel > p[style*='text-align: center'] {
+  color: var(--text-dim);
+}
+
+/* —— 滚动条 —— */
+html[data-theme='mystic'] ::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+html[data-theme='mystic'] ::-webkit-scrollbar-track {
+  background: #070910;
+}
+
+html[data-theme='mystic'] ::-webkit-scrollbar-thumb {
+  background: rgba(201, 163, 92, 0.22);
+  border-radius: 8px;
+  border: 2px solid #070910;
+}
+
+html[data-theme='mystic'] ::-webkit-scrollbar-thumb:hover {
+  background: rgba(201, 163, 92, 0.4);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html[data-theme='mystic'] body::before,
+  html[data-theme='mystic'] .sigil-dashed,
+  html[data-theme='mystic'] .empty-sigil-ring::before {
+    animation: none;
+  }
+}
+
+@media (max-width: 760px) {
+  html[data-theme='mystic'] .masthead {
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+  html[data-theme='mystic'] .masthead-right {
+    width: 100%;
+    justify-content: space-between;
+  }
+  html[data-theme='mystic'] .brand h1 {
+    font-size: 24px;
+    letter-spacing: 5px;
+  }
+  html[data-theme='mystic'] .masthead-chip {
+    display: none;
+  }
+}
+
+/* —— 四化小印：深色底 + 发光字，避免浅色药丸在暗盘上发白 —— */
+html[data-theme='mystic'] .chart-scroll .iztro-star-mutagen {
+  background: rgba(8, 10, 17, 0.55);
+  color: #e8cc93;
+  box-shadow: inset 0 0 0 1px rgba(201, 163, 92, 0.32), 0 0 8px rgba(0, 0, 0, 0.25);
+  border-radius: 3px;
+  padding: 0 3px;
+  font-weight: 700;
+  text-shadow: 0 0 8px currentColor;
+}
+
+html[data-theme='mystic'] .chart-scroll .iztro-star-mutagen.mutagen-0 {
+  background: rgba(118, 199, 162, 0.12);
+  color: #93e4c1;
+  box-shadow: inset 0 0 0 1px rgba(118, 199, 162, 0.38), 0 0 8px rgba(118, 199, 162, 0.12);
+}
+
+html[data-theme='mystic'] .chart-scroll .iztro-star-mutagen.mutagen-1 {
+  background: rgba(162, 148, 255, 0.12);
+  color: #c0b4ff;
+  box-shadow: inset 0 0 0 1px rgba(162, 148, 255, 0.38), 0 0 8px rgba(162, 148, 255, 0.12);
+}
+
+html[data-theme='mystic'] .chart-scroll .iztro-star-mutagen.mutagen-2 {
+  background: rgba(127, 199, 217, 0.12);
+  color: #a6e0ec;
+  box-shadow: inset 0 0 0 1px rgba(127, 199, 217, 0.38), 0 0 8px rgba(127, 199, 217, 0.12);
+}
+
+html[data-theme='mystic'] .chart-scroll .iztro-star-mutagen.mutagen-3 {
+  background: rgba(224, 120, 120, 0.12);
+  color: #f2aaaa;
+  box-shadow: inset 0 0 0 1px rgba(224, 120, 120, 0.38), 0 0 8px rgba(224, 120, 120, 0.12);
+}
+
+/* —— 面板顶部金线 / 切换淡入 —— */
+html[data-theme='mystic'] .left > .panel,
+html[data-theme='mystic'] .center > .panel,
+html[data-theme='mystic'] .right > .panel {
+  position: relative;
+}
+
+html[data-theme='mystic'] .left > .panel::before,
+html[data-theme='mystic'] .center > .panel::before,
+html[data-theme='mystic'] .right > .panel::before {
+  content: '';
+  position: absolute;
+  top: -1px;
+  left: 16px;
+  right: 42%;
+  height: 1px;
+  background: linear-gradient(90deg, rgba(201, 163, 92, 0.55), rgba(201, 163, 92, 0));
+  pointer-events: none;
+}
+
+html[data-theme='mystic'] .center > .panel,
+html[data-theme='mystic'] .center > .legacy-wrap {
+  animation: mystic-in 0.32s ease both;
+}
+
+@keyframes mystic-in {
+  from { opacity: 0; transform: translateY(7px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+html[data-theme='mystic'] .chart-scroll .iztro-palace-footer {
+  border-top: 1px solid rgba(201, 163, 92, 0.08);
+  padding-top: 4px;
+}
+
+html[data-theme='mystic'] .disclaimer {
+  color: #968c78;
+}
+
+/* —— 运限小标签：暗底彩字，避免白字压在浅金底上 —— */
+html[data-theme='mystic'] .chart-scroll .iztro-palace-fate span {
+  color: #d8c49a;
+  background: rgba(201, 163, 92, 0.07);
+  box-shadow: inset 0 0 0 1px rgba(201, 163, 92, 0.16);
+}
+
+html[data-theme='mystic'] .chart-scroll .iztro-palace-fate .iztro-palace-decadal-active {
+  color: #f0b35e;
+  background: rgba(240, 179, 94, 0.14);
+  box-shadow: inset 0 0 0 1px rgba(240, 179, 94, 0.3);
+}
+
+html[data-theme='mystic'] .chart-scroll .iztro-palace-fate .iztro-palace-yearly-active {
+  color: #7fd6a4;
+  background: rgba(127, 214, 164, 0.13);
+  box-shadow: inset 0 0 0 1px rgba(127, 214, 164, 0.28);
+}
+
+html[data-theme='mystic'] .chart-scroll .iztro-palace-fate .iztro-palace-monthly-active {
+  color: #8fb7ff;
+  background: rgba(143, 183, 255, 0.13);
+  box-shadow: inset 0 0 0 1px rgba(143, 183, 255, 0.28);
+}
+
+html[data-theme='mystic'] .chart-scroll .iztro-palace-fate .iztro-palace-daily-active {
+  color: #c3a6ff;
+  background: rgba(195, 166, 255, 0.13);
+  box-shadow: inset 0 0 0 1px rgba(195, 166, 255, 0.28);
+}
+
+html[data-theme='mystic'] .chart-scroll .iztro-palace-fate .iztro-palace-hourly-active {
+  color: #f2a3c0;
+  background: rgba(242, 163, 192, 0.13);
+  box-shadow: inset 0 0 0 1px rgba(242, 163, 192, 0.28);
+}
+
+html[data-theme='mystic'] .chart-scroll .iztro-palace-name-taichi {
+  color: #f0d9a4;
+  background: rgba(201, 163, 92, 0.18);
+}
+
+html[data-theme='mystic'] .chart-scroll .iztro-star-lucun {
+  color: #f0cf8a;
+}

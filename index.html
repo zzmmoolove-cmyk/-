@@ -1,9 +1,17 @@
 <!doctype html>
-<html lang="zh-CN">
+<html lang="zh-CN" data-theme="mystic">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>紫微斗数 · AI 查盘</title>
+    <title>紫微斗数 · 观星</title>
+    <script>
+      try {
+        var __t = localStorage.getItem('ziwei-theme');
+        document.documentElement.dataset.theme = __t === 'paper' ? 'paper' : 'mystic';
+      } catch (e) {
+        document.documentElement.dataset.theme = 'mystic';
+      }
+    </script>
   </head>
   <body>
     <div id="root"></div>

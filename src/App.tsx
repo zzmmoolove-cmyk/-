@@ -15,6 +15,8 @@ import ChartPanel from './components/ChartPanel';
 import PalaceDetail from './components/PalaceDetail';
 import SummaryPanel from './components/SummaryPanel';
 import PalaceReportPanel from './components/PalaceReportPanel';
+import ScopeReportPanel from './components/ScopeReportPanel';
+import ToolsPanel from './components/ToolsPanel';
 import StarProfilePanel from './components/StarProfilePanel';
 import ScopeNav from './components/ScopeNav';
 import { AI_PROVIDERS, type AiConfig, type AiProvider } from './lib/ai';
@@ -29,6 +31,7 @@ import {
 import { getRelations, type Relations } from './lib/relations';
 import { computeTimeIndex } from './lib/truesolar';
 import { FLOW_PROFILES, PROFILE_STATS, STAR_PROFILES } from './lib/knowledge/starProfiles';
+import Sigil from './components/Sigil';
 
 const DEFAULT_INPUT: BirthInput = {
   birthday: '1990-06-15',
@@ -177,9 +180,25 @@ export default function App() {
   const [activeUserId, setActiveUserId] = useState<string | null>(null);
   const [currentProfile, setCurrentProfile] = useState<UserProfile>({ name: '', relation: '本人', note: '' });
   const [dirty, setDirty] = useState(false);
-  const [tab, setTab] = useState<'chart' | 'card' | 'summary'>('chart');
+  const [tab, setTab] = useState<'chart' | 'card' | 'scope' | 'summary' | 'tools'>('chart');
   const [saveMsg, setSaveMsg] = useState<string | null>(null);
   const [starFocus, setStarFocus] = useState<{ name: string; palace?: string } | null>(null);
+  const [theme, setTheme] = useState<'mystic' | 'paper'>(() => {
+    try {
+      return localStorage.getItem('ziwei-theme') === 'paper' ? 'paper' : 'mystic';
+    } catch {
+      return 'mystic';
+    }
+  });
+
+  useEffect(() => {
+    document.documentElement.dataset.theme = theme;
+    try {
+      localStorage.setItem('ziwei-theme', theme);
+    } catch {
+      /* ignore */
+    }
+  }, [theme]);
 
   useEffect(() => {
     try {
@@ -382,9 +401,24 @@ export default function App() {
 
   return (
     <div className="app">
-      <header>
-        <h1>紫微斗数 · AI 查盘</h1>
-        <span className="sub">用户 · 命盘 · 宫位卡 · 运限</span>
+      <header className="masthead">
+        <div className="brand">
+          <Sigil />
+          <div>
+            <h1>紫微斗数</h1>
+            <span className="brand-sub">观星 · 察象 · 知机</span>
+          </div>
+        </div>
+        <div className="masthead-right">
+          <span className="masthead-chip">本地知识库 · AI 辅助</span>
+          <button
+            className="theme-switch"
+            onClick={() => setTheme(theme === 'mystic' ? 'paper' : 'mystic')}
+            title={theme === 'mystic' ? '切换到宣纸浅色' : '切换到玄夜深色'}
+          >
+            {theme === 'mystic' ? '宣纸' : '玄夜'}
+          </button>
+        </div>
       </header>
       <p className="disclaimer">
         本工具基于开源排盘引擎 iztro（MIT）与自建知识库。解读内容仅供传统文化研究与娱乐参考，不构成医疗、法律、投资等任何专业建议。
@@ -433,11 +467,24 @@ export default function App() {
               宫位卡 · {paletteLabel}
             </button>
             <button
+              className={`tab ${tab === 'scope' ? 'active' : ''}`}
+              disabled={!astrolabe || !raw}
+              onClick={() => setTab('scope')}
+            >
+              运限
+            </button>
+            <button
               className={`tab ${tab === 'summary' ? 'active' : ''}`}
               disabled={!astrolabe}
               onClick={() => setTab('summary')}
             >
               综述
+            </button>
+            <button
+              className={`tab ${tab === 'tools' ? 'active' : ''}`}
+              onClick={() => setTab('tools')}
+            >
+              工具
             </button>
             <span className={`current-user ${activeUserId && !dirty ? 'saved' : ''}`}>
               <b>{currentProfile.name || '未命名'}</b>
@@ -489,12 +536,36 @@ export default function App() {
               <div className="panel empty-state">先排盘，再看宫位卡。</div>
             ))}
 
+          {tab === 'scope' &&
+            (astrolabe && raw ? (
+              <ScopeReportPanel
+                astrolabe={astrolabe}
+                raw={raw}
+                active={activeLayers}
+                userLabel={currentProfile.name ? `${currentProfile.name} · ${currentProfile.relation}` : ''}
+                onSelectPalace={setSelectedPalace}
+              />
+            ) : (
+              <div className="panel empty-state">先排盘，再看运限。</div>
+            ))}
+
           {tab === 'summary' &&
             (astrolabe ? (
               <SummaryPanel astrolabe={astrolabe} aiConfig={hasKey ? aiConfig : null} />
             ) : (
               <div className="panel empty-state">先排盘，再看综述。</div>
             ))}
+
+          {tab === 'tools' && (
+            <ToolsPanel
+              astrolabe={astrolabe}
+              users={users}
+              activeUserId={activeUserId}
+              userName={currentProfile.name}
+              userLabel={currentProfile.name ? `${currentProfile.name} · ${currentProfile.relation}` : ''}
+              options={options}
+            />
+          )}
         </div>
 
         {/* 右列：运限点选导航 */}

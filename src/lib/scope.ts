@@ -37,6 +37,12 @@ export type ScopeData = {
   highlightPalace?: string;
   /** 小限虚岁（仅小限层级） */
   nominalAge?: number;
+  /** 该层运限命宫落在本命盘的宫位 index */
+  scopePalaceIndex?: number;
+  /** 该层运限命宫落在本命盘的宫位名 */
+  scopePalaceName?: string;
+  /** 本命宫位名 → 该层运限宫位名（如本命命宫 → 流年财帛） */
+  flowPalaceByBase: Record<string, string>;
 };
 
 const MUTAGEN_ORDER = ['禄', '权', '科', '忌'];
@@ -45,21 +51,32 @@ function extractItem(
   item: Record<string, unknown>,
   scope: ScopeKey,
   label: string,
+  basePalaces: Palace[],
   extra: { highlightPalace?: string; nominalAge?: number } = {},
 ): ScopeData {
   const palaceNames = (item?.palaceNames as string[]) ?? [];
   const stars = (item?.stars as Record<string, unknown>[][]) ?? [];
   const mutagen = (item?.mutagen as string[]) ?? [];
+  const scopeIndex = Number(item?.index);
 
   const mutagenMap = mutagen.map((star, i) => ({ star, mutagen: MUTAGEN_ORDER[i] ?? '禄' }));
 
+  // 注意：palaceNames[i] 是该层「运限宫位名」，stars[i] 落在本命第 i 宫。
+  // 因此这里按本命宫位名归档，供盘面/卡片按本命宫名读取流耀。
   const palaces: Record<string, ScopeStar[]> = {};
-  palaceNames.forEach((name, i) => {
-    palaces[name] = (stars[i] ?? []).map((s) => ({
+  const flowPalaceByBase: Record<string, string> = {};
+  basePalaces.forEach((p, i) => {
+    palaces[p.name] = (stars[i] ?? []).map((s) => ({
       name: String(s.name ?? ''),
       type: String(s.type ?? ''),
     }));
+    flowPalaceByBase[p.name] = palaceNames[i] ?? '';
   });
+
+  const scopePalaceName =
+    Number.isFinite(scopeIndex) && scopeIndex >= 0 && scopeIndex < basePalaces.length
+      ? basePalaces[scopeIndex].name
+      : undefined;
 
   return {
     scope,
@@ -70,6 +87,9 @@ function extractItem(
     palaces,
     highlightPalace: extra.highlightPalace,
     nominalAge: extra.nominalAge,
+    scopePalaceIndex: Number.isFinite(scopeIndex) ? scopeIndex : undefined,
+    scopePalaceName,
+    flowPalaceByBase,
   };
 }
 
@@ -125,6 +145,7 @@ export function getScopeData(
       earthlyBranch: '',
       mutagenMap: getBaseMutagenMap(raw.palaces),
       palaces: {},
+      flowPalaceByBase: {},
     };
   }
 
@@ -134,21 +155,29 @@ export function getScopeData(
     const item = list[idx] ?? list[0];
     const d = item as { palaceName?: string; ageRange?: [number, number]; heavenlyStem?: string; earthlyBranch?: string };
     const label = `大限 ${d.palaceName ?? ''} ${d.ageRange?.[0] ?? ''}–${d.ageRange?.[1] ?? ''}岁 ${d.heavenlyStem ?? ''}${d.earthlyBranch ?? ''}`;
-    return extractItem(item, scope, label);
+    return extractItem(item, scope, label, raw.palaces);
   }
 
   const h = raw.horoscope(opts.targetDate, opts.targetTimeIndex);
   const item = h[scope] as Record<string, unknown> | undefined;
   if (!item) {
-    return { scope, label: SCOPE_LABELS[scope], heavenlyStem: '', earthlyBranch: '', mutagenMap: [], palaces: {} };
+    return {
+      scope,
+      label: SCOPE_LABELS[scope],
+      heavenlyStem: '',
+      earthlyBranch: '',
+      mutagenMap: [],
+      palaces: {},
+      flowPalaceByBase: {},
+    };
   }
   if (scope === 'age') {
     const agePalace = (h as { agePalace?: () => { name?: string } }).agePalace?.();
     const nominalAge = (item as { nominalAge?: number }).nominalAge;
     const label = `小限 ${nominalAge ?? ''}岁 · ${agePalace?.name ?? ''}`;
-    return extractItem(item, scope, label, { highlightPalace: agePalace?.name, nominalAge });
+    return extractItem(item, scope, label, raw.palaces, { highlightPalace: agePalace?.name, nominalAge });
   }
-  return extractItem(item, scope, SCOPE_LABELS[scope]);
+  return extractItem(item, scope, SCOPE_LABELS[scope], raw.palaces);
 }
 
 // —— 多层叠加（大限 + 流年 + 流月 + 流日 同时显示） ——

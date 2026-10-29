@@ -9,7 +9,7 @@ export default function SettingsPanel({
 }) {
   return (
     <div className="panel" style={{ marginTop: 16 }}>
-      <h2>排盘设置（流派）</h2>
+      <h2>排盘流派</h2>
 
       <div className="field">
         <label>安星算法</label>
@@ -29,8 +29,8 @@ export default function SettingsPanel({
             value={options.yearDivide}
             onChange={(e) => onChange({ ...options, yearDivide: e.target.value as ChartOptions['yearDivide'] })}
           >
-            <option value="normal">立春分界</option>
-            <option value="exact">精确分界</option>
+            <option value="normal">正月初一（默认）</option>
+            <option value="exact">立春分界</option>
           </select>
         </div>
         <div className="field">
@@ -39,8 +39,8 @@ export default function SettingsPanel({
             value={options.horoscopeDivide}
             onChange={(e) => onChange({ ...options, horoscopeDivide: e.target.value as ChartOptions['horoscopeDivide'] })}
           >
-            <option value="normal">常规</option>
-            <option value="exact">精确</option>
+            <option value="normal">正月初一（默认）</option>
+            <option value="exact">立春分界</option>
           </select>
         </div>
       </div>
@@ -69,7 +69,7 @@ export default function SettingsPanel({
       </div>
 
       <p className="hint">
-        中州派算法为 iztro 内置；四化/庙旺流派表可后续按权威资料扩充。
+        年份/大限分界：normal = 正月初一，exact = 立春；中州派算法为 iztro 内置。
       </p>
     </div>
   );
