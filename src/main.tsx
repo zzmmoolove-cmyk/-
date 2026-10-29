@@ -5,6 +5,7 @@ import './index.css';
 import './theme-mystic.css';
 import './readability.css';
 import './features.css';
+import './shell.css';
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>

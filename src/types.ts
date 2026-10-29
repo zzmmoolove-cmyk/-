@@ -93,6 +93,23 @@ export type UserRecord = {
   payload: BirthInput & ChartOptions;
 };
 
+export type ReadingRecord = {
+  id: string;
+  clientId: string;
+  clientName: string;
+  createdAt: string;
+  rangeLabel: string;
+  view: 'chart' | 'card' | 'summary';
+  palace: string;
+  layers: {
+    decadal: number | null;
+    yearly: number | null;
+    monthly: number | null;
+    daily: string | null;
+  };
+  summary: string;
+};
+
 export type UserSummary = {
   id: string;
   name: string;

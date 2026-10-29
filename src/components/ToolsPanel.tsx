@@ -33,10 +33,6 @@ export default function ToolsPanel({
 
   return (
     <div className="panel tools-panel">
-      <div className="tools-head">
-        <h2>工具箱 <span className="dim">从命盘到可交付物</span></h2>
-      </div>
-
       <div className="tool-nav">
         {TOOLS.map((t) => (
           <button

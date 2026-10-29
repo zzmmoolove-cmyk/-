@@ -1,0 +1,97 @@
+import type { ReadingRecord, UserRecord } from '../types';
+import { encodeChart } from '../lib/chartcode';
+
+async function copyText(text: string) {
+  try {
+    await navigator.clipboard.writeText(text);
+  } catch {
+    /* ignore */
+  }
+}
+
+export default function ClientProfileSheet({
+  user,
+  readings,
+  onClose,
+  onOpenChart,
+  onEdit,
+  onNewService,
+  onOpenReading,
+  onDelete,
+}: {
+  user: UserRecord;
+  readings: ReadingRecord[];
+  onClose: () => void;
+  onOpenChart: () => void;
+  onEdit: () => void;
+  onNewService: () => void;
+  onOpenReading: (r: ReadingRecord) => void;
+  onDelete: () => void;
+}) {
+  const mine = readings.filter((r) => r.clientId === user.id);
+
+  return (
+    <div className="modal-backdrop" onClick={onClose}>
+      <div className="client-sheet" onClick={(e) => e.stopPropagation()}>
+        <div className="client-sheet-head">
+          <div>
+            <div className="inspector-eyebrow">客户档案</div>
+            <h2>{user.name} <span>{user.relation}</span></h2>
+            <p>{user.payload.birthday} {user.payload.clockTime} · {user.payload.gender} · {user.payload.useTrueSolar ? '真太阳时' : '北京时间'}</p>
+          </div>
+          <button className="sheet-close" onClick={onClose} aria-label="关闭">×</button>
+        </div>
+
+        <div className="client-sheet-body">
+          <div className="sheet-rows">
+            <div><span>出生</span><b>{user.payload.birthday} {user.payload.clockTime}</b></div>
+            <div><span>历法</span><b>{user.payload.birthdayType === 'lunar' ? '农历' : '公历'}</b></div>
+            <div><span>经度</span><b>{user.payload.longitude}°E</b></div>
+            <div><span>备注</span><b>{user.note || '—'}</b></div>
+          </div>
+
+          <div className="sheet-section">
+            <div className="sheet-section-head">
+              <h3>解盘记录</h3>
+              <span className="dim">{mine.length} 条</span>
+            </div>
+            {mine.length ? (
+              <div className="reading-records">
+                {mine.map((r) => (
+                  <button key={r.id} className="reading-record" onClick={() => onOpenReading(r)}>
+                    <div>
+                      <b>{r.rangeLabel}</b>
+                      <span>{r.palace} · {r.view === 'card' ? '宫位卡' : r.view === 'summary' ? '综述' : '命盘'}</span>
+                    </div>
+                    <em>{r.createdAt}</em>
+                  </button>
+                ))}
+              </div>
+            ) : (
+              <p className="dim">还没有解盘记录。点“开始解盘”，在解盘页保存一条。</p>
+            )}
+          </div>
+
+          <div className="sheet-section">
+            <div className="sheet-section-head"><h3>服务</h3></div>
+            <p className="dim">起名 / 择日 / 合盘在「服务」里新建，记录功能下一步接入。</p>
+          </div>
+        </div>
+
+        <div className="client-sheet-actions">
+          <button className="btn" onClick={onOpenChart}>{mine.length ? '继续解盘' : '开始解盘'}</button>
+          <button className="btn ghost" onClick={onNewService}>新建服务</button>
+          <button className="btn ghost" onClick={onEdit}>编辑资料</button>
+          <button
+            className="btn ghost"
+            onClick={async () => { await copyText(encodeChart(user.payload)); }}
+            title="复制安星码"
+          >
+            分享安星码
+          </button>
+          <button className="btn ghost danger-text" onClick={() => { if (window.confirm(`删除客户「${user.name}」？`)) onDelete(); }}>删除</button>
+        </div>
+      </div>
+    </div>
+  );
+}

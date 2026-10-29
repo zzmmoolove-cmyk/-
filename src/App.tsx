@@ -5,22 +5,25 @@ import type {
   BirthInput,
   ChartOptions,
   HistoryItem,
+  ReadingRecord,
   UserProfile,
   UserRecord,
   UserSummary,
 } from './types';
+import Sigil from './components/Sigil';
 import UserPanel from './components/UserPanel';
-import ToolBox from './components/ToolBox';
-import ChartPanel from './components/ChartPanel';
-import PalaceDetail from './components/PalaceDetail';
-import SummaryPanel from './components/SummaryPanel';
-import PalaceReportPanel from './components/PalaceReportPanel';
-import ScopeReportPanel from './components/ScopeReportPanel';
 import ToolsPanel from './components/ToolsPanel';
+import ReadingWorkspace from './components/ReadingWorkspace';
+import TodayPanel from './components/TodayPanel';
+import ClientListPanel from './components/ClientListPanel';
+import ClientProfileSheet from './components/ClientProfileSheet';
+import ClientSwitcher from './components/ClientSwitcher';
+import LibraryPage, { type LibraryTab } from './components/LibraryPage';
+import OutputSheet from './components/OutputSheet';
 import StarProfilePanel from './components/StarProfilePanel';
-import ScopeNav from './components/ScopeNav';
 import { AI_PROVIDERS, type AiConfig, type AiProvider } from './lib/ai';
 import { readChart } from './lib/synthesize';
+import { buildPalaceSnapshot, snapshotToText } from './lib/report';
 import {
   getLayeredData,
   getDecadalOptions,
@@ -30,8 +33,8 @@ import {
 } from './lib/scope';
 import { getRelations, type Relations } from './lib/relations';
 import { computeTimeIndex } from './lib/truesolar';
+import { loadOutputProfile, saveOutputProfile, type OutputProfile } from './lib/output';
 import { FLOW_PROFILES, PROFILE_STATS, STAR_PROFILES } from './lib/knowledge/starProfiles';
-import Sigil from './components/Sigil';
 
 const DEFAULT_INPUT: BirthInput = {
   birthday: '1990-06-15',
@@ -64,6 +67,7 @@ const DEFAULT_AI: AiConfig = {
 const AI_STORAGE_KEY = 'ziwei-ai-config-v1';
 const USERS_STORAGE_KEY = 'ziwei-users-v2';
 const LEGACY_HISTORY_KEY = 'ziwei-history-v1';
+const READINGS_STORAGE_KEY = 'ziwei-readings-v1';
 
 function loadAiConfig(): AiConfig {
   try {
@@ -98,6 +102,19 @@ function loadUsers(): UserRecord[] {
         updatedAt: h.savedAt,
         payload: h.payload,
       }));
+    }
+  } catch {
+    /* ignore */
+  }
+  return [];
+}
+
+function loadReadings(): ReadingRecord[] {
+  try {
+    const raw = localStorage.getItem(READINGS_STORAGE_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw) as ReadingRecord[];
+      if (Array.isArray(parsed)) return parsed.filter((r) => r && r.clientId);
     }
   } catch {
     /* ignore */
@@ -147,7 +164,7 @@ function toPlain(a: Record<string, unknown>): Astrolabe {
       adjectiveStars: stars(p.adjectiveStars as unknown[]),
       changsheng12: String(p.changsheng12 ?? ''),
       boshi12: String(p.boshi12 ?? ''),
-      decadal: dec ?? { range: [0, 0], heavenlyStem: '', earthlyBranch: '' },
+      decadal: dec ?? { range: [0, 0] as [number, number], heavenlyStem: '', earthlyBranch: '' },
       ages: (p.ages as number[]) ?? [],
     };
   });
@@ -177,10 +194,20 @@ export default function App() {
   const [selectedPalace, setSelectedPalace] = useState<string | null>('命宫');
   const [aiConfig, setAiConfig] = useState<AiConfig>(loadAiConfig);
   const [users, setUsers] = useState<UserRecord[]>(loadUsers);
+  const [readings, setReadings] = useState<ReadingRecord[]>(loadReadings);
   const [activeUserId, setActiveUserId] = useState<string | null>(null);
   const [currentProfile, setCurrentProfile] = useState<UserProfile>({ name: '', relation: '本人', note: '' });
   const [dirty, setDirty] = useState(false);
-  const [tab, setTab] = useState<'chart' | 'card' | 'scope' | 'summary' | 'tools'>('chart');
+  const [section, setSection] = useState<'today' | 'clients' | 'services' | 'library'>('today');
+  const [view, setView] = useState<'chart' | 'card' | 'summary'>('chart');
+  const [showClientList, setShowClientList] = useState(false);
+  const [profileId, setProfileId] = useState<string | null>(null);
+  const [profileOpen, setProfileOpen] = useState(false);
+  const [editorOpen, setEditorOpen] = useState(false);
+  const [switcherOpen, setSwitcherOpen] = useState(false);
+  const [libraryTab, setLibraryTab] = useState<LibraryTab>('manual');
+  const [outputProfile, setOutputProfile] = useState<OutputProfile>(loadOutputProfile);
+  const [exportOpen, setExportOpen] = useState(false);
   const [saveMsg, setSaveMsg] = useState<string | null>(null);
   const [starFocus, setStarFocus] = useState<{ name: string; palace?: string } | null>(null);
   const [theme, setTheme] = useState<'mystic' | 'paper'>(() => {
@@ -216,6 +243,18 @@ export default function App() {
     }
   }, [users]);
 
+  useEffect(() => {
+    try {
+      localStorage.setItem(READINGS_STORAGE_KEY, JSON.stringify(readings));
+    } catch {
+      /* ignore */
+    }
+  }, [readings]);
+
+  useEffect(() => {
+    saveOutputProfile(outputProfile);
+  }, [outputProfile]);
+
   const timeIndex = useMemo(() => computeTimeIndex(input), [input]);
 
   const userSummaries: UserSummary[] = useMemo(
@@ -229,6 +268,8 @@ export default function App() {
       })),
     [users],
   );
+
+  const profileUser = useMemo(() => users.find((u) => u.id === profileId) ?? null, [users, profileId]);
 
   const flash = (msg: string) => {
     setSaveMsg(msg);
@@ -255,7 +296,7 @@ export default function App() {
       setAstrolabe(toPlain(a as unknown as Record<string, unknown>));
       setSelectedPalace('命宫');
       setActiveLayers({ decadal: null, yearly: null, monthly: null, daily: null });
-      setTab('chart');
+      setView('chart');
     } catch (e) {
       console.error(e);
       setRaw(null);
@@ -325,9 +366,11 @@ export default function App() {
     setCurrentProfile(profile);
     if (activeUserId) setDirty(true);
     generate(next);
+    setSection('clients');
+    setShowClientList(false);
   };
 
-  const saveUser = (next: BirthInput, profile: UserProfile) => {
+  const saveUser = (next: BirthInput, profile: UserProfile): string => {
     const displayName = profile.name.trim() || '未命名';
     const now = new Date().toLocaleString('zh-CN');
     const id = activeUserId ?? String(Date.now());
@@ -345,7 +388,10 @@ export default function App() {
     setActiveUserId(id);
     setCurrentProfile({ ...profile, name: displayName });
     setDirty(false);
+    setSection('clients');
+    setShowClientList(false);
     flash('✓ 已保存');
+    return id;
   };
 
   const loadUser = (id: string) => {
@@ -355,15 +401,29 @@ export default function App() {
     setCurrentProfile({ name: record.name, relation: record.relation, note: record.note });
     setDirty(false);
     setFormKey((k) => k + 1);
+    setSection('clients');
+    setShowClientList(false);
+    setProfileOpen(false);
+    setSwitcherOpen(false);
+    setEditorOpen(false);
     generate(inputFromPayload(record.payload), optionsFromPayload(record.payload));
   };
 
   const deleteUser = (id: string) => {
     setUsers((prev) => prev.filter((u) => u.id !== id));
+    setReadings((prev) => prev.filter((r) => r.clientId !== id));
+    if (profileId === id) {
+      setProfileOpen(false);
+      setProfileId(null);
+    }
     if (activeUserId === id) {
       setActiveUserId(null);
       setCurrentProfile({ name: '', relation: '本人', note: '' });
+      setAstrolabe(null);
+      setRaw(null);
       setDirty(false);
+      setSection('clients');
+      setShowClientList(true);
     }
   };
 
@@ -375,9 +435,85 @@ export default function App() {
     setActiveUserId(null);
     setCurrentProfile({ name: '', relation: '本人', note: '' });
     setDirty(false);
-    setTab('chart');
+    setSection('clients');
+    setShowClientList(false);
+    setView('chart');
     setStarFocus(null);
     setFormKey((k) => k + 1);
+  };
+
+  const newClient = () => {
+    newUser();
+    setEditorOpen(true);
+    setSwitcherOpen(false);
+    setProfileOpen(false);
+  };
+
+  const openClient = (id: string) => {
+    loadUser(id);
+    setSection('clients');
+    setShowClientList(false);
+  };
+
+  const openProfile = (id: string) => {
+    setProfileId(id);
+    setProfileOpen(true);
+    setSwitcherOpen(false);
+  };
+
+  const openReading = (r: ReadingRecord) => {
+    loadUser(r.clientId);
+    setActiveLayers(r.layers);
+    setSelectedPalace(r.palace);
+    setView(r.view);
+    setSection('clients');
+    setShowClientList(false);
+    setProfileOpen(false);
+  };
+
+  const saveReading = () => {
+    if (!astrolabe) return;
+    let clientId = activeUserId;
+    if (!clientId) {
+      if (!currentProfile.name.trim()) {
+        flash('先给客户起个名字，再保存解盘记录');
+        setEditorOpen(true);
+        return;
+      }
+      clientId = saveUser(input, currentProfile);
+    }
+    const rangeLabel =
+      activeLayers.daily != null
+        ? `${activeLayers.daily} 流日`
+        : activeLayers.monthly != null
+          ? `${activeLayers.yearly}.${String(activeLayers.monthly).padStart(2, '0')} 流月`
+          : activeLayers.yearly != null
+            ? `${activeLayers.yearly} 流年`
+            : activeLayers.decadal != null
+              ? `大限 ${decadalOptions.find((d) => d.index === activeLayers.decadal)?.label ?? ''}`
+              : '本命盘';
+    let text = summary;
+    if (selectedPalace) {
+      try {
+        const snap = buildPalaceSnapshot(astrolabe, selectedPalace, false);
+        text = snapshotToText(snap).slice(0, 1200);
+      } catch {
+        /* keep summary */
+      }
+    }
+    const record: ReadingRecord = {
+      id: String(Date.now()),
+      clientId,
+      clientName: currentProfile.name || '未命名',
+      createdAt: new Date().toLocaleString('zh-CN'),
+      rangeLabel,
+      view,
+      palace: selectedPalace ?? '命宫',
+      layers: activeLayers,
+      summary: text,
+    };
+    setReadings((prev) => [record, ...prev].slice(0, 300));
+    flash('✓ 解盘记录已保存');
   };
 
   const handleImport = (next: BirthInput, opts: ChartOptions) => {
@@ -386,6 +522,9 @@ export default function App() {
     setDirty(false);
     setFormKey((k) => k + 1);
     generate(next, opts);
+    setSection('clients');
+    setShowClientList(false);
+    setEditorOpen(false);
   };
 
   const changeProvider = (provider: AiProvider) => {
@@ -393,198 +532,307 @@ export default function App() {
     setAiConfig((c) => ({ ...c, provider, baseUrl: preset.baseUrl, model: preset.model }));
   };
 
-  const paletteLabel = selectedPalace
-    ? selectedPalace.endsWith('宫')
-      ? selectedPalace
-      : `${selectedPalace}宫`
-    : '宫位卡';
+  const openExport = () => {
+    if (!astrolabe) return;
+    if (!selectedPalace) setSelectedPalace('命宫');
+    setSection('clients');
+    setShowClientList(false);
+    setView('card');
+    setExportOpen(true);
+  };
+
+  const changeAlgorithm = (algorithm: ChartOptions['algorithm']) => {
+    if (options.algorithm === algorithm) return;
+    const next = { ...options, algorithm };
+    setOptions(next);
+    if (astrolabe) {
+      generate(input, next);
+      setView('card');
+    }
+  };
+
+  const handleExport = () => {
+    setExportOpen(false);
+    setView('card');
+    window.setTimeout(() => {
+      document.querySelectorAll<HTMLDetailsElement>('details.report-fold').forEach((d) => { d.open = true; });
+      window.print();
+    }, 180);
+  };
+
+  const topState = activeUserId ? (dirty ? '已修改' : '已保存') : currentProfile.name ? '未保存' : '';
 
   return (
     <div className="app">
-      <header className="masthead">
-        <div className="brand">
+      <header className="app-topbar">
+        <div className="topbar-brand" onClick={() => setSection('today')}>
           <Sigil />
           <div>
             <h1>紫微斗数</h1>
-            <span className="brand-sub">观星 · 察象 · 知机</span>
+            <span>观星 · 察象 · 知机</span>
           </div>
         </div>
-        <div className="masthead-right">
-          <span className="masthead-chip">本地知识库 · AI 辅助</span>
-          <button
-            className="theme-switch"
-            onClick={() => setTheme(theme === 'mystic' ? 'paper' : 'mystic')}
-            title={theme === 'mystic' ? '切换到宣纸浅色' : '切换到玄夜深色'}
-          >
+
+        <button className="top-client" onClick={() => setSwitcherOpen(true)}>
+          <span className="top-avatar">{Array.from(currentProfile.name || '客')[0]}</span>
+          <span>
+            <b>{currentProfile.name || '选择客户'}</b>
+            <em>{currentProfile.name ? currentProfile.relation : '按客户工作'}</em>
+          </span>
+          {topState && <span className={`top-state ${activeUserId && !dirty ? 'saved' : 'dirty'}`}>{topState}</span>}
+        </button>
+
+        <div className="topbar-spacer" />
+
+        <div className="topbar-actions">
+          <button className="topbar-btn" onClick={openExport} disabled={!astrolabe} title="选择输出内容并打印 / 另存为 PDF">导出 PDF</button>
+          <button className="topbar-btn" onClick={() => { setSection('library'); setLibraryTab('settings'); }}>设置</button>
+          <button className="topbar-btn" onClick={() => setTheme(theme === 'mystic' ? 'paper' : 'mystic')}>
             {theme === 'mystic' ? '宣纸' : '玄夜'}
           </button>
         </div>
       </header>
-      <p className="disclaimer">
-        本工具基于开源排盘引擎 iztro（MIT）与自建知识库。解读内容仅供传统文化研究与娱乐参考，不构成医疗、法律、投资等任何专业建议。
-      </p>
 
-      <div className="layout">
-        {/* 左列：用户信息 + 折叠工具 */}
-        <div className="left">
-          <UserPanel
-            key={formKey}
-            initial={input}
-            initialProfile={currentProfile}
-            users={userSummaries}
-            activeUserId={activeUserId}
-            options={options}
-            saveMsg={saveMsg}
-            onGenerate={handleGenerate}
-            onSave={saveUser}
-            onNew={newUser}
-            onSelectUser={loadUser}
-            onDeleteUser={deleteUser}
-            onImport={handleImport}
-            onExportStars={exportStarDB}
-          />
-          <ToolBox
-            options={options}
-            onOptionsChange={changeOptions}
-            aiConfig={aiConfig}
-            onAiChange={setAiConfig}
-            onProviderChange={changeProvider}
-            hasKey={hasKey}
-          />
-        </div>
-
-        {/* 中列：一次只看一件事 */}
-        <div className="center">
-          <div className="center-tabs">
-            <button className={`tab ${tab === 'chart' ? 'active' : ''}`} onClick={() => setTab('chart')}>
-              命盘
-            </button>
-            <button
-              className={`tab ${tab === 'card' ? 'active' : ''}`}
-              disabled={!astrolabe}
-              onClick={() => setTab('card')}
-            >
-              宫位卡 · {paletteLabel}
-            </button>
-            <button
-              className={`tab ${tab === 'scope' ? 'active' : ''}`}
-              disabled={!astrolabe || !raw}
-              onClick={() => setTab('scope')}
-            >
-              运限
-            </button>
-            <button
-              className={`tab ${tab === 'summary' ? 'active' : ''}`}
-              disabled={!astrolabe}
-              onClick={() => setTab('summary')}
-            >
-              综述
-            </button>
-            <button
-              className={`tab ${tab === 'tools' ? 'active' : ''}`}
-              onClick={() => setTab('tools')}
-            >
-              工具
-            </button>
-            <span className={`current-user ${activeUserId && !dirty ? 'saved' : ''}`}>
-              <b>{currentProfile.name || '未命名'}</b>
-              <em>{currentProfile.relation}</em>
-              <i>{activeUserId ? (dirty ? '已修改' : '已保存') : '未保存'}</i>
-            </span>
+      <div className="app-body">
+        <aside className="sidebar">
+          <div className="side-section">
+            <div className="side-label">工作台</div>
+            <div className="side-nav">
+              <button className={`side-nav-item ${section === 'today' ? 'active' : ''}`} onClick={() => setSection('today')}>
+                <span className="side-icon">✦</span>今日
+              </button>
+              <button
+                className={`side-nav-item ${section === 'clients' ? 'active' : ''}`}
+                onClick={() => { setSection('clients'); setShowClientList(true); }}
+              >
+                <span className="side-icon">◉</span>客户<span className="side-count">{users.length}</span>
+              </button>
+              <button className={`side-nav-item ${section === 'services' ? 'active' : ''}`} onClick={() => setSection('services')}>
+                <span className="side-icon">◇</span>服务
+              </button>
+              <button className={`side-nav-item ${section === 'library' ? 'active' : ''}`} onClick={() => { setSection('library'); setLibraryTab('manual'); }}>
+                <span className="side-icon">▤</span>资料
+              </button>
+            </div>
           </div>
 
-          {tab === 'chart' && (
-            <ChartPanel
-              astrolabe={astrolabe}
-              input={input}
-              options={options}
-              timeIndex={timeIndex}
-              layered={layered}
-              selectedPalace={selectedPalace}
-              userLabel={currentProfile.name ? `${currentProfile.name} · ${currentProfile.relation}` : ''}
-              onSelectPalace={setSelectedPalace}
-              onOpenPalaceCard={(name) => {
-                setSelectedPalace(name);
-                setTab('card');
-              }}
-              onSelectStar={openStar}
-            />
-          )}
+          <div className="side-section">
+            <div className="side-label">
+              最近客户
+              <button onClick={newClient} title="新建客户">+</button>
+            </div>
+            <div className="side-clients">
+              {users.slice(0, 6).map((u) => (
+                <button
+                  key={u.id}
+                  className={`side-client ${u.id === activeUserId ? 'active' : ''}`}
+                  onClick={() => openClient(u.id)}
+                >
+                  <span className="side-avatar">{Array.from(u.name)[0] || '客'}</span>
+                  <span className="side-client-main">
+                    <b>{u.name}</b>
+                    <em>{u.relation} · {u.payload.birthday || '生辰未填'}</em>
+                  </span>
+                </button>
+              ))}
+              {!users.length && <p className="dim" style={{ padding: '4px 9px', margin: 0 }}>还没有客户</p>}
+            </div>
+            <button className="side-new" onClick={newClient}>+ 新建客户</button>
+          </div>
 
-          {tab === 'card' &&
-            (astrolabe && selectedPalace ? (
-              <>
-                <PalaceReportPanel
-                  astrolabe={astrolabe}
-                  palaceName={selectedPalace}
-                  onSelectPalace={setSelectedPalace}
-                  onSelectStar={openStar}
-                />
-                <details className="panel legacy-wrap">
-                  <summary>传统解读与 AI（旧版）</summary>
-                  <PalaceDetail
-                    astrolabe={astrolabe}
-                    palaceName={selectedPalace}
-                    summary={summary}
-                    aiConfig={hasKey ? aiConfig : null}
-                    relations={relations}
-                    onSelectStar={openStar}
-                  />
-                </details>
-              </>
-            ) : (
-              <div className="panel empty-state">先排盘，再看宫位卡。</div>
-            ))}
+          <div className="side-foot">
+            本地优先 · 数据只存本机<br />
+            解读仅供传统文化研究
+          </div>
+        </aside>
 
-          {tab === 'scope' &&
-            (astrolabe && raw ? (
-              <ScopeReportPanel
-                astrolabe={astrolabe}
-                raw={raw}
-                active={activeLayers}
-                userLabel={currentProfile.name ? `${currentProfile.name} · ${currentProfile.relation}` : ''}
-                onSelectPalace={setSelectedPalace}
-              />
-            ) : (
-              <div className="panel empty-state">先排盘，再看运限。</div>
-            ))}
-
-          {tab === 'summary' &&
-            (astrolabe ? (
-              <SummaryPanel astrolabe={astrolabe} aiConfig={hasKey ? aiConfig : null} />
-            ) : (
-              <div className="panel empty-state">先排盘，再看综述。</div>
-            ))}
-
-          {tab === 'tools' && (
-            <ToolsPanel
-              astrolabe={astrolabe}
+        <main className="content">
+          {section === 'today' && (
+            <TodayPanel
               users={users}
               activeUserId={activeUserId}
-              userName={currentProfile.name}
-              userLabel={currentProfile.name ? `${currentProfile.name} · ${currentProfile.relation}` : ''}
-              options={options}
+              hasChart={Boolean(astrolabe)}
+              onOpenClient={openClient}
+              onNewClient={newClient}
+              onOpenServices={() => setSection('services')}
+              onOpenLibrary={() => { setSection('library'); setLibraryTab('manual'); }}
             />
           )}
-        </div>
 
-        {/* 右列：运限点选导航 */}
-        <div className="right">
-          <div className="panel">
-            <h2>运限导航</h2>
-            {astrolabe && raw ? (
-              <ScopeNav
-                decadalOptions={decadalOptions}
-                yearRange={yearRange}
-                active={activeLayers}
-                onActiveChange={setActiveLayers}
+          {section === 'clients' &&
+            (showClientList || !astrolabe ? (
+              <ClientListPanel
+                users={users}
+                activeUserId={activeUserId}
+                onOpen={openClient}
+                onProfile={openProfile}
+                onNew={newClient}
+                onDelete={deleteUser}
               />
             ) : (
-              <p className="hint">排盘后在此点选大限 → 流年 → 流月 → 流日。</p>
-            )}
+              <ReadingWorkspace
+                astrolabe={astrolabe}
+                raw={raw}
+                input={input}
+                options={options}
+                timeIndex={timeIndex}
+                layered={layered}
+                active={activeLayers}
+                selectedPalace={selectedPalace}
+                userLabel={currentProfile.name ? `${currentProfile.name} · ${currentProfile.relation}` : ''}
+                userName={currentProfile.name}
+                view={view}
+                onViewChange={setView}
+                onSelectPalace={setSelectedPalace}
+                onSelectStar={openStar}
+                decadalOptions={decadalOptions}
+                yearRange={yearRange}
+                onActiveChange={setActiveLayers}
+                onOpenProfile={() => (activeUserId ? openProfile(activeUserId) : setEditorOpen(true))}
+                onOpenEditor={() => setEditorOpen(true)}
+                onSaveReading={saveReading}
+                onOpenExport={openExport}
+                saveMsg={saveMsg}
+                summary={summary}
+                relations={relations}
+                aiConfig={hasKey ? aiConfig : null}
+                hasKey={hasKey}
+                output={outputProfile}
+              />
+            ))}
+
+          {section === 'services' && (
+            <div className="services-page">
+              <div className="page-head">
+                <div>
+                  <h2>服务</h2>
+                  <p className="dim">
+                    {currentProfile.name ? `当前客户：${currentProfile.name} · ${currentProfile.relation}` : '起名 / 择日 / 合盘，先在左侧选择客户'}
+                  </p>
+                </div>
+              </div>
+              <ToolsPanel
+                astrolabe={astrolabe}
+                users={users}
+                activeUserId={activeUserId}
+                userName={currentProfile.name}
+                userLabel={currentProfile.name ? `${currentProfile.name} · ${currentProfile.relation}` : ''}
+                options={options}
+              />
+            </div>
+          )}
+
+          {section === 'library' && (
+            <LibraryPage
+              initialTab={libraryTab}
+              options={options}
+              onOptionsChange={changeOptions}
+              aiConfig={aiConfig}
+              onAiChange={setAiConfig}
+              onProviderChange={changeProvider}
+              hasKey={hasKey}
+              onExportStars={exportStarDB}
+            />
+          )}
+
+          <footer className="app-foot">
+            基于 iztro（MIT）与自建知识库 · 解读仅供传统文化研究与娱乐参考，不构成医疗、法律、投资建议。
+          </footer>
+        </main>
+      </div>
+
+      {profileOpen && profileUser && (
+        <ClientProfileSheet
+          user={profileUser}
+          readings={readings}
+          onClose={() => setProfileOpen(false)}
+          onOpenChart={() => openClient(profileUser.id)}
+          onEdit={() => {
+            loadUser(profileUser.id);
+            setProfileOpen(false);
+            setEditorOpen(true);
+          }}
+          onNewService={() => {
+            setSection('services');
+            setProfileOpen(false);
+          }}
+          onOpenReading={openReading}
+          onDelete={() => {
+            deleteUser(profileUser.id);
+            setProfileOpen(false);
+          }}
+        />
+      )}
+
+      {switcherOpen && (
+        <ClientSwitcher
+          users={users}
+          activeUserId={activeUserId}
+          onSelect={openClient}
+          onNew={newClient}
+          onClose={() => setSwitcherOpen(false)}
+        />
+      )}
+
+      {editorOpen && (
+        <div className="modal-backdrop" onClick={() => setEditorOpen(false)}>
+          <div className="modal client-editor" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-head">
+              <div>
+                <h2>客户资料</h2>
+                <div className="modal-sub">出生信息、真太阳时与保存</div>
+              </div>
+              <button className="modal-close" onClick={() => setEditorOpen(false)}>×</button>
+            </div>
+            <div className="modal-body">
+              <UserPanel
+                key={formKey}
+                initial={input}
+                initialProfile={currentProfile}
+                users={userSummaries}
+                activeUserId={activeUserId}
+                options={options}
+                saveMsg={saveMsg}
+                onGenerate={(next, profile) => {
+                  handleGenerate(next, profile);
+                  saveUser(next, profile);
+                  setEditorOpen(false);
+                }}
+                onSave={(next, profile) => {
+                  saveUser(next, profile);
+                  generate(next);
+                  setEditorOpen(false);
+                }}
+                onNew={newUser}
+                onSelectUser={(id) => {
+                  loadUser(id);
+                  setEditorOpen(false);
+                }}
+                onDeleteUser={(id) => {
+                  deleteUser(id);
+                  setEditorOpen(false);
+                }}
+                onImport={(next, opts) => {
+                  handleImport(next, opts);
+                  setEditorOpen(false);
+                }}
+                onExportStars={exportStarDB}
+              />
+            </div>
           </div>
         </div>
-      </div>
+      )}
+
+      <OutputSheet
+        open={exportOpen}
+        profile={outputProfile}
+        onChange={setOutputProfile}
+        onClose={() => setExportOpen(false)}
+        onExport={handleExport}
+        hasChart={Boolean(astrolabe)}
+        algorithm={options.algorithm}
+        onAlgorithmChange={changeAlgorithm}
+      />
 
       {starFocus && (
         <StarProfilePanel

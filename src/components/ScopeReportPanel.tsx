@@ -151,7 +151,7 @@ export default function ScopeReportPanel({
       </div>
 
       <p className="hint" style={{ marginTop: 0 }}>
-        在右侧依次点选「大限 → 流年 → 流月 → 流日」，报告会按当前层级叠加。大限定十年底色，流年看引动，流月流日抓时机。
+        点上方「选择时间…」按大限 → 流年 → 流月 → 流日逐级选择，报告会按当前层级叠加。大限定十年底色，流年看引动，流月流日抓时机。
       </p>
 
       {activeCount === 0 ? (
@@ -161,7 +161,7 @@ export default function ScopeReportPanel({
             <span className="empty-sigil-star">✦</span>
           </div>
           <p className="empty-kicker">先选一个运限层</p>
-          <p className="dim">右侧「运限导航」里点一个大限，再逐级选流年 / 流月 / 流日。</p>
+          <p className="dim">点上方「选择时间…」，先选一个大限，再逐级选流年 / 流月 / 流日。</p>
         </div>
       ) : (
         <div className="scope-stack">
