@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import type { Astrolabe } from '../types';
 import { buildPalacePromptText, buildPalaceSnapshot, snapshotToText } from '../lib/report';
 import { referenceLabel, type OutputProfile, type OutputSections } from '../lib/output';
+import { quotesForStars } from '../lib/classics';
 
 const LABEL = (n: string) => (n.endsWith('宫') ? n : `${n}宫`);
 
@@ -40,7 +41,11 @@ export default function PalaceReportPanel({
   const show = (key: keyof OutputSections) => (output ? output.sections[key] : true);
   const refs = output ? referenceLabel(output) : '';
   const secondary = show('stars') || show('synastry') || show('surround') || show('wuxing') || show('four');
-  const anyContent = show('position') || secondary || show('blockages') || show('strategies') || show('gaps');
+  const anyContent = show('position') || secondary || show('blockages') || show('strategies') || show('classics') || show('gaps');
+  const classicQuotes = useMemo(
+    () => (output ? quotesForStars(snapshot.stars.map((s) => s.name), 4) : []),
+    [snapshot, output],
+  );
 
   const doCopy = async (kind: 'prompt' | 'text') => {
     const text = kind === 'prompt' ? buildPalacePromptText(snapshot) : snapshotToText(snapshot);
@@ -264,6 +269,25 @@ export default function PalaceReportPanel({
           ))}
         </div>
       </section>
+      )}
+
+      {show('classics') && (
+        <section>
+          <h3 className="section-title">附：古籍摘录</h3>
+          <p className="hint">整理本检索，非影印原文；逐字引用前请核对原书。</p>
+          {classicQuotes.length ? (
+            <div className="classic-quotes">
+              {classicQuotes.map((q) => (
+                <div key={q.paragraphId} className="classic-quote">
+                  <div className="classic-hit-source">{q.bookTitle} · {q.chapterTitle}</div>
+                  <p>{q.text}</p>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="dim">本宫星曜暂未在这三本整理本中检索到直接段落。</p>
+          )}
+        </section>
       )}
 
       {show('gaps') && (

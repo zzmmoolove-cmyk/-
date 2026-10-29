@@ -10,6 +10,7 @@ export type OutputSections = {
   four: boolean;
   blockages: boolean;
   strategies: boolean;
+  classics: boolean;
   gaps: boolean;
 };
 
@@ -36,6 +37,7 @@ export const DEFAULT_OUTPUT: OutputProfile = {
     four: true,
     blockages: true,
     strategies: true,
+    classics: false,
     gaps: false,
   },
   references: {
@@ -54,6 +56,7 @@ export const SECTION_META: { key: keyof OutputSections; label: string; hint: str
   { key: 'four', label: '四化', hint: '生年 / 自化 / 飞化' },
   { key: 'blockages', label: '卡点与策略', hint: '依据 / 影响 / 解法' },
   { key: 'strategies', label: '用星建议', hint: '风险 / 修正 / 座右铭' },
+  { key: 'classics', label: '古籍摘录', hint: '按本宫星曜检索的整理本' },
   { key: 'gaps', label: '数据缺口', hint: '哪些资料还没补齐' },
 ];
 

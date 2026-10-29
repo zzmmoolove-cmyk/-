@@ -3,12 +3,15 @@ import type { ChartOptions } from '../types';
 import { AI_PROVIDERS, type AiConfig, type AiProvider } from '../lib/ai';
 import { FLOW_PROFILES, PROFILE_STATS, STAR_PROFILES } from '../lib/knowledge/starProfiles';
 import CalendarPanel from './CalendarPanel';
+import ClassicsBrowser from './ClassicsBrowser';
+import { quotesForStar } from '../lib/classics';
 import SettingsPanel from './SettingsPanel';
 
-export type LibraryTab = 'manual' | 'calendar' | 'settings' | 'ai' | 'data';
+export type LibraryTab = 'manual' | 'classics' | 'calendar' | 'settings' | 'ai' | 'data';
 
 const TABS: { key: LibraryTab; label: string }[] = [
   { key: 'manual', label: '星曜手册' },
+  { key: 'classics', label: '古籍' },
   { key: 'calendar', label: '万年历' },
   { key: 'settings', label: '排盘设置' },
   { key: 'ai', label: 'AI 设置' },
@@ -40,18 +43,20 @@ export default function LibraryPage({
   const stars = useMemo(() => Object.values(STAR_PROFILES), []);
   const [query, setQuery] = useState('');
   const [selected, setSelected] = useState(stars[0]?.name ?? '');
+  const [classicQuery, setClassicQuery] = useState('');
   const filtered = useMemo(() => {
     const q = query.trim();
     return q ? stars.filter((s) => `${s.name}${s.keywords.join('')}${s.essence}`.includes(q)) : stars;
   }, [stars, query]);
   const profile = STAR_PROFILES[selected] ?? filtered[0];
+  const classicQuotes = useMemo(() => (profile ? quotesForStar(profile.name, 2) : []), [profile?.name]);
 
   return (
     <div className="library-page">
       <div className="page-head">
         <div>
           <h2>资料</h2>
-          <p className="dim">星曜手册、万年历、排盘口径、AI 与数据</p>
+          <p className="dim">星曜手册、古籍、万年历、排盘口径、AI 与数据</p>
         </div>
       </div>
 
@@ -92,11 +97,28 @@ export default function LibraryPage({
                 {profile.positive?.length ? <><div className="sub-title ok">正面</div><ul className="notes">{profile.positive.map((x) => <li key={x}>{x}</li>)}</ul></> : null}
                 {profile.negative?.length ? <><div className="sub-title danger">风险</div><ul className="notes">{profile.negative.map((x) => <li key={x}>{x}</li>)}</ul></> : null}
                 <p className="hint">资料库 {PROFILE_STATS.total} 颗（完整 {PROFILE_STATS.full}）＋ 运限派生 {FLOW_PROFILES.length}。来源：{profile.source || '自建知识库'}。</p>
+
+                {classicQuotes.length > 0 && (
+                  <div className="classic-quotes">
+                    <div className="sub-title">古籍摘录 <span className="dim">整理本，非影印原文</span></div>
+                    {classicQuotes.map((q) => (
+                      <div key={q.paragraphId} className="classic-quote">
+                        <div className="classic-hit-source">{q.bookTitle} · {q.chapterTitle}</div>
+                        <p>{q.text}</p>
+                      </div>
+                    ))}
+                    <button className="btn ghost small" onClick={() => { setClassicQuery(profile.name); setTab('classics'); }}>
+                      在古籍中检索「{profile.name}」→
+                    </button>
+                  </div>
+                )}
               </>
             ) : <p className="dim">没有匹配星曜。</p>}
           </div>
         </div>
       )}
+
+      {tab === 'classics' && <div className="library-body"><ClassicsBrowser key={classicQuery} initialQuery={classicQuery} /></div>}
 
       {tab === 'calendar' && <div className="library-body"><CalendarPanel /></div>}
       {tab === 'settings' && <div className="library-body"><SettingsPanel options={options} onChange={onOptionsChange} /></div>}
