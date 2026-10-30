@@ -6,6 +6,9 @@ const STORAGE_KEY = 'ziwei-client-pill-pos';
 type Pos = { x: number; y: number };
 
 function initialPos(): Pos {
+  if (typeof window !== 'undefined' && window.innerWidth < 760) {
+    return { x: 12, y: Math.max(74, window.innerHeight - 74) };
+  }
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (raw) {
@@ -15,7 +18,6 @@ function initialPos(): Pos {
   } catch {
     /* ignore */
   }
-  if (typeof window !== 'undefined' && window.innerWidth < 760) return { x: 12, y: 66 };
   return { x: 280, y: 10 };
 }
 
