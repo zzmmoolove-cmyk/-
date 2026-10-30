@@ -1,45 +1,23 @@
-import { useEffect, useMemo, useState } from 'react';
-import type { ChartOptions } from '../types';
-import { AI_PROVIDERS, type AiConfig, type AiProvider } from '../lib/ai';
+import { useMemo, useState } from 'react';
 import { FLOW_PROFILES, PROFILE_STATS, STAR_PROFILES } from '../lib/knowledge/starProfiles';
-import CalendarPanel from './CalendarPanel';
 import ClassicsBrowser from './ClassicsBrowser';
 import { quotesForStar } from '../lib/classics';
-import SettingsPanel from './SettingsPanel';
 
-export type LibraryTab = 'manual' | 'classics' | 'calendar' | 'settings' | 'ai' | 'data';
+type LibraryTab = 'manual' | 'classics';
 
 const TABS: { key: LibraryTab; label: string }[] = [
   { key: 'manual', label: '星曜手册' },
   { key: 'classics', label: '古籍' },
-  { key: 'calendar', label: '万年历' },
-  { key: 'settings', label: '排盘设置' },
-  { key: 'ai', label: 'AI 设置' },
-  { key: 'data', label: '数据' },
 ];
 
 export default function LibraryPage({
-  initialTab,
-  options,
-  onOptionsChange,
-  aiConfig,
-  onAiChange,
-  onProviderChange,
-  hasKey,
-  onExportStars,
+  onOpenCalendar,
+  onOpenData,
 }: {
-  initialTab: LibraryTab;
-  options: ChartOptions;
-  onOptionsChange: (o: ChartOptions) => void;
-  aiConfig: AiConfig;
-  onAiChange: (c: AiConfig) => void;
-  onProviderChange: (p: AiProvider) => void;
-  hasKey: boolean;
-  onExportStars: () => void;
+  onOpenCalendar: () => void;
+  onOpenData: () => void;
 }) {
-  const [tab, setTab] = useState<LibraryTab>(initialTab);
-  useEffect(() => setTab(initialTab), [initialTab]);
-
+  const [tab, setTab] = useState<LibraryTab>('manual');
   const stars = useMemo(() => Object.values(STAR_PROFILES), []);
   const [query, setQuery] = useState('');
   const [selected, setSelected] = useState(stars[0]?.name ?? '');
@@ -56,7 +34,11 @@ export default function LibraryPage({
       <div className="page-head">
         <div>
           <h2>资料</h2>
-          <p className="dim">星曜手册、古籍、万年历、排盘口径、AI 与数据</p>
+          <p className="dim">星曜手册与古籍。万年历、数据在右上角；排盘与 AI 设置收进站点右上角「设置」。</p>
+        </div>
+        <div className="library-head-actions">
+          <button className="btn ghost small" onClick={onOpenCalendar}>万年历</button>
+          <button className="btn ghost small" onClick={onOpenData}>数据</button>
         </div>
       </div>
 
@@ -119,36 +101,6 @@ export default function LibraryPage({
       )}
 
       {tab === 'classics' && <div className="library-body"><ClassicsBrowser key={classicQuery} initialQuery={classicQuery} /></div>}
-
-      {tab === 'calendar' && <div className="library-body"><CalendarPanel /></div>}
-      {tab === 'settings' && <div className="library-body"><SettingsPanel options={options} onChange={onOptionsChange} /></div>}
-      {tab === 'ai' && (
-        <div className="library-body">
-          <div className="panel">
-            <h2>AI 设置</h2>
-            <div className="field">
-              <label>服务商</label>
-              <select value={aiConfig.provider} onChange={(e) => onProviderChange(e.target.value as AiProvider)}>
-                {(Object.keys(AI_PROVIDERS) as AiProvider[]).map((k) => <option key={k} value={k}>{AI_PROVIDERS[k].label}</option>)}
-              </select>
-            </div>
-            <div className="field"><label>API Key</label><input type="password" value={aiConfig.apiKey} placeholder="sk-..." onChange={(e) => onAiChange({ ...aiConfig, apiKey: e.target.value })} /></div>
-            <div className="field"><label>接口地址</label><input value={aiConfig.baseUrl} onChange={(e) => onAiChange({ ...aiConfig, baseUrl: e.target.value })} /></div>
-            <div className="field"><label>模型</label><input value={aiConfig.model} onChange={(e) => onAiChange({ ...aiConfig, model: e.target.value })} /></div>
-            <p className="hint">Key 仅存本机 localStorage；浏览器直连服务商。没有 Key 也可以用本地知识库和复制 Prompt。</p>
-            {hasKey && <p className="hint" style={{ color: 'var(--ok)' }}>✓ 已配置</p>}
-          </div>
-        </div>
-      )}
-      {tab === 'data' && (
-        <div className="library-body">
-          <div className="panel">
-            <h2>数据</h2>
-            <p className="hint">星曜库 {PROFILE_STATS.total} 颗（完整 {PROFILE_STATS.full}）＋ 运限派生 {FLOW_PROFILES.length}。导出 JSON 可用于备份或二次开发。</p>
-            <button className="btn" onClick={onExportStars}>导出星曜库 JSON</button>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

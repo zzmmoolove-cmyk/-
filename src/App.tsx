@@ -23,7 +23,9 @@ import ClientProfileSheet from './components/ClientProfileSheet';
 import ServiceRecordList from './components/ServiceRecordList';
 import ServiceRecordSheet from './components/ServiceRecordSheet';
 import ClientSwitcher from './components/ClientSwitcher';
-import LibraryPage, { type LibraryTab } from './components/LibraryPage';
+import LibraryPage from './components/LibraryPage';
+import SettingsSheet, { type SettingsTab } from './components/SettingsSheet';
+import CalendarSheet from './components/CalendarSheet';
 import OutputSheet from './components/OutputSheet';
 import StarProfilePanel from './components/StarProfilePanel';
 import { AI_PROVIDERS, type AiConfig, type AiProvider } from './lib/ai';
@@ -226,7 +228,9 @@ export default function App() {
   const [profileOpen, setProfileOpen] = useState(false);
   const [editorOpen, setEditorOpen] = useState(false);
   const [switcherOpen, setSwitcherOpen] = useState(false);
-  const [libraryTab, setLibraryTab] = useState<LibraryTab>('manual');
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  const [settingsTab, setSettingsTab] = useState<SettingsTab>('chart');
+  const [calendarOpen, setCalendarOpen] = useState(false);
   const [outputProfile, setOutputProfile] = useState<OutputProfile>(loadOutputProfile);
   const [exportOpen, setExportOpen] = useState(false);
   const [saveMsg, setSaveMsg] = useState<string | null>(null);
@@ -663,7 +667,7 @@ export default function App() {
 
         <div className="topbar-actions">
           <button className="topbar-btn" onClick={openExport} disabled={!astrolabe} title="选择输出内容并打印 / 另存为 PDF">导出 PDF</button>
-          <button className="topbar-btn" onClick={() => { setSection('library'); setLibraryTab('settings'); }}>设置</button>
+          <button className="topbar-btn" onClick={() => { setSettingsTab('chart'); setSettingsOpen(true); }}>设置</button>
           <button className="topbar-btn" onClick={() => setTheme(theme === 'mystic' ? 'paper' : 'mystic')}>
             {theme === 'mystic' ? '宣纸' : '玄夜'}
           </button>
@@ -687,7 +691,7 @@ export default function App() {
               <button className={`side-nav-item ${section === 'services' ? 'active' : ''}`} onClick={() => setSection('services')}>
                 <span className="side-icon">◇</span>服务
               </button>
-              <button className={`side-nav-item ${section === 'library' ? 'active' : ''}`} onClick={() => { setSection('library'); setLibraryTab('manual'); }}>
+              <button className={`side-nav-item ${section === 'library' ? 'active' : ''}`} onClick={() => setSection('library')}>
                 <span className="side-icon">▤</span>资料
               </button>
             </div>
@@ -732,7 +736,7 @@ export default function App() {
               onOpenClient={openClient}
               onNewClient={newClient}
               onOpenServices={() => setSection('services')}
-              onOpenLibrary={() => { setSection('library'); setLibraryTab('manual'); }}
+              onOpenLibrary={() => setSection('library')}
             />
           )}
 
@@ -820,14 +824,8 @@ export default function App() {
 
           {section === 'library' && (
             <LibraryPage
-              initialTab={libraryTab}
-              options={options}
-              onOptionsChange={changeOptions}
-              aiConfig={aiConfig}
-              onAiChange={setAiConfig}
-              onProviderChange={changeProvider}
-              hasKey={hasKey}
-              onExportStars={exportStarDB}
+              onOpenCalendar={() => setCalendarOpen(true)}
+              onOpenData={() => { setSettingsTab('data'); setSettingsOpen(true); }}
             />
           )}
 
@@ -929,6 +927,21 @@ export default function App() {
           onDelete={() => deleteService(openService.id)}
         />
       )}
+
+      <SettingsSheet
+        open={settingsOpen}
+        initialTab={settingsTab}
+        options={options}
+        onOptionsChange={changeOptions}
+        aiConfig={aiConfig}
+        onAiChange={setAiConfig}
+        onProviderChange={changeProvider}
+        hasKey={hasKey}
+        onExportStars={exportStarDB}
+        onClose={() => setSettingsOpen(false)}
+      />
+
+      {calendarOpen && <CalendarSheet onClose={() => setCalendarOpen(false)} />}
 
       <OutputSheet
         open={exportOpen}
