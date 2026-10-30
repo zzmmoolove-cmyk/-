@@ -2995,3 +2995,112 @@ html[data-theme='paper'] .master-switch.on .master-switch-track i {
 .scope-current {
   min-height: 18px;
 }
+
+/* —— 盘面运限宫位短标签 & 流曜分色 —— */
+.chart-scroll .iztro-palace-fate.chart-scope-labels-host {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-content: center;
+  gap: 2px;
+  width: 100%;
+  min-height: 0;
+  padding: 1px 2px;
+  line-height: 1;
+}
+
+.chart-scroll .iztro-palace-fate > span:not(.chart-scope-label) {
+  display: none !important;
+}
+
+.chart-scope-label {
+  display: inline-block;
+  padding: 1px 4px;
+  border: 1px solid currentColor;
+  border-radius: 3px;
+  font-size: 7.5px;
+  line-height: 1.25;
+  white-space: nowrap;
+  opacity: 0.92;
+}
+.chart-scope-label.layer-decadal { color: #d7b45a; }
+.chart-scope-label.layer-yearly { color: #6fc39a; }
+.chart-scope-label.layer-monthly { color: #7fa9ea; }
+.chart-scope-label.layer-daily { color: #b89ae8; }
+
+.chart-scroll .iztro-palace-horo-star .iztro-star .star-with-mutagen { color: var(--text-dim); }
+.chart-scroll .iztro-palace-horo-star .iztro-star.flow-layer-decadal .star-with-mutagen { color: #d7b45a; }
+.chart-scroll .iztro-palace-horo-star .iztro-star.flow-layer-yearly .star-with-mutagen { color: #6fc39a; }
+.chart-scroll .iztro-palace-horo-star .iztro-star.flow-layer-monthly .star-with-mutagen { color: #7fa9ea; }
+.chart-scroll .iztro-palace-horo-star .iztro-star.flow-layer-daily .star-with-mutagen { color: #b89ae8; }
+
+/* 简版也显示当前选中的运限宫位标签 */
+.chart-simple .iztro-palace-fate.chart-scope-labels-host { display: flex; }
+
+/* 运限宫位标签：两列排布，避免小字挤在一行 */
+.chart-scroll .iztro-palace-fate.chart-scope-labels-host {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 2px;
+  padding: 2px 4px;
+  justify-items: stretch;
+}
+
+.chart-scope-label {
+  min-width: 0;
+  padding: 1px 2px;
+  font-size: 8.5px;
+  line-height: 1.35;
+  text-align: center;
+  letter-spacing: 0.02em;
+}
+
+.chart-scope-label.layer-decadal {
+  color: #e4c06d;
+  border-color: rgba(215, 180, 90, 0.38);
+  background: rgba(215, 180, 90, 0.1);
+}
+.chart-scope-label.layer-yearly {
+  color: #82d3aa;
+  border-color: rgba(111, 195, 154, 0.38);
+  background: rgba(111, 195, 154, 0.09);
+}
+.chart-scope-label.layer-monthly {
+  color: #91b6ef;
+  border-color: rgba(127, 169, 234, 0.38);
+  background: rgba(127, 169, 234, 0.09);
+}
+.chart-scope-label.layer-daily {
+  color: #c6abf0;
+  border-color: rgba(184, 154, 232, 0.38);
+  background: rgba(184, 154, 232, 0.09);
+}
+
+.chart-simple .iztro-palace-fate.chart-scope-labels-host { display: grid; }
+
+html[data-theme='paper'] .chart-scope-label.layer-decadal { color: #80560b; background: rgba(154, 107, 12, 0.08); border-color: rgba(154, 107, 12, 0.3); }
+html[data-theme='paper'] .chart-scope-label.layer-yearly { color: #256b50; background: rgba(37, 107, 80, 0.06); border-color: rgba(37, 107, 80, 0.25); }
+html[data-theme='paper'] .chart-scope-label.layer-monthly { color: #315f9f; background: rgba(49, 95, 159, 0.06); border-color: rgba(49, 95, 159, 0.25); }
+html[data-theme='paper'] .chart-scope-label.layer-daily { color: #67508c; background: rgba(103, 80, 140, 0.06); border-color: rgba(103, 80, 140, 0.25); }
+
+/* 覆盖第三方 fate span 的统一色，确保四层颜色真正分开 */
+.chart-scope-label.layer-decadal {
+  color: #e4c06d !important;
+  background: rgba(215, 180, 90, 0.12) !important;
+  box-shadow: inset 0 0 0 1px rgba(215, 180, 90, 0.4) !important;
+}
+.chart-scope-label.layer-yearly {
+  color: #82d3aa !important;
+  background: rgba(111, 195, 154, 0.1) !important;
+  box-shadow: inset 0 0 0 1px rgba(111, 195, 154, 0.4) !important;
+}
+.chart-scope-label.layer-monthly {
+  color: #91b6ef !important;
+  background: rgba(127, 169, 234, 0.1) !important;
+  box-shadow: inset 0 0 0 1px rgba(127, 169, 234, 0.4) !important;
+}
+.chart-scope-label.layer-daily {
+  color: #c6abf0 !important;
+  background: rgba(184, 154, 232, 0.1) !important;
+  box-shadow: inset 0 0 0 1px rgba(184, 154, 232, 0.4) !important;
+}

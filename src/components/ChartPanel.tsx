@@ -150,6 +150,63 @@ export default function ChartPanel({
     };
   }, [astrolabe, selectedPalace, options, dense]);
 
+  // 运限宫位短标签：大命 / 年命 / 月命 / 日命；同时删掉第三方「流年·丙」天干小字。
+  useEffect(() => {
+    if (!astrolabe) return;
+    const deco = () => {
+      const container = chartInnerRef.current;
+      if (!container) return;
+      const maps = layered?.flowPalaces ?? {};
+      const scopes = (['decadal', 'yearly', 'monthly', 'daily'] as const).filter((s) => maps[s]);
+      const prefix: Record<string, string> = { decadal: '大', yearly: '年', monthly: '月', daily: '日' };
+      const scopeLabel: Record<string, string> = { decadal: '大限', yearly: '流年', monthly: '流月', daily: '流日' };
+      const short: Record<string, string> = {
+        命宫: '命', 兄弟: '兄', 夫妻: '夫', 子女: '子', 财帛: '财', 疾厄: '疾',
+        迁移: '迁', 仆役: '友', 交友: '友', 官禄: '官', 田宅: '田', 福德: '福', 父母: '父',
+      };
+
+      container.querySelectorAll<HTMLElement>('.iztro-palace').forEach((p) => {
+        const text = p.querySelector('.iztro-palace-name-wrapper')?.textContent ?? '';
+        const base = PALACE_ORDER.find((n) => text.includes(n));
+        const host = p.querySelector<HTMLElement>('.iztro-palace-fate');
+        if (host) {
+          host.replaceChildren();
+          host.classList.add('chart-scope-labels-host');
+          const labels: HTMLElement[] = [];
+          if (base) {
+            scopes.forEach((scope) => {
+              const flow = maps[scope]?.[base];
+              if (!flow) return;
+              const label = document.createElement('span');
+              label.className = `chart-scope-label layer-${scope}`;
+              label.textContent = `${prefix[scope]}${short[flow] ?? flow.replace('宫', '').slice(0, 1)}`;
+              label.title = `${scopeLabel[scope]} · ${flow}`;
+              labels.push(label);
+            });
+          }
+          host.append(...labels);
+          host.style.display = labels.length ? 'grid' : 'none';
+        }
+
+        p.querySelectorAll<HTMLElement>('.iztro-palace-horo-star .iztro-star').forEach((star) => {
+          star.classList.remove('flow-layer-decadal', 'flow-layer-yearly', 'flow-layer-monthly', 'flow-layer-daily');
+          const n = star.textContent?.trim() ?? '';
+          const scope = /^(运|大)/.test(n) ? 'decadal' : /^(年|流)/.test(n) ? 'yearly' : /^月/.test(n) ? 'monthly' : /^日/.test(n) ? 'daily' : null;
+          if (scope) star.classList.add(`flow-layer-${scope}`);
+        });
+      });
+    };
+    const timer = window.setTimeout(deco, 80);
+    const retry = window.setTimeout(deco, 360);
+    const onResize = () => deco();
+    window.addEventListener('resize', onResize);
+    return () => {
+      window.clearTimeout(timer);
+      window.clearTimeout(retry);
+      window.removeEventListener('resize', onResize);
+    };
+  }, [astrolabe, layered, dense, options]);
+
   if (!astrolabe) {
     return (
       <div className="panel" style={{ textAlign: 'center', padding: '56px 20px' }}>

@@ -198,6 +198,8 @@ export type LayeredData = {
   palaces: Record<string, LayerStar[]>;
   /** 各层级四化（本命星 → 四化），用于标记颜色与文字 */
   mutagens: { scope: LayerScope; star: string; mutagen: string }[];
+  /** 各层：本命宫位名 → 该层运限宫位名 */
+  flowPalaces: Partial<Record<LayerScope, Record<string, string>>>;
 };
 
 /** 层级的颜色/短标元信息 */
@@ -220,12 +222,14 @@ export function getLayeredData(
 ): LayeredData {
   const palaces: Record<string, LayerStar[]> = {};
   const mutagens: { scope: LayerScope; star: string; mutagen: string }[] = [];
+  const flowPalaces: Partial<Record<LayerScope, Record<string, string>>> = {};
 
   const merge = (d: ScopeData, scope: LayerScope) => {
     Object.entries(d.palaces).forEach(([name, stars]) => {
       (palaces[name] ??= []).push(...stars.map((s) => ({ name: s.name, type: s.type, scope })));
     });
     d.mutagenMap.forEach((m) => mutagens.push({ scope, star: m.star, mutagen: m.mutagen }));
+    flowPalaces[scope] = d.flowPalaceByBase;
   };
 
   if (active.decadal != null) {
@@ -242,7 +246,7 @@ export function getLayeredData(
     merge(getScopeData(raw, 'daily', { targetDate: active.daily }), 'daily');
   }
 
-  return { palaces, mutagens };
+  return { palaces, mutagens, flowPalaces };
 }
 
 /** 大限列表项的年区间（用于流年选择） */

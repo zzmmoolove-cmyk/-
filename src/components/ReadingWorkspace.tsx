@@ -146,7 +146,7 @@ export default function ReadingWorkspace({
       <div className="chart-top-rail">
         <div className="scope-filter panel">
           <div className="scope-filter-row">
-            <span className="scope-filter-label">时间</span>
+            <span className="scope-filter-label">大限</span>
             <button
               className={`scope-chip ${range === 'natal' ? 'active' : ''}`}
               onClick={() => onActiveChange({ decadal: null, yearly: null, monthly: null, daily: null })}
@@ -154,7 +154,6 @@ export default function ReadingWorkspace({
               本命
             </button>
             <span className="scope-filter-sep" />
-            <span className="scope-filter-label">大限</span>
             {decadalOptions.map((d) => (
               <button
                 key={d.index}
@@ -162,7 +161,7 @@ export default function ReadingWorkspace({
                 onClick={() => onActiveChange({ decadal: d.index, yearly: null, monthly: null, daily: null })}
                 title={d.label}
               >
-                {d.label.split(' ')[0]} <em>{d.label.match(/\d+–\d+岁/)?.[0] ?? ''}</em>
+                {d.label.match(/\d+–\d+岁/)?.[0] ?? d.label}
               </button>
             ))}
             <span className="scope-current">{rangeText}</span>
