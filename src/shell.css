@@ -1836,3 +1836,19 @@ html[data-theme='mystic'] .sidebar {
   .client-pill-float { max-width: calc(100vw - 24px); }
   .client-pill-grip { display: none; }
 }
+
+/* —— 侧栏今日：紧凑万年历 + 流日 —— */
+.side-today-date { padding-bottom: 4px; }
+.side-today-cal { margin: 0 4px 6px; padding: 6px 7px; border: 1px solid var(--border); border-radius: 5px; background: rgba(255,255,255,.015); }
+.side-today-gz { font-size: 9.5px; color: var(--text); letter-spacing: .3px; }
+.side-today-chong { margin-top: 1px; font-size: 8.5px; color: var(--text-dim); }
+.side-today-yiji { display: flex; align-items: baseline; gap: 4px; margin-top: 2px; font-size: 8.5px; color: var(--text-dim); }
+.side-today-yiji span { flex: 0 0 12px; color: var(--ok); }
+.side-today-yiji.ji span { color: var(--danger); }
+.side-today-fortune-head { display: flex; align-items: baseline; justify-content: space-between; padding: 0 9px 3px; font-size: 9px; letter-spacing: 1px; color: var(--text-dim); }
+.side-today-fortune-head em { font-style: normal; letter-spacing: 0; font-size: 8.5px; color: var(--accent); }
+.side-today-mini { display: flex; flex-direction: column; gap: 2px; margin: 4px 4px 0; padding: 4px 7px; border-top: 1px dashed var(--border); }
+.side-today-mini span { display: flex; align-items: baseline; gap: 4px; font-size: 8.5px; color: var(--text-dim); }
+.side-today-mini em { flex: 0 0 24px; font-style: normal; color: var(--accent); }
+
+.side-today-cal-label { margin-bottom: 1px; font-size: 8px; letter-spacing: 1px; color: var(--text-dim); }

@@ -69,32 +69,39 @@ export default function SidebarToday({
         {calendar && <em>{calendar.lunar} · {calendar.yearGanZhi}年</em>}
       </div>
 
+      {calendar && (
+        <div className="side-today-cal">
+          <div className="side-today-cal-label">万年历</div>
+          <div className="side-today-gz">{calendar.yearGanZhi}年 {calendar.monthGanZhi}月 {calendar.dayGanZhi}日</div>
+          <div className="side-today-chong">冲{calendar.dayChong} · 煞{calendar.daySha}{calendar.prevJieQi ? ` · ${calendar.prevJieQi}` : ''}</div>
+          <div className="side-today-yiji">
+            <span>宜</span>{calendar.dayYi.slice(0, 3).join('、') || '—'}
+          </div>
+          <div className="side-today-yiji ji">
+            <span>忌</span>{calendar.dayJi.slice(0, 3).join('、') || '—'}
+          </div>
+        </div>
+      )}
+
       {primary ? (
         <>
+          <div className="side-today-fortune-head">流日运势 <em>{primary.name}</em></div>
           <div className="side-today-systems">
             <div className="side-today-row ziwei">
               <div><em>紫微</em><b>{fortune?.level ?? '—'} · {fortune?.scopePalace ?? '—'}</b></div>
               <p>{fortune?.advice[0] ?? '今日流日待算。'}</p>
             </div>
-            {baziDay && (
-              <div className="side-today-row bazi">
-                <div><em>八字</em><b>{baziDay.dayPillar} · {baziDay.tenGod}</b></div>
-                <p>{baziDay.advice}</p>
-              </div>
-            )}
-            {astroDay && (
-              <div className="side-today-row astro">
-                <div><em>星座</em><b>太阳入{astroDay.transitSun.sign} · {astroDay.aspect.label}</b></div>
-                <p>{astroDay.advice[0]}</p>
-              </div>
-            )}
+          </div>
+          <div className="side-today-mini">
+            {baziDay && <span><em>八字</em>{baziDay.dayPillar} · {baziDay.tenGod}</span>}
+            {astroDay && <span><em>星座</em>太阳入{astroDay.transitSun.sign}</span>}
           </div>
           <button className="side-today-more" onClick={onOpenToday}>展开今日 · 万年历 →</button>
         </>
       ) : (
         <button className="side-today-empty" onClick={onOpenMasters}>
           <b>还没有主客户</b>
-          <span>去命主页打开开关，主客户下方直接显示今日 →</span>
+          <span>去命主页打开开关，下面直接显示流日运势 →</span>
         </button>
       )}
     </div>
