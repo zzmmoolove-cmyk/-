@@ -2,6 +2,8 @@ import { useMemo, useState } from 'react';
 import type { Astrolabe } from '../types';
 import { buildPalacePromptText, buildPalaceSnapshot, snapshotToText } from '../lib/report';
 import { referenceLabel, type OutputProfile, type OutputSections } from '../lib/output';
+import { weightedPalace } from '../lib/scopePalace';
+import type { ActiveLayers, LayeredData } from '../lib/scope';
 import { quotesForStars } from '../lib/classics';
 
 const LABEL = (n: string) => (n.endsWith('宫') ? n : `${n}宫`);
@@ -29,12 +31,16 @@ export default function PalaceReportPanel({
   onSelectPalace,
   onSelectStar,
   output,
+  active,
+  layered,
 }: {
   astrolabe: Astrolabe;
   palaceName: string;
   onSelectPalace: (name: string) => void;
   onSelectStar: (name: string, palace?: string) => void;
   output?: OutputProfile;
+  active?: ActiveLayers;
+  layered?: LayeredData | null;
 }) {
   const snapshot = useMemo(() => buildPalaceSnapshot(astrolabe, palaceName), [astrolabe, palaceName]);
   const [copied, setCopied] = useState<'prompt' | 'text' | null>(null);
@@ -42,6 +48,10 @@ export default function PalaceReportPanel({
   const refs = output ? referenceLabel(output) : '';
   const secondary = show('stars') || show('synastry') || show('surround') || show('wuxing') || show('four');
   const anyContent = show('position') || secondary || show('blockages') || show('strategies') || show('classics') || show('gaps');
+  const weighted = useMemo(
+    () => (active ? weightedPalace(astrolabe, palaceName, layered ?? null, active) : null),
+    [astrolabe, palaceName, active, layered],
+  );
   const classicQuotes = useMemo(
     () => (output ? quotesForStars(snapshot.stars.map((s) => s.name), 4) : []),
     [snapshot, output],
@@ -80,6 +90,29 @@ export default function PalaceReportPanel({
         <span className="hint" style={{ margin: 0 }}>本地规则生成，不含 AI 臆测。</span>
         {refs && <span className="source-note">参考：{refs}（仅引文标注）</span>}
       </div>
+
+      {weighted && (
+        <section className="scope-weight-card">
+          <div className="scope-weight-head">
+            <div>
+              <div className="inspector-eyebrow">本限宫位卡 · 加权</div>
+              <h3>本命之后，再看当前选中的运限层</h3>
+            </div>
+            <div className="scope-weight-total"><b>{weighted.total}</b><span>{weighted.label}</span></div>
+          </div>
+          <div className="scope-weight-rows">
+            {weighted.layers.map((l) => (
+              <div key={l.scope} className="scope-weight-row">
+                <span>{l.label}</span>
+                <b>{l.score}</b>
+                <em>{l.weight}%</em>
+                <p>{l.note}</p>
+              </div>
+            ))}
+          </div>
+          <p className="hint">本命 50% + 大限 20% + 流年 15% + 流月 10% + 流日 5%，按当前已选层归一化；这是结构权重，不是吉凶总分。</p>
+        </section>
+      )}
 
       <div className="index-grid">
         {snapshot.index.map((row) => (

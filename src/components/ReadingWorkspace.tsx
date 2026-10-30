@@ -228,6 +228,7 @@ export default function ReadingWorkspace({
                 options={options}
                 timeIndex={timeIndex}
                 layered={layered}
+                active={active}
                 selectedPalace={selectedPalace}
                 userLabel={userLabel}
                 onSelectPalace={onSelectPalace}
@@ -245,6 +246,8 @@ export default function ReadingWorkspace({
                     onSelectPalace={onSelectPalace}
                     onSelectStar={onSelectStar}
                     output={output}
+                    active={active}
+                    layered={layered}
                   />
                   <details className="panel legacy-wrap">
                     <summary>传统解读与 AI（旧版）</summary>
@@ -290,6 +293,9 @@ export default function ReadingWorkspace({
               palaceName={selectedPalace}
               onExpand={() => onViewChange('card')}
               onSelectStar={onSelectStar}
+              active={active}
+              layered={layered}
+              onSelectPalace={onSelectPalace}
             />
           )}
         </div>

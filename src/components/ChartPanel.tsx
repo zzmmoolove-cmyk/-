@@ -2,6 +2,8 @@ import { useEffect, useRef, useState } from 'react';
 import type { MouseEvent as ReactMouseEvent } from 'react';
 import { Iztrolabe } from 'react-iztro';
 import type { Astrolabe, BirthInput, ChartOptions, Palace } from '../types';
+import { weightedPalace } from '../lib/scopePalace';
+import type { ActiveLayers } from '../lib/scope';
 import { LAYER_META, type LayeredData, type LayerScope } from '../lib/scope';
 import { getProfile } from '../lib/knowledge/starProfiles';
 import { PALACE_KB, PALACE_ORDER } from '../lib/knowledge/palaces';
@@ -88,6 +90,7 @@ export default function ChartPanel({
   options,
   timeIndex,
   layered,
+  active,
   selectedPalace,
   userLabel,
   onSelectPalace,
@@ -99,6 +102,7 @@ export default function ChartPanel({
   options: ChartOptions;
   timeIndex: number;
   layered: LayeredData | null;
+  active?: ActiveLayers;
   selectedPalace: string | null;
   userLabel?: string;
   onSelectPalace: (name: string) => void;
@@ -583,25 +587,36 @@ export default function ChartPanel({
 
       <div className="panel">
         <h2>
-          十二宫<span className="dim">（点击查看解读，运限叠加显示）</span>
+          十二宫<span className="dim">（点击看本限加权、三方四正与检查器）</span>
         </h2>
         <div className="palace-grid">
           {astrolabe.palaces.map((p: Palace) => {
             const layerStars = layered?.palaces[p.name] ?? [];
+            const weight = active ? weightedPalace(astrolabe, p.name, layered, active) : null;
             return (
               <div
                 key={p.index}
                 role="button"
                 tabIndex={0}
                 className={`palace-card ${selectedPalace === p.name ? 'active' : ''}`}
-                onClick={() => (onOpenPalaceCard ?? onSelectPalace)(p.name)}
+                onClick={() => onSelectPalace(p.name)}
                 onKeyDown={(e) => {
-                  if (e.key === 'Enter' || e.key === ' ') (onOpenPalaceCard ?? onSelectPalace)(p.name);
+                  if (e.key === 'Enter' || e.key === ' ') onSelectPalace(p.name);
                 }}
               >
                 <div className="palace-card-head">
                   <span className="palace-name">{p.name}</span>
                   {p.isBodyPalace && <span className="badge badge-body">身宫</span>}
+                  {weight && <span className="palace-weight-badge">本限 {weight.total}</span>}
+                  {onOpenPalaceCard && (
+                    <button
+                      className="palace-open"
+                      title="展开完整宫位卡"
+                      onClick={(e) => { e.stopPropagation(); onOpenPalaceCard(p.name); }}
+                    >
+                      ↗
+                    </button>
+                  )}
                 </div>
                 <div className="palace-stars">
                   {p.majorStars.length ? (

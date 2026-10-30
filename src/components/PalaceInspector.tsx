@@ -1,19 +1,31 @@
 import { useMemo } from 'react';
 import type { Astrolabe } from '../types';
 import { buildPalaceSnapshot } from '../lib/report';
+import { weightedPalace } from '../lib/scopePalace';
+import type { ActiveLayers, LayeredData } from '../lib/scope';
 
 export default function PalaceInspector({
   astrolabe,
   palaceName,
   onExpand,
   onSelectStar,
+  active,
+  layered,
+  onSelectPalace,
 }: {
   astrolabe: Astrolabe;
   palaceName: string;
   onExpand: () => void;
   onSelectStar: (name: string, palace?: string) => void;
+  active?: ActiveLayers;
+  layered?: LayeredData | null;
+  onSelectPalace?: (name: string) => void;
 }) {
   const snap = useMemo(() => buildPalaceSnapshot(astrolabe, palaceName, false), [astrolabe, palaceName]);
+  const weighted = useMemo(
+    () => (active ? weightedPalace(astrolabe, palaceName, layered ?? null, active) : null),
+    [astrolabe, palaceName, active, layered],
+  );
 
   return (
     <aside className="inspector panel">
@@ -30,6 +42,14 @@ export default function PalaceInspector({
         </span>
       </div>
 
+      {weighted && (
+        <div className="inspector-weighted">
+          <span>本限加权</span>
+          <b>{weighted.total}</b>
+          <em>{weighted.label}</em>
+        </div>
+      )}
+
       <div className="inspector-stars">
         {snap.stars.slice(0, 6).map((s) => (
           <button key={s.name} className="inspector-star" onClick={() => onSelectStar(s.name, palaceName)}>
@@ -38,6 +58,19 @@ export default function PalaceInspector({
           </button>
         ))}
         {snap.stars.length === 0 && <p className="dim">空宫，借对宫参看。</p>}
+      </div>
+
+      <div className="inspector-section">
+        <div className="inspector-label">三方四正</div>
+        <div className="inspector-surround">
+          {snap.surrounding.map((g) => (
+            <button key={g.role + g.palace} onClick={() => onSelectPalace?.(g.palace)}>
+              <em>{g.role}</em>
+              <b>{g.palace}</b>
+              <span>{g.stars.slice(0, 3).join('、') || '空宫'}</span>
+            </button>
+          ))}
+        </div>
       </div>
 
       <div className="inspector-section">

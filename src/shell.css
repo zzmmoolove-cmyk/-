@@ -1619,3 +1619,36 @@ html[data-theme='mystic'] .sidebar {
 .scope-report-actions { flex: 0 0 auto; display: flex; align-items: center; gap: 8px; }
 .scope-report-actions .btn { width: auto; }
 @media print { .scope-report-actions .btn { display: none !important; } }
+
+/* —— 检查器：本限加权 / 三方四正 —— */
+.inspector-weighted { display: flex; align-items: baseline; gap: 5px; margin: 8px 0; padding: 6px 8px; border: 1px solid rgba(201, 163, 92, 0.3); border-radius: 6px; background: rgba(201, 163, 92, 0.06); }
+.inspector-weighted span { font-size: 9px; color: var(--text-dim); }
+.inspector-weighted b { font-size: 18px; color: var(--accent-soft); }
+.inspector-weighted em { font-style: normal; font-size: 9px; color: var(--text-dim); }
+.inspector-surround { display: flex; flex-direction: column; gap: 3px; }
+.inspector-surround button { display: flex; align-items: baseline; gap: 5px; width: 100%; padding: 4px 5px; border: 1px solid var(--border); border-radius: 4px; background: var(--panel-2); color: var(--text); text-align: left; cursor: pointer; }
+.inspector-surround button:hover { border-color: var(--accent); }
+.inspector-surround em { flex: 0 0 24px; font-style: normal; font-size: 8px; color: var(--accent); }
+.inspector-surround b { flex: 0 0 34px; font-size: 10px; color: var(--accent-soft); }
+.inspector-surround span { min-width: 0; font-size: 9px; color: var(--text-dim); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* —— 宫位卡：本限加权 —— */
+.scope-weight-card { margin: 10px 0; padding: 11px 12px; border: 1px solid rgba(201, 163, 92, 0.28); border-radius: 8px; background: rgba(201, 163, 92, 0.04); }
+.scope-weight-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
+.scope-weight-head h3 { margin: 3px 0 0; font-family: var(--font-display); font-size: 16px; letter-spacing: 1px; color: var(--accent-soft); }
+.scope-weight-total { flex: 0 0 auto; text-align: right; }
+.scope-weight-total b { display: block; font-family: var(--font-display); font-size: 26px; line-height: 1; color: var(--accent-soft); }
+.scope-weight-total span { display: block; margin-top: 2px; font-size: 9px; color: var(--text-dim); }
+.scope-weight-rows { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 5px; margin-top: 8px; }
+.scope-weight-row { padding: 6px 7px; border: 1px solid var(--border); border-radius: 5px; background: var(--panel-2); min-width: 0; }
+.scope-weight-row > span { display: block; font-size: 9px; color: var(--text-dim); }
+.scope-weight-row > b { font-size: 15px; color: var(--accent-soft); }
+.scope-weight-row > em { margin-left: 3px; font-style: normal; font-size: 8px; color: var(--text-dim); }
+.scope-weight-row p { margin: 3px 0 0; font-size: 8.5px; line-height: 1.45; color: var(--text-dim); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+
+@media (max-width: 800px) { .scope-weight-rows { grid-template-columns: 1fr 1fr; } }
+
+/* —— 十二宫：本限加权 / 展开 —— */
+.palace-weight-badge { margin-left: 4px; padding: 1px 5px; border: 1px solid rgba(201, 163, 92, 0.3); border-radius: 3px; font-size: 8px; color: var(--accent); white-space: nowrap; }
+.palace-open { margin-left: auto; padding: 0 3px; border: 0; background: none; color: var(--text-dim); font-size: 13px; line-height: 1; cursor: pointer; }
+.palace-open:hover { color: var(--accent-soft); }
