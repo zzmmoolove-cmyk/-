@@ -1315,3 +1315,94 @@ html[data-theme='mystic'] .sidebar {
   .ideal-b-head { flex-direction: column; }
   .synastry-dim-head { flex-direction: column; }
 }
+
+.service-type.type-investment { background: rgba(201, 163, 92, 0.16); color: #e4c587; }
+
+/* —— 投资倾向 —— */
+.investment-disclaimer {
+  margin: 10px 0 12px;
+  padding: 9px 11px;
+  border: 1px solid rgba(224, 120, 120, 0.32);
+  border-left: 3px solid var(--danger);
+  border-radius: 0 7px 7px 0;
+  background: rgba(224, 120, 120, 0.06);
+  font-size: 11px;
+  line-height: 1.7;
+  color: var(--text-dim);
+}
+.investment-disclaimer b { color: var(--danger); }
+.investment-profile {
+  padding: 14px;
+  border: 1px solid var(--border);
+  border-radius: 11px;
+  background: var(--panel);
+}
+.investment-profile-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+.investment-profile-head h4 { margin: 3px 0 3px; font-family: var(--font-display); font-size: 22px; letter-spacing: 1.5px; color: var(--accent-soft); }
+.investment-profile-head p { margin: 0; font-size: 11.5px; color: var(--text-dim); }
+.investment-risk { flex: 0 0 auto; min-width: 100px; text-align: right; }
+.investment-risk b { display: block; font-family: var(--font-display); font-size: 30px; line-height: 1; color: var(--accent-soft); }
+.investment-risk span { display: block; margin-top: 3px; font-size: 10px; color: var(--text-dim); }
+.investment-risk.high b { color: var(--danger); }
+.investment-risk.low b { color: var(--ok); }
+.investment-summary { margin: 9px 0; font-size: 12px; line-height: 1.75; color: var(--text); }
+.investment-patterns { display: flex; flex-wrap: wrap; gap: 4px; }
+.investment-patterns span { padding: 2px 6px; border: 1px solid var(--border); border-radius: 4px; background: var(--panel-2); font-size: 10px; color: var(--text-dim); }
+.investment-patterns .investment-style { color: var(--accent-soft); border-color: rgba(201, 163, 92, 0.35); }
+.investment-scores { margin-top: 12px; }
+.investment-score-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; }
+.investment-score { padding: 8px 10px; border: 1px solid var(--border); border-radius: 7px; background: var(--panel); }
+.investment-score-top { display: flex; align-items: baseline; justify-content: space-between; }
+.investment-score-top b { font-size: 12px; color: var(--text); }
+.investment-score-top span { font-size: 15px; color: var(--accent-soft); }
+.investment-bar { height: 4px; margin: 5px 0; border-radius: 99px; background: rgba(255, 255, 255, 0.06); overflow: hidden; }
+.investment-bar i { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, var(--accent), var(--accent-soft)); }
+.investment-score p { margin: 2px 0 0; font-size: 9.5px; line-height: 1.5; color: var(--text-dim); }
+.investment-timing { margin-top: 12px; padding: 13px 14px; border: 1px solid var(--border); border-radius: 10px; background: var(--panel); }
+.investment-level { display: inline-block; margin-bottom: 5px; padding: 2px 8px; border: 1px solid var(--border); border-radius: 99px; font-size: 10px; }
+.investment-level.积极 { color: var(--ok); border-color: rgba(99, 179, 150, 0.4); }
+.investment-level.均衡 { color: var(--warn); border-color: rgba(214, 170, 90, 0.35); }
+.investment-level.防守 { color: var(--danger); border-color: rgba(224, 120, 120, 0.4); }
+.investment-timing-meta { display: flex; flex-wrap: wrap; gap: 8px; margin: 4px 0; font-size: 10.5px; color: var(--text-dim); }
+.investment-timing > p { margin: 5px 0; font-size: 11.5px; line-height: 1.7; color: var(--text); }
+.investment-timing .notes { margin: 5px 0 0; padding-left: 16px; }
+.investment-timing .notes li { margin: 2px 0; font-size: 10.5px; line-height: 1.55; color: var(--text-dim); }
+.investment-mutagens { margin-top: 9px; padding-top: 8px; border-top: 1px dashed var(--border); }
+.investment-mutagens > em { display: block; margin-bottom: 4px; font-style: normal; font-size: 9.5px; color: var(--text-dim); }
+.investment-mutagens > div { display: flex; flex-wrap: wrap; gap: 4px; }
+.investment-two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 12px; }
+.investment-list-card { padding: 11px 12px; border: 1px solid var(--border); border-radius: 8px; background: var(--panel); }
+.investment-list-card h4 { margin: 0 0 5px; font-size: 12px; letter-spacing: 1px; color: var(--accent-soft); }
+.investment-list-card ul { margin: 0; padding-left: 16px; }
+.investment-list-card li { margin: 3px 0; font-size: 11px; line-height: 1.6; color: var(--text); }
+.investment-list-card.warn h4 { color: var(--danger); }
+.investment-checklist { margin-top: 12px; padding: 13px 14px; border: 1px solid var(--border); border-radius: 10px; background: var(--panel); }
+.investment-checklist ol { margin: 4px 0 0; padding-left: 20px; }
+.investment-checklist li { margin: 3px 0; font-size: 11px; line-height: 1.65; color: var(--text); }
+
+@media (max-width: 700px) {
+  .investment-score-grid, .investment-two-col { grid-template-columns: 1fr; }
+  .investment-profile-head { flex-direction: column; }
+  .investment-risk { text-align: left; }
+}
+
+.tool-nav { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+@media (max-width: 760px) {
+  .tool-nav { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+.investment-framework {
+  display: flex;
+  gap: 9px;
+  align-items: baseline;
+  margin: -4px 0 12px;
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  background: var(--panel-2);
+  font-size: 10.5px;
+  line-height: 1.65;
+  color: var(--text-dim);
+}
+.investment-framework span { flex: 0 0 auto; color: var(--accent); font-weight: 700; }
+.investment-framework p { margin: 0; }

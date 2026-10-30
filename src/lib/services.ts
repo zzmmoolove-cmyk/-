@@ -4,6 +4,7 @@ export const SERVICE_LABELS: Record<ServiceType, string> = {
   naming: '起名',
   dates: '择日',
   synastry: '合盘',
+  investment: '投资',
   team: '团队',
 };
 

@@ -863,6 +863,7 @@ export default function App() {
               <div id="service-new" className="service-new-block">
                 <ToolsPanel
                   astrolabe={astrolabe}
+                  raw={raw}
                   users={users}
                   activeUserId={activeUserId}
                   userName={currentProfile.name}

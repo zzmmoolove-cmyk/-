@@ -97,7 +97,7 @@ export type UserRecord = {
   payload: BirthInput & ChartOptions;
 };
 
-export type ServiceType = 'naming' | 'dates' | 'synastry' | 'team';
+export type ServiceType = 'naming' | 'dates' | 'synastry' | 'investment' | 'team';
 export type ServiceStatus = 'draft' | 'delivered';
 
 export type ServiceDraft = {

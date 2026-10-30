@@ -3,18 +3,21 @@ import type { Astrolabe, BirthInput, ChartOptions, ServiceDraft, UserProfile, Us
 import NamingTool from './NamingTool';
 import DateSelectTool from './DateSelectTool';
 import SynastryTool from './SynastryTool';
+import InvestmentTool from './InvestmentTool';
 
-type ToolKey = 'naming' | 'dates' | 'synastry' | 'team';
+type ToolKey = 'naming' | 'dates' | 'synastry' | 'investment' | 'team';
 
 const TOOLS: { key: ToolKey; label: string; hint: string }[] = [
   { key: 'naming', label: '起名', hint: '四柱五行 + 字库 + 音律' },
   { key: 'dates', label: '择日', hint: '黄历宜忌 + 生肖冲煞' },
   { key: 'synastry', label: '合盘', hint: '双人关系结构 + 分享卡' },
+  { key: 'investment', label: '投资', hint: '财富剧本 + 风险节奏' },
   { key: 'team', label: '团队', hint: '下一版' },
 ];
 
 export default function ToolsPanel({
   astrolabe,
+  raw,
   users,
   activeUserId,
   userName,
@@ -24,6 +27,7 @@ export default function ToolsPanel({
   onCreateClient,
 }: {
   astrolabe: Astrolabe | null;
+  raw: Record<string, unknown> | null;
   users: UserRecord[];
   activeUserId: string | null;
   userName?: string;
@@ -59,6 +63,9 @@ export default function ToolsPanel({
         <NamingTool astrolabe={astrolabe} userLabel={userLabel} defaultSurname={defaultSurname} options={options} onSaveService={saveForCurrent} />
       )}
       {tool === 'dates' && <DateSelectTool astrolabe={astrolabe} userLabel={userLabel} onSaveService={saveForCurrent} />}
+      {tool === 'investment' && (
+        <InvestmentTool astrolabe={astrolabe} raw={raw} userLabel={userLabel} onSaveService={saveForCurrent} />
+      )}
       {tool === 'synastry' && (
         <SynastryTool
           astrolabe={astrolabe}
