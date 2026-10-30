@@ -439,6 +439,23 @@ export default function App() {
     generate(inputFromPayload(record.payload), optionsFromPayload(record.payload));
   };
 
+  const createClient = (next: BirthInput, profile: UserProfile): string => {
+    const id = String(Date.now());
+    const now = new Date().toLocaleString('zh-CN');
+    const record: UserRecord = {
+      id,
+      name: profile.name.trim() || '未命名',
+      relation: profile.relation,
+      note: profile.note,
+      savedAt: now,
+      updatedAt: now,
+      payload: { ...next, ...options },
+    };
+    setUsers((prev) => [record, ...prev].slice(0, 100));
+    flash('✓ 已新建客户');
+    return id;
+  };
+
   const saveService = (draft: ServiceDraft) => {
     const record: ServiceRecord = {
       ...draft,
@@ -795,6 +812,7 @@ export default function App() {
                   userLabel={currentProfile.name ? `${currentProfile.name} · ${currentProfile.relation}` : ''}
                   options={options}
                   onSaveService={saveService}
+                  onCreateClient={createClient}
                 />
               </div>
             </div>

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import type { Astrolabe, ChartOptions, ServiceDraft, UserRecord } from '../types';
+import type { Astrolabe, BirthInput, ChartOptions, ServiceDraft, UserProfile, UserRecord } from '../types';
 import NamingTool from './NamingTool';
 import DateSelectTool from './DateSelectTool';
 import SynastryTool from './SynastryTool';
@@ -21,6 +21,7 @@ export default function ToolsPanel({
   userLabel,
   options,
   onSaveService,
+  onCreateClient,
 }: {
   astrolabe: Astrolabe | null;
   users: UserRecord[];
@@ -29,6 +30,7 @@ export default function ToolsPanel({
   userLabel?: string;
   options: ChartOptions;
   onSaveService?: (draft: ServiceDraft) => void;
+  onCreateClient?: (input: BirthInput, profile: UserProfile) => string;
 }) {
   const [tool, setTool] = useState<ToolKey>('naming');
   const defaultSurname = userName ? Array.from(userName)[0] : '';
@@ -65,6 +67,7 @@ export default function ToolsPanel({
           userName={userName || userLabel?.split(' · ')[0] || '你'}
           options={options}
           onSaveService={onSaveService}
+          onCreateClient={onCreateClient}
         />
       )}
       {tool === 'team' && (

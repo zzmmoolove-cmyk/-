@@ -1,8 +1,9 @@
 import { useMemo, useState } from 'react';
 import { astro } from 'iztro';
-import type { Astrolabe, ChartOptions, ServiceDraft, UserRecord } from '../types';
+import type { Astrolabe, BirthInput, ChartOptions, ServiceDraft, UserProfile, UserRecord } from '../types';
 import { buildAstrolabe } from '../lib/buildChart';
 import { compareCharts, synastryText } from '../lib/synastry';
+import QuickClientSheet from './QuickClientSheet';
 
 function optionsFrom(p: UserRecord['payload']): ChartOptions {
   return {
@@ -145,6 +146,7 @@ export default function SynastryTool({
   userName,
   options,
   onSaveService,
+  onCreateClient,
 }: {
   astrolabe: Astrolabe | null;
   users: UserRecord[];
@@ -152,6 +154,7 @@ export default function SynastryTool({
   userName?: string;
   options: ChartOptions;
   onSaveService?: (draft: ServiceDraft) => void;
+  onCreateClient?: (input: BirthInput, profile: UserProfile) => string;
 }) {
   const candidates = useMemo(
     () => users.filter((u) => u.id !== activeUserId),
@@ -159,6 +162,7 @@ export default function SynastryTool({
   );
   const [bId, setBId] = useState<string>(candidates[0]?.id ?? '');
   const [copied, setCopied] = useState(false);
+  const [quickOpen, setQuickOpen] = useState(false);
 
   const bRecord = candidates.find((u) => u.id === bId) ?? candidates[0];
   const bChart = useMemo(() => {
@@ -217,8 +221,18 @@ export default function SynastryTool({
         </div>
         <div className="tool-empty slim">
           <p className="empty-kicker">还差 B 盘</p>
-          <p className="dim">在左侧「用户信息」里保存另一个人的档案（姓名 + 出生信息），再回来选 B。</p>
+          <p className="dim">新建 B 只保存档案，不会切换当前 A 盘。</p>
+          {onCreateClient && <button className="btn" onClick={() => setQuickOpen(true)}>+ 新建 B</button>}
         </div>
+        {quickOpen && (
+          <QuickClientSheet
+            onClose={() => setQuickOpen(false)}
+            onSave={(input, profile) => {
+              const id = onCreateClient?.(input, profile);
+              if (id) setBId(id);
+            }}
+          />
+        )}
       </div>
     );
   }
@@ -248,13 +262,16 @@ export default function SynastryTool({
         </div>
         <div className="field">
           <label>B 盘（已保存用户）</label>
-          <select value={bRecord?.id ?? ''} onChange={(e) => setBId(e.target.value)}>
-            {candidates.map((u) => (
-              <option key={u.id} value={u.id}>
-                {u.name} · {u.relation} · {u.payload.birthday}
-              </option>
-            ))}
-          </select>
+          <div className="synastry-b-row">
+            <select value={bRecord?.id ?? ''} onChange={(e) => setBId(e.target.value)}>
+              {candidates.map((u) => (
+                <option key={u.id} value={u.id}>
+                  {u.name} · {u.relation} · {u.payload.birthday}
+                </option>
+              ))}
+            </select>
+            {onCreateClient && <button className="btn ghost small" onClick={() => setQuickOpen(true)}>+ 新建 B</button>}
+          </div>
         </div>
       </div>
 
@@ -310,6 +327,15 @@ export default function SynastryTool({
           <p className="tool-note">
             分数看的是结构匹配与张力，不是感情好坏；低分也可能代表高吸引。合盘是关系参考，不替代沟通、心理咨询或法律意见。
           </p>
+          {quickOpen && (
+            <QuickClientSheet
+              onClose={() => setQuickOpen(false)}
+              onSave={(input, profile) => {
+                const id = onCreateClient?.(input, profile);
+                if (id) setBId(id);
+              }}
+            />
+          )}
         </div>
       )}
     </div>
