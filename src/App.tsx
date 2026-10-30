@@ -18,6 +18,7 @@ import UserPanel from './components/UserPanel';
 import ToolsPanel from './components/ToolsPanel';
 import ReadingWorkspace from './components/ReadingWorkspace';
 import TodayPanel from './components/TodayPanel';
+import SidebarToday from './components/SidebarToday';
 import ClientListPanel from './components/ClientListPanel';
 import ClientProfileSheet from './components/ClientProfileSheet';
 import ServiceRecordList from './components/ServiceRecordList';
@@ -719,9 +720,6 @@ export default function App() {
               <button className={`side-nav-item ${section === 'master' || section === 'clients' ? 'active' : ''}`} onClick={() => setSection('master')}>
                 <span className="side-icon">◉</span>命主
               </button>
-              <button className={`side-nav-item ${section === 'today' ? 'active' : ''}`} onClick={() => setSection('today')}>
-                <span className="side-icon">✦</span>今日
-              </button>
               <button className={`side-nav-item ${section === 'services' ? 'active' : ''}`} onClick={() => setSection('services')}>
                 <span className="side-icon">◇</span>服务
               </button>
@@ -753,6 +751,13 @@ export default function App() {
             )}
           </div>
 
+          <SidebarToday
+            primary={primary}
+            options={options}
+            onOpenToday={() => setSection('today')}
+            onOpenMasters={() => setSection('master')}
+          />
+
           <div className="side-foot">
             本地优先 · 数据只存本机<br />
             解读仅供传统文化研究
@@ -771,6 +776,7 @@ export default function App() {
               onNewClient={newClient}
               onOpenServices={() => setSection('services')}
               onOpenLibrary={() => setSection('library')}
+              onOpenMasters={() => setSection('master')}
               onPrimaryChange={setPrimaryId}
             />
           )}

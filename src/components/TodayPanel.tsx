@@ -18,6 +18,7 @@ export default function TodayPanel({
   onNewClient,
   onOpenServices,
   onOpenLibrary,
+  onOpenMasters,
   onPrimaryChange,
 }: {
   users: UserRecord[];
@@ -29,6 +30,7 @@ export default function TodayPanel({
   onNewClient: () => void;
   onOpenServices: () => void;
   onOpenLibrary: () => void;
+  onOpenMasters: () => void;
   onPrimaryChange: (id: string) => void;
 }) {
   const today = todayIso();
@@ -43,6 +45,7 @@ export default function TodayPanel({
 
   return (
     <div className="today-page">
+      <button className="today-back" onClick={onOpenMasters}>← 回到命主</button>
       <div className="today-date">
         <div>
           <span>今天</span>

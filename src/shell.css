@@ -1785,3 +1785,33 @@ html[data-theme='mystic'] .sidebar {
 
 .chart-head-tools { display: flex; align-items: center; gap: 6px; }
 .chart-palace-picker { width: auto; max-width: 120px; padding: 3px 6px; font-size: 10px; }
+
+/* —— 侧栏今日：主客户下方直接展示 —— */
+.side-today { margin-top: 2px; }
+.side-today-dow { font-size: 9px; color: var(--text-dim); }
+.side-today-date { padding: 0 9px 7px; }
+.side-today-date b { display: block; font-family: var(--font-display); font-size: 17px; letter-spacing: 1px; color: var(--accent-soft); }
+.side-today-date em { display: block; margin-top: 1px; font-style: normal; font-size: 9px; color: var(--text-dim); }
+.side-today-systems { display: flex; flex-direction: column; gap: 4px; padding: 0 4px; }
+.side-today-row { padding: 6px 7px; border-left: 2px solid var(--border); border-radius: 0 5px 5px 0; background: rgba(255,255,255,.015); }
+.side-today-row.ziwei { border-left-color: var(--accent); }
+.side-today-row.bazi { border-left-color: #9bc7b4; }
+.side-today-row.astro { border-left-color: #b8a9e8; }
+.side-today-row > div { display: flex; align-items: baseline; gap: 5px; }
+.side-today-row em { font-style: normal; font-size: 8.5px; color: var(--text-dim); }
+.side-today-row b { font-size: 10.5px; color: var(--text); }
+.side-today-row p { margin: 2px 0 0; font-size: 9px; line-height: 1.5; color: var(--text-dim); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.side-today-more { width: calc(100% - 8px); margin: 6px 4px 0; padding: 5px 7px; border: 1px solid var(--border); border-radius: 5px; background: transparent; color: var(--text-dim); font-size: 9.5px; text-align: left; cursor: pointer; }
+.side-today-more:hover { border-color: var(--accent); color: var(--accent-soft); }
+.side-today-empty { width: calc(100% - 8px); margin: 0 4px; padding: 8px; border: 1px dashed var(--border); border-radius: 6px; background: transparent; color: var(--text); text-align: left; cursor: pointer; }
+.side-today-empty b { display: block; font-size: 11px; }
+.side-today-empty span { display: block; margin-top: 2px; font-size: 9px; line-height: 1.5; color: var(--text-dim); }
+
+@media (max-width: 760px) {
+  .side-today-systems { display: grid; grid-template-columns: 1fr 1fr 1fr; }
+  .side-today-row p { -webkit-line-clamp: 2; }
+  .side-today-more { width: auto; }
+}
+
+.today-back { width: auto; margin: 0 0 8px; padding: 3px 7px; border: 1px solid var(--border); border-radius: 4px; background: transparent; color: var(--text-dim); font-size: 10px; cursor: pointer; }
+.today-back:hover { border-color: var(--accent); color: var(--accent-soft); }
