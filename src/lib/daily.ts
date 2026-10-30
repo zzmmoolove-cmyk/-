@@ -1,4 +1,4 @@
-// 流日运势：以主客户本命盘为底，取 iztro horoscope 的流日层。
+// 流日运势：以主命主本命盘为底，取 iztro horoscope 的流日层。
 // 只做当日触发与作息/沟通提醒，不断长期吉凶。
 
 import { astro } from 'iztro';

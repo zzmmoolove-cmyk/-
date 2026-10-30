@@ -76,6 +76,7 @@ export type Relation =
   | '朋友'
   | '同事'
   | '客户'
+  | '服务对象'
   | '其他';
 
 export type UserProfile = {

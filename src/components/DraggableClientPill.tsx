@@ -113,13 +113,13 @@ export default function DraggableClientPill({
       onPointerMove={move}
       onPointerUp={up}
       onPointerCancel={up}
-      title="拖动可移动；点击切换当前客户"
-      aria-label="当前客户，拖动可移动，点击切换"
+      title="拖动可移动；点击切换当前命主"
+      aria-label="当前命主，拖动可移动，点击切换"
     >
       <span className="top-avatar">{Array.from(name || '客')[0]}</span>
       <span>
-        <b>{name || '选择客户'}</b>
-        <em>{name ? `${relation || '本人'}${isPrimary ? ' · 主客户' : ''}` : '按客户工作'}</em>
+        <b>{name || '选择命主'}</b>
+        <em>{name ? `${relation || '本人'}${isPrimary ? ' · 主命主' : ''}` : '按命主工作'}</em>
       </span>
       {state && <span className={`top-state ${state === '已保存' ? 'saved' : 'dirty'}`}>{state}</span>}
       <span className="client-pill-grip" aria-hidden="true">⠿</span>

@@ -62,8 +62,8 @@ export default function ClientProfileSheet({
       <div className="client-sheet" onClick={(e) => e.stopPropagation()}>
         <div className="client-sheet-head">
           <div>
-            <div className="inspector-eyebrow">客户档案</div>
-            <h2>{user.name} <span>{user.relation}</span></h2>
+            <div className="inspector-eyebrow">命主档案</div>
+            <h2>{user.name} <span>{user.relation === '客户' ? '服务对象' : user.relation}</span></h2>
             <p>{user.payload.birthday} {user.payload.clockTime} · {user.payload.gender} · {user.payload.useTrueSolar ? '真太阳时' : '北京时间'}</p>
           </div>
           <button className="sheet-close" onClick={onClose} aria-label="关闭">×</button>
@@ -142,7 +142,7 @@ export default function ClientProfileSheet({
           >
             分享安星码
           </button>
-          <button className="btn ghost danger-text" onClick={() => { if (window.confirm(`删除客户「${user.name}」？`)) onDelete(); }}>删除</button>
+          <button className="btn ghost danger-text" onClick={() => { if (window.confirm(`删除命主「${user.name}」？`)) onDelete(); }}>删除</button>
         </div>
       </div>
     </div>

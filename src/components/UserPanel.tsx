@@ -6,7 +6,7 @@ import { parseDateInput, parseTimeInput } from '../lib/datetime';
 import { encodeChart, decodeChart } from '../lib/chartcode';
 import { FLOW_PROFILES, PROFILE_STATS } from '../lib/knowledge/starProfiles';
 
-const RELATIONS: Relation[] = ['本人', '父亲', '母亲', '配偶', '子女', '兄弟', '姐妹', '朋友', '同事', '客户', '其他'];
+const RELATIONS: Relation[] = ['本人', '父亲', '母亲', '配偶', '子女', '兄弟', '姐妹', '朋友', '同事', '服务对象', '其他'];
 
 const TIME_OPTIONS: { value: number; label: string }[] = [
   { value: 0, label: '早子时 00:00–01:00' },
@@ -67,7 +67,7 @@ export default function UserPanel({
   );
 
   const [name, setName] = useState(initialProfile.name);
-  const [relation, setRelation] = useState<Relation>(initialProfile.relation);
+  const [relation, setRelation] = useState<Relation>(initialProfile.relation === '客户' ? '服务对象' : initialProfile.relation);
   const [note, setNote] = useState(initialProfile.note);
   const [birthday, setBirthday] = useState(initial.birthday);
   const [birthdayText, setBirthdayText] = useState(initial.birthday);
@@ -229,7 +229,7 @@ export default function UserPanel({
           <option value="">已保存用户 · {users.length}</option>
           {users.map((u) => (
             <option key={u.id} value={u.id}>
-              {u.name} · {u.relation} · {u.birthday}
+              {u.name} · {u.relation === '客户' ? '服务对象' : u.relation} · {u.birthday}
             </option>
           ))}
         </select>
@@ -261,7 +261,7 @@ export default function UserPanel({
 
       <div className="field">
         <label>备注</label>
-        <input value={note} placeholder="客户来源 / 关注点" onChange={(e) => setNote(e.target.value)} />
+        <input value={note} placeholder="命主来源 / 关注点" onChange={(e) => setNote(e.target.value)} />
       </div>
 
       <div className="row">

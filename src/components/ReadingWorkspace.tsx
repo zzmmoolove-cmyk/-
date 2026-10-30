@@ -133,11 +133,11 @@ export default function ReadingWorkspace({
       <div className="workspace-head">
         <div className="workspace-title">
           <div className="inspector-eyebrow">解盘</div>
-          <h2>{userLabel || '未命名客户'}</h2>
+          <h2>{userLabel || '未命名命主'}</h2>
           <p>{astrolabe ? `${astrolabe.solarDate} · ${astrolabe.chineseDate}` : '尚未排盘'}</p>
         </div>
         <div className="workspace-actions">
-          <button className="btn ghost small" onClick={onOpenProfile}>客户档案</button>
+          <button className="btn ghost small" onClick={onOpenProfile}>命主档案</button>
           <button className="btn ghost small" onClick={onSaveReading} disabled={!astrolabe}>保存解盘记录</button>
           <button className="btn ghost small" onClick={onOpenExport} disabled={!astrolabe}>导出 PDF</button>
         </div>
@@ -234,7 +234,7 @@ export default function ReadingWorkspace({
             <span className="empty-sigil-star">✦</span>
           </div>
           <p className="empty-kicker">还没有命盘</p>
-          <p className="dim">补全出生信息并排盘，开始为 {userName || '这位客户'} 解盘。</p>
+          <p className="dim">补全出生信息并排盘，开始为 {userName || '这位命主'} 解盘。</p>
           <button className="btn" onClick={onOpenEditor}>补全出生信息 → 排盘</button>
         </div>
       ) : (

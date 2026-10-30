@@ -21,7 +21,7 @@ export default function ServiceRecordList({
           <span className={`service-type type-${r.type}`}>{serviceLabel(r.type)}</span>
           <span className="service-record-main">
             <b>{r.title}</b>
-            <em>{r.clientNames.length ? r.clientNames.join(' × ') : '未关联客户'} · {r.summary}</em>
+            <em>{r.clientNames.length ? r.clientNames.join(' × ') : '未关联命主'} · {r.summary}</em>
           </span>
           <span className="service-record-side">
             <span className={`service-status ${r.status}`}>{r.status === 'delivered' ? '已交付' : '草稿'}</span>

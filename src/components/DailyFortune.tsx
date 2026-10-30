@@ -109,21 +109,21 @@ export default function DailyFortune({
           {!user ? (
             <div className="daily-fortune-empty">
               <div className="inspector-eyebrow">流日运势</div>
-              <h3>先选主客户</h3>
-              <p className="dim">选择一位客户作为主客户后，这里按他的本命盘计算流日命宫、流日四化与当天建议。</p>
+              <h3>先选主命主</h3>
+              <p className="dim">选择一位命主作为主命主后，这里按他的本命盘计算流日命宫、流日四化与当天建议。</p>
             </div>
           ) : !fortune ? (
             <div className="daily-fortune-empty">
               <div className="inspector-eyebrow">流日运势</div>
               <h3>这张盘还算不了</h3>
               <p className="dim">请检查「{user.name}」的出生日期、时间与历法；补全后再回来。</p>
-              <button className="btn ghost small" onClick={() => onOpenClient(user.id)}>打开客户解盘</button>
+              <button className="btn ghost small" onClick={() => onOpenClient(user.id)}>打开命主解盘</button>
             </div>
           ) : (
             <>
               <div className="daily-fortune-head">
                 <div>
-                  <div className="inspector-eyebrow">主客户 · {user.name}</div>
+                  <div className="inspector-eyebrow">主命主 · {user.name}</div>
                   <h3>流日运势 <span className={`daily-level ${fortune.level === '顺' ? 'good' : fortune.level === '慎' ? 'careful' : 'flat'}`}>{fortune.level}</span></h3>
                 </div>
                 <button className="text-btn" onClick={() => onOpenClient(user.id)}>打开解盘 →</button>

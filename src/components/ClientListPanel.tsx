@@ -61,7 +61,7 @@ export default function ClientListPanel({
               >
                 <span className="client-avatar">{Array.from(u.name)[0] || '客'}</span>
                 <div className="client-main">
-                  <b>{u.name} {isPrimary && <span className="master-badge">主客户</span>}</b>
+                  <b>{u.name} {isPrimary && <span className="master-badge">主命主</span>}</b>
                   <span>{clientKindLabel(u)} · {u.payload.birthday || '生辰未填'} {u.payload.clockTime || ''}</span>
                 </div>
 
@@ -69,10 +69,10 @@ export default function ClientListPanel({
                   type="button"
                   role="switch"
                   aria-checked={isPrimary}
-                  aria-label={isPrimary ? `${u.name} 是当前主客户` : `设 ${u.name} 为主客户`}
+                  aria-label={isPrimary ? `${u.name} 是当前主命主` : `设 ${u.name} 为主命主`}
                   className={`master-switch ${isPrimary ? 'on' : ''}`}
                   onClick={(e) => { e.stopPropagation(); onPrimaryChange(u.id); }}
-                  title={isPrimary ? '当前主客户' : `设 ${u.name} 为主客户`}
+                  title={isPrimary ? '当前主命主' : `设 ${u.name} 为主命主`}
                 >
                   <span className="master-switch-track"><i /></span>
                   <em>{isPrimary ? '已开' : '设为主'}</em>
@@ -114,7 +114,7 @@ export default function ClientListPanel({
         </div>
       )}
 
-      <p className="hint master-foot">开关只改变「主客户」，不会删除或重置任何人的命盘；点「排盘 →」才进入命盘页面。</p>
+      <p className="hint master-foot">开关只改变「主命主」，不会删除或重置任何人的命盘；点「排盘 →」才进入命盘页面。</p>
     </div>
   );
 }

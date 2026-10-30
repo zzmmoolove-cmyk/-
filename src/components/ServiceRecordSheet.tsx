@@ -38,7 +38,7 @@ function printService(record: ServiceRecord): void {
 <body>
   <div class="brand">紫微斗数 · 观星</div>
   <h1>${escapeHtml(record.title)}</h1>
-  <div class="meta">${record.clientNames.length ? escapeHtml(record.clientNames.join(' × ')) : '未关联客户'} · ${escapeHtml(record.createdAt)}<span class="status">${status}</span></div>
+  <div class="meta">${record.clientNames.length ? escapeHtml(record.clientNames.join(' × ')) : '未关联命主'} · ${escapeHtml(record.createdAt)}<span class="status">${status}</span></div>
   <div class="summary">${escapeHtml(record.summary)}</div>
   <pre>${escapeHtml(record.detail)}</pre>
   <footer>传统命理参考，不构成医疗、法律、投资或情感建议。 · 紫微斗数观星</footer>
@@ -86,7 +86,7 @@ export default function ServiceRecordSheet({
           <div>
             <div className="inspector-eyebrow">服务记录 · {serviceLabel(record.type)}</div>
             <h2>{record.title}</h2>
-            <p>{record.clientNames.join(' × ') || '未关联客户'} · {record.createdAt}</p>
+            <p>{record.clientNames.join(' × ') || '未关联命主'} · {record.createdAt}</p>
           </div>
           <button className="sheet-close" onClick={onClose} aria-label="关闭">×</button>
         </div>

@@ -95,7 +95,7 @@ export default function SettingsSheet({
                   <div><span>运限派生</span><b>{FLOW_PROFILES.length}</b></div>
                 </div>
                 <button className="btn" onClick={onExportStars}>导出星曜库 JSON</button>
-                <p className="hint" style={{ marginTop: 10 }}>客户、解盘记录与服务记录只存在浏览器 localStorage；换浏览器不会自动同步。</p>
+                <p className="hint" style={{ marginTop: 10 }}>命主、解盘记录与服务记录只存在浏览器 localStorage；换浏览器不会自动同步。</p>
               </div>
             )}
           </div>

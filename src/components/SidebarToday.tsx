@@ -100,7 +100,7 @@ export default function SidebarToday({
         </>
       ) : (
         <button className="side-today-empty" onClick={onOpenMasters}>
-          <b>还没有主客户</b>
+          <b>还没有主命主</b>
           <span>去命主页打开开关，下面直接显示流日运势 →</span>
         </button>
       )}

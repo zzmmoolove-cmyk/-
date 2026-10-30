@@ -56,13 +56,13 @@ export default function TodayPanel({
 
       <section className="today-section primary-section">
         <div className="today-section-title">
-          主客户 <span className="dim">万年历流日按此人的盘</span>
+          主命主 <span className="dim">万年历流日按此人的盘</span>
         </div>
         {users.length ? (
           <>
             <div className="primary-row">
               <select value={primaryId ?? ''} onChange={(e) => onPrimaryChange(e.target.value)}>
-                <option value="">选择主客户…</option>
+                <option value="">选择主命主…</option>
                 {users.map((u) => (
                   <option key={u.id} value={u.id}>{u.name} · {clientKindLabel(u)} · {u.payload.birthday}</option>
                 ))}
@@ -78,11 +78,11 @@ export default function TodayPanel({
                 </div>
               </div>
             ) : (
-              <p className="dim primary-hint">选一位客户，下面万年历会显示他的流日命宫、四化与当天建议。</p>
+              <p className="dim primary-hint">选一位命主，下面万年历会显示他的流日命宫、四化与当天建议。</p>
             )}
           </>
         ) : (
-          <p className="dim primary-hint">先新建客户，才能按盘给流日建议。</p>
+          <p className="dim primary-hint">先新建命主，才能按盘给流日建议。</p>
         )}
       </section>
 
@@ -94,7 +94,7 @@ export default function TodayPanel({
           <button className="today-resume" onClick={() => onOpenClient(active.id)}>
             <div>
               <b>{active.name}</b>
-              <span>{active.relation} · {active.payload.birthday}</span>
+              <span>{active.relation === '客户' ? '服务对象' : active.relation} · {active.payload.birthday}</span>
             </div>
             <em>{hasChart ? '回到上次解盘' : '开始解盘'} →</em>
           </button>

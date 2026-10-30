@@ -65,13 +65,13 @@ export default function InvestmentTool({
           <span className="empty-sigil-star">✦</span>
         </div>
         <p className="empty-kicker">先有一张盘</p>
-        <p className="dim">投资倾向要看财帛、福德、命宫与当前大限/流年；先选择一个客户或排盘。</p>
+        <p className="dim">投资倾向要看财帛、福德、命宫与当前大限/流年；先选择一位命主或排盘。</p>
       </div>
     );
   }
 
   const report = [
-    `【紫微投资倾向】${userLabel || '当前客户'}`,
+    `【紫微投资倾向】${userLabel || '当前命主'}`,
     '这不是投资建议，不预测指数/个股涨跌，也不构成收益承诺。',
     '',
     `${profile.title}｜${profile.subtitle}`,
@@ -257,7 +257,7 @@ export default function InvestmentTool({
           className="btn ghost"
           onClick={() => onSaveService?.({
             type: 'investment',
-            title: `${userLabel || '当前客户'} · 投资倾向`,
+            title: `${userLabel || '当前命主'} · 投资倾向`,
             summary: `${profile.title} · ${profile.riskLabel} · ${profile.timing?.level ?? '本命'}`,
             detail: report,
           })}

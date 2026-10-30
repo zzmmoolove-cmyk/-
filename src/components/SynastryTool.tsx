@@ -388,7 +388,7 @@ export default function SynastryTool({
             <select value={bRecord?.id ?? ''} onChange={(e) => setBId(e.target.value)}>
               {candidates.map((u) => (
                 <option key={u.id} value={u.id}>
-                  {u.name} · {u.relation} · {u.payload.birthday}
+                  {u.name} · {u.relation === '客户' ? '服务对象' : u.relation} · {u.payload.birthday}
                 </option>
               ))}
             </select>

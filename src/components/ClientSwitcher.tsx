@@ -24,7 +24,7 @@ export default function ClientSwitcher({
     <div className="modal-backdrop" onClick={onClose}>
       <div className="switcher-sheet" onClick={(e) => e.stopPropagation()}>
         <div className="switcher-head">
-          <input autoFocus value={q} placeholder="搜索客户…" onChange={(e) => setQ(e.target.value)} />
+          <input autoFocus value={q} placeholder="搜索命主…" onChange={(e) => setQ(e.target.value)} />
           <button className="sheet-close" onClick={onClose} aria-label="关闭">×</button>
         </div>
         <div className="switcher-list">
@@ -37,14 +37,14 @@ export default function ClientSwitcher({
               <span className="client-avatar">{Array.from(u.name)[0] || '客'}</span>
               <span className="switcher-main">
                 <b>{u.name}</b>
-                <em>{u.relation} · {u.payload.birthday}</em>
+                <em>{u.relation === '客户' ? '服务对象' : u.relation} · {u.payload.birthday}</em>
               </span>
               <span className="dim">{u.id === activeUserId ? '当前' : '打开'}</span>
             </button>
           ))}
-          {!list.length && <p className="dim" style={{ padding: 16 }}>没有匹配客户。</p>}
+          {!list.length && <p className="dim" style={{ padding: 16 }}>没有匹配命主。</p>}
         </div>
-        <button className="switcher-new" onClick={onNew}>+ 新建客户</button>
+        <button className="switcher-new" onClick={onNew}>+ 新建命主</button>
       </div>
     </div>
   );

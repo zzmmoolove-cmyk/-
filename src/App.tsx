@@ -108,7 +108,7 @@ function loadUsers(): UserRecord[] {
       return items.map((h, i) => ({
         id: h.id || `legacy-${i}`,
         name: '未命名',
-        relation: '客户',
+        relation: '服务对象',
         note: '',
         savedAt: h.savedAt,
         updatedAt: h.savedAt,
@@ -487,7 +487,7 @@ export default function App() {
       payload: { ...next, ...options },
     };
     setUsers((prev) => [record, ...prev].slice(0, 100));
-    flash('✓ 已新建客户');
+    flash('✓ 已新建命主');
     return id;
   };
 
@@ -590,7 +590,7 @@ export default function App() {
     let clientId = activeUserId;
     if (!clientId) {
       if (!currentProfile.name.trim()) {
-        flash('先给客户起个名字，再保存解盘记录');
+        flash('先给命主起个名字，再保存解盘记录');
         setEditorOpen(true);
         return;
       }
@@ -675,10 +675,11 @@ export default function App() {
   };
 
   const topState = activeUserId ? (dirty ? '已修改' : '已保存') : currentProfile.name ? '未保存' : '';
+  const relationText = (relation: string) => (relation === '客户' ? '服务对象' : relation);
   const topProfile = currentProfile.name
-    ? { name: currentProfile.name, relation: currentProfile.relation }
+    ? { name: currentProfile.name, relation: relationText(currentProfile.relation) }
     : primary
-      ? { name: primary.name, relation: primary.relation }
+      ? { name: primary.name, relation: relationText(primary.relation) }
       : null;
 
   return (
@@ -799,7 +800,7 @@ export default function App() {
                 layered={layered}
                 active={activeLayers}
                 selectedPalace={selectedPalace}
-                userLabel={currentProfile.name ? `${currentProfile.name} · ${currentProfile.relation}` : ''}
+                userLabel={currentProfile.name ? `${currentProfile.name} · ${relationText(currentProfile.relation)}` : ''}
                 userName={currentProfile.name}
                 view={view}
                 onViewChange={setView}
@@ -829,7 +830,7 @@ export default function App() {
                 users={users}
                 activeUserId={activeUserId}
                 userName={currentProfile.name}
-                userLabel={currentProfile.name ? `${currentProfile.name} · ${currentProfile.relation}` : ''}
+                userLabel={currentProfile.name ? `${currentProfile.name} · ${relationText(currentProfile.relation)}` : ''}
                 options={options}
                 onSaveService={saveService}
                 onCreateClient={createClient}
@@ -889,7 +890,7 @@ export default function App() {
           <div className="modal client-editor" onClick={(e) => e.stopPropagation()}>
             <div className="modal-head">
               <div>
-                <h2>客户资料</h2>
+                <h2>命主资料</h2>
                 <div className="modal-sub">出生信息、真太阳时与保存</div>
               </div>
               <button className="modal-close" onClick={() => setEditorOpen(false)}>×</button>

@@ -120,7 +120,7 @@ export default function DateSelectTool({
             className="btn ghost"
             onClick={() => onSaveService?.({
               type: 'dates',
-              title: `${userLabel || '客户'} · 择日 · ${result.event}`,
+              title: `${userLabel || '命主'} · 择日 · ${result.event}`,
               summary: `首选 ${result.candidates[0]?.date ?? '—'} · ${result.candidates[0]?.level ?? ''}`,
               detail: dateDetail(result, userLabel),
             })}

@@ -17,7 +17,7 @@ function example(id: string, name: string, gender: '男' | '女', birthday: stri
   return {
     id: `demo-celeb-${id}`,
     name,
-    relation: '客户',
+    relation: '服务对象',
     note: NOTE,
     savedAt: '示例',
     updatedAt: '示例',
@@ -55,7 +55,7 @@ export const CELEBRITY_SEED_KEY = 'ziwei-celebrity-seed-v1';
 // StrictMode 会重复调用 state 初始化器；缓存保证两次拿到同一批数据。
 let seedCache: UserRecord[] | null = null;
 
-/** 首次加载时把 10 个名人示例追加到客户列表；用户删掉后不自动补回。 */
+/** 首次加载时把 10 个名人示例追加到命主列表；用户删掉后不自动补回。 */
 export function seedCelebrityExamples(users: UserRecord[]): UserRecord[] {
   if (seedCache) return seedCache;
   try {

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import type { BirthInput, Relation, UserProfile } from '../types';
 
-const RELATIONS: Relation[] = ['客户', '配偶', '朋友', '同事', '本人', '其他'];
+const RELATIONS: Relation[] = ['服务对象', '配偶', '朋友', '同事', '本人', '其他'];
 
 export default function QuickClientSheet({
   onClose,
@@ -11,7 +11,7 @@ export default function QuickClientSheet({
   onSave: (input: BirthInput, profile: UserProfile) => void;
 }) {
   const [name, setName] = useState('');
-  const [relation, setRelation] = useState<Relation>('客户');
+  const [relation, setRelation] = useState<Relation>('服务对象');
   const [gender, setGender] = useState<'男' | '女'>('女');
   const [birthday, setBirthday] = useState('');
   const [clockTime, setClockTime] = useState('');
@@ -46,7 +46,7 @@ export default function QuickClientSheet({
           <div>
             <div className="inspector-eyebrow">合盘 · 新建 B</div>
             <h2>先有 B 盘，才能合盘</h2>
-            <p>只创建客户档案，不会切换或覆盖当前 A 盘。农历、真太阳时可保存后在客户档案里补。</p>
+            <p>只创建命主档案，不会切换或覆盖当前 A 盘。农历、真太阳时可保存后在命主档案里补。</p>
           </div>
           <button className="sheet-close" onClick={onClose} aria-label="关闭">×</button>
         </div>
@@ -64,7 +64,7 @@ export default function QuickClientSheet({
             <div className="field"><label>时区</label><div className="quick-fixed">北京时间</div></div>
           </div>
           {error && <p className="field-error">{error}</p>}
-          <p className="hint">详细校正：保存后到「客户档案 → 编辑资料」改农历、真太阳时与城市。</p>
+          <p className="hint">详细校正：保存后到「命主档案 → 编辑资料」改农历、真太阳时与城市。</p>
         </div>
         <div className="quick-client-actions">
           <button className="btn" onClick={submit}>保存 B 并用于合盘</button>
