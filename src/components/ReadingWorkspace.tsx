@@ -298,7 +298,7 @@ export default function ReadingWorkspace({
 
             {view === 'report' && (
               raw && range !== 'natal'
-                ? <ScopeFocusReport astrolabe={astrolabe} raw={raw} active={active} userLabel={userLabel} />
+                ? <ScopeFocusReport astrolabe={astrolabe} raw={raw} active={active} userLabel={userLabel} input={input} options={options} />
                 : <div className="panel empty-state">先在上方选一个大限、流年、流月或流日，再生成对应报告。</div>
             )}
           </div>

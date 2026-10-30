@@ -2795,3 +2795,179 @@ html[data-theme='paper'] .master-switch.on .master-switch-track i {
     top: 58px;
   }
 }
+
+/* ============================================================
+   运限报告：统一「摘要 → 叠宫 → 四化 → 领域 → 窗口 → 边界」
+   ============================================================ */
+.scope-report-badge { padding: 4px 9px; border: 1px solid rgba(201, 163, 92, 0.3); border-radius: 999px; font-size: 8.5px; letter-spacing: 0.12em; color: var(--accent-soft); }
+
+.scope-report-summary { display: grid; grid-template-columns: minmax(0, 1.45fr) minmax(260px, 0.8fr); gap: 12px; margin: 12px 0; padding: 12px; border: 1px solid var(--hairline); border-radius: 9px; background: var(--panel-2); }
+.scope-kicker { font-size: 8.5px; letter-spacing: 0.16em; color: var(--text-dim); }
+.scope-summary-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 8px; }
+.scope-summary-cols ul { margin: 7px 0 0; padding: 0; list-style: none; }
+.scope-summary-cols li { margin: 0 0 7px; font-size: 10.5px; line-height: 1.55; color: var(--text-dim); }
+.scope-summary-cols li b { display: block; margin-bottom: 1px; font-size: 11px; font-weight: 500; color: var(--text); }
+.semantic-label { display: inline-block; padding: 1px 5px; border: 1px solid currentColor; border-radius: 3px; font-style: normal; font-size: 8px; letter-spacing: 0.12em; }
+.semantic-label.opportunity, .semantic-pill.opportunity { color: #76b99b; }
+.semantic-label.pressure, .semantic-pill.pressure { color: #cf9c62; }
+.semantic-label.watch, .semantic-pill.watch { color: #8b94a6; }
+.semantic-pill { display: inline-block; padding: 1px 6px; border: 1px solid currentColor; border-radius: 999px; font-size: 8px; letter-spacing: 0.04em; white-space: nowrap; }
+.scope-summary-side { padding-left: 12px; border-left: 1px solid var(--hairline); }
+.scope-summary-side > p { margin: 7px 0 0; font-size: 9px; line-height: 1.6; color: var(--text-dim); }
+.scope-weight-pills { display: flex; flex-wrap: wrap; gap: 3px; margin-top: 7px; }
+.scope-weight-pills span { padding: 2px 5px; border: 1px solid var(--hairline); border-radius: 3px; font-size: 8.5px; color: var(--text-dim); }
+.scope-weight-pills b { color: var(--accent-soft); font-weight: 500; }
+.scope-action-list { margin-top: 9px; }
+.scope-action-list > div { display: flex; gap: 6px; padding: 4px 0; border-top: 1px dashed var(--hairline); }
+.scope-action-list i { flex: 0 0 16px; font-style: normal; font-size: 8px; color: var(--accent); }
+.scope-action-list span { font-size: 9.5px; line-height: 1.55; color: var(--text); }
+
+.scope-section-head { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; border-bottom: 1px solid var(--hairline); padding-bottom: 5px; }
+.scope-section-head h3 { margin: 0; font-family: var(--font-display); font-size: 15px; font-weight: 500; letter-spacing: 0.08em; color: var(--accent-soft); }
+.scope-section-head .dim { font-size: 8.5px; }
+
+.scope-params { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 5px; margin: 9px 0; }
+.scope-params > div { min-width: 0; padding: 5px 7px; border: 1px solid var(--hairline); border-radius: 5px; background: var(--panel-2); }
+.scope-params span { display: block; font-size: 7.5px; letter-spacing: 0.08em; color: var(--text-dim); }
+.scope-params b { display: block; margin-top: 1px; font-size: 9px; font-weight: 400; line-height: 1.4; color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.scope-chain { display: flex; align-items: stretch; gap: 0; overflow-x: auto; padding: 2px 0 3px; }
+.scope-chain > div { position: relative; flex: 0 0 auto; min-width: 82px; padding: 6px 15px 6px 7px; border: 1px solid var(--hairline); border-radius: 5px; margin-right: 14px; background: var(--panel-2); }
+.scope-chain > div.focus { border-color: rgba(201, 163, 92, 0.42); background: rgba(201, 163, 92, 0.065); }
+.scope-chain em { display: block; font-style: normal; font-size: 7.5px; letter-spacing: 0.1em; color: var(--text-dim); }
+.scope-chain b { display: block; font-size: 10px; font-weight: 500; color: var(--text); }
+.scope-chain span { display: block; font-size: 8px; color: var(--text-dim); }
+.chain-arrow { position: absolute; right: -12px; top: 50%; transform: translateY(-50%); font-style: normal; font-size: 10px; color: var(--accent); }
+
+.scope-structure { display: grid; grid-template-columns: 1fr 1fr 1.2fr; gap: 6px; margin-top: 8px; }
+.scope-structure > div { padding: 7px 8px; border: 1px solid var(--hairline); border-radius: 5px; background: var(--panel-2); }
+.scope-structure em { display: block; font-style: normal; font-size: 8px; letter-spacing: 0.1em; color: var(--text-dim); }
+.scope-structure p { margin: 3px 0 0; font-size: 9.5px; line-height: 1.55; color: var(--text); }
+
+.scope-transform-groups { display: flex; flex-direction: column; gap: 6px; margin-top: 8px; }
+.scope-transform-group { display: grid; grid-template-columns: 74px 1fr; gap: 8px; align-items: start; }
+.scope-transform-label { font-size: 9px; color: var(--text-dim); }
+.scope-transform-label span { font-size: 8px; color: var(--accent); }
+.scope-mutagen-list { display: flex; flex-wrap: wrap; gap: 3px; }
+
+.scope-domain-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; margin-top: 8px; }
+.scope-domain-card { padding: 9px 10px; border: 1px solid var(--hairline); border-left: 2px solid var(--hairline); border-radius: 6px; background: var(--panel-2); min-width: 0; }
+.scope-domain-card.opportunity { border-left-color: rgba(118, 185, 155, 0.7); }
+.scope-domain-card.pressure { border-left-color: rgba(207, 156, 98, 0.8); }
+.scope-domain-card.watch { border-left-color: rgba(139, 148, 166, 0.6); }
+.scope-domain-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
+.scope-domain-head em { display: block; font-style: normal; font-size: 8px; letter-spacing: 0.1em; color: var(--text-dim); }
+.scope-domain-head b { display: block; font-size: 11px; font-weight: 500; color: var(--text); }
+.scope-domain-evidence { margin: 5px 0 0; font-size: 9px; line-height: 1.55; color: var(--text-dim); }
+.scope-domain-hua { display: flex; flex-wrap: wrap; gap: 3px; margin-top: 5px; }
+.scope-domain-hua span { padding: 1px 4px; border: 1px solid var(--hairline); border-radius: 3px; font-size: 8px; color: var(--accent-soft); }
+.scope-domain-advice { margin: 5px 0 0; font-size: 9.5px; line-height: 1.55; color: var(--text); }
+.scope-domain-boundary { margin: 4px 0 0; font-size: 8.5px; line-height: 1.5; color: var(--text-dim); }
+
+.scope-window-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; margin-top: 8px; }
+.scope-window { padding: 7px 8px; border: 1px solid var(--hairline); border-left: 2px solid var(--hairline); border-radius: 5px; background: var(--panel-2); }
+.scope-window.opportunity { border-left-color: rgba(118, 185, 155, 0.7); }
+.scope-window.pressure { border-left-color: rgba(207, 156, 98, 0.8); }
+.scope-window > div { display: flex; align-items: baseline; justify-content: space-between; gap: 5px; }
+.scope-window b { font-size: 10px; font-weight: 500; color: var(--text); }
+.scope-window p { margin: 3px 0 0; font-size: 8.5px; line-height: 1.5; color: var(--text-dim); }
+
+.scope-authority { padding: 10px 11px; border: 1px solid rgba(201, 163, 92, 0.22); border-radius: 7px; background: rgba(201, 163, 92, 0.035); }
+.scope-authority .scope-section-head { border-bottom-color: rgba(201, 163, 92, 0.18); }
+.scope-authority-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 7px; margin-top: 8px; }
+.scope-authority-grid > div { padding: 7px 8px; border: 1px solid var(--hairline); border-radius: 5px; background: var(--panel); }
+.scope-authority-grid em { font-style: normal; font-size: 8px; letter-spacing: 0.12em; color: var(--accent); }
+.scope-authority-grid p { margin: 3px 0 0; font-size: 9px; line-height: 1.55; color: var(--text-dim); }
+.scope-authority ul.notes { margin: 8px 0 0; padding-left: 15px; }
+.scope-authority ul.notes li { margin: 2px 0; font-size: 9px; line-height: 1.55; color: var(--text-dim); }
+
+.scope-evidence { margin-top: 12px; border: 1px solid var(--hairline); border-radius: 6px; background: var(--panel-2); }
+.scope-evidence > summary { display: flex; align-items: baseline; justify-content: space-between; padding: 8px 10px; cursor: pointer; font-size: 9.5px; letter-spacing: 0.06em; color: var(--text-dim); list-style: none; }
+.scope-evidence > summary::-webkit-details-marker { display: none; }
+.scope-evidence > summary span { font-size: 8px; color: var(--accent); }
+.scope-evidence[open] > summary { border-bottom: 1px solid var(--hairline); }
+.scope-evidence-body { display: grid; grid-template-columns: 1.2fr 1fr; gap: 14px; padding: 9px 10px; }
+.scope-evidence-body h4 { margin: 0 0 5px; font-family: var(--font-display); font-size: 11px; font-weight: 500; letter-spacing: 0.06em; color: var(--accent-soft); }
+.scope-evidence-body ul.notes { margin: 0; padding-left: 14px; }
+.scope-evidence-body li { margin: 2px 0; font-size: 8.5px; line-height: 1.55; color: var(--text-dim); }
+.scope-evidence-body dl { margin: 0; display: grid; grid-template-columns: 58px 1fr; gap: 3px 5px; }
+.scope-evidence-body dt { font-size: 8.5px; color: var(--accent-soft); }
+.scope-evidence-body dd { margin: 0; font-size: 8.5px; line-height: 1.5; color: var(--text-dim); }
+.scope-evidence .hint { margin: 0; padding: 0 10px 9px; font-size: 8.5px; }
+.scope-report-foot { margin: 10px 0 0; padding-top: 7px; border-top: 1px solid var(--hairline); font-size: 8px; line-height: 1.55; color: var(--text-dim); }
+
+@media (max-width: 900px) {
+  .scope-report-summary { grid-template-columns: 1fr; }
+  .scope-summary-side { padding-left: 0; border-left: 0; border-top: 1px solid var(--hairline); padding-top: 8px; }
+  .scope-params { grid-template-columns: 1fr 1fr; }
+  .scope-structure { grid-template-columns: 1fr; }
+  .scope-domain-grid { grid-template-columns: 1fr; }
+  .scope-window-grid { grid-template-columns: 1fr 1fr; }
+  .scope-authority-grid { grid-template-columns: 1fr; }
+  .scope-evidence-body { grid-template-columns: 1fr; }
+}
+@media (max-width: 600px) {
+  .scope-summary-cols { grid-template-columns: 1fr; }
+  .scope-window-grid { grid-template-columns: 1fr; }
+  .scope-report-head { flex-direction: column; }
+  .scope-report-actions { width: 100%; flex-direction: row; justify-content: space-between; }
+}
+@media print {
+  .scope-report-actions, .scope-filter, .scope-view-bar { display: none !important; }
+  .scope-focus-report { border: 0 !important; padding: 0 !important; }
+  .scope-evidence { display: block !important; }
+}
+
+/* 运限报告可读性微调：保持专业密度，不做成小字说明书 */
+.scope-report-head p { font-size: 12.5px; }
+.scope-section-head h3 { font-size: 17px; }
+.scope-section-head .dim { font-size: 9.5px; }
+.scope-summary-cols li { font-size: 11.5px; }
+.scope-summary-cols li b { font-size: 12px; }
+.scope-summary-side > p { font-size: 9.5px; }
+.scope-action-list span { font-size: 10.5px; }
+.scope-params b { font-size: 9.5px; }
+.scope-chain b { font-size: 11px; }
+.scope-chain span { font-size: 8.5px; }
+.scope-structure p { font-size: 10.5px; }
+.scope-domain-card { padding: 10px 12px; }
+.scope-domain-head b { font-size: 12px; }
+.scope-domain-evidence { font-size: 10px; }
+.scope-domain-advice { font-size: 10.5px; }
+.scope-domain-boundary { font-size: 9px; }
+.scope-window b { font-size: 11px; }
+.scope-window p { font-size: 9.5px; }
+.scope-authority-grid p { font-size: 9.5px; }
+.scope-evidence-body li,
+.scope-evidence-body dd { font-size: 9px; }
+.scope-report-foot { font-size: 8.5px; }
+
+/* 十二宫叠合表 */
+.scope-overlap { margin-top: 7px; border: 1px solid var(--hairline); border-radius: 6px; background: var(--panel-2); }
+.scope-overlap > summary { display: flex; align-items: baseline; justify-content: space-between; padding: 7px 9px; font-size: 9.5px; letter-spacing: 0.05em; color: var(--text-dim); cursor: pointer; list-style: none; }
+.scope-overlap > summary::-webkit-details-marker { display: none; }
+.scope-overlap > summary span { font-size: 8px; color: var(--accent); }
+.scope-overlap[open] > summary { border-bottom: 1px solid var(--hairline); }
+.scope-overlap-scroll { max-height: 280px; overflow: auto; }
+.scope-overlap table { width: 100%; border-collapse: collapse; font-size: 9px; }
+.scope-overlap th, .scope-overlap td { padding: 4px 7px; border-bottom: 1px solid var(--hairline); text-align: left; white-space: nowrap; }
+.scope-overlap thead th { position: sticky; top: 0; background: var(--panel); font-size: 8px; font-weight: 500; color: var(--text-dim); letter-spacing: 0.08em; }
+.scope-overlap tbody th { font-weight: 400; color: var(--accent-soft); }
+.scope-overlap td { color: var(--text); }
+.scope-overlap tr.focus { background: rgba(201, 163, 92, 0.07); }
+
+@media print {
+  .scope-overlap-scroll { max-height: none !important; overflow: visible !important; }
+  .scope-overlap table { font-size: 8.5px; }
+}
+
+.scope-observables { margin-top: 9px; padding-top: 8px; border-top: 1px dashed rgba(201, 163, 92, 0.2); }
+.scope-observables ul { margin: 5px 0 0; padding-left: 15px; }
+.scope-observables li { margin: 3px 0; font-size: 9px; line-height: 1.6; color: var(--text); }
+
+.scope-surround { display: flex; align-items: stretch; gap: 5px; margin-top: 6px; flex-wrap: wrap; }
+.scope-surround-label { flex: 0 0 auto; align-self: center; font-size: 8px; letter-spacing: 0.1em; color: var(--text-dim); }
+.scope-surround > div { flex: 1 1 160px; padding: 5px 7px; border: 1px solid var(--hairline); border-radius: 4px; background: var(--panel-2); }
+.scope-surround em { font-style: normal; font-size: 7.5px; color: var(--accent); }
+.scope-surround b { display: block; margin-top: 1px; font-size: 9px; font-weight: 500; color: var(--text); }
+.scope-surround span { display: block; margin-top: 1px; font-size: 8px; color: var(--text-dim); }
