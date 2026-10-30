@@ -28,7 +28,6 @@ async function copyText(text: string): Promise<void> {
 export default function PalaceReportPanel({
   astrolabe,
   palaceName,
-  onSelectPalace,
   onSelectStar,
   output,
   active,
@@ -36,7 +35,6 @@ export default function PalaceReportPanel({
 }: {
   astrolabe: Astrolabe;
   palaceName: string;
-  onSelectPalace: (name: string) => void;
   onSelectStar: (name: string, palace?: string) => void;
   output?: OutputProfile;
   active?: ActiveLayers;
@@ -113,24 +111,6 @@ export default function PalaceReportPanel({
           <p className="hint">本命 50% + 大限 20% + 流年 15% + 流月 10% + 流日 5%，按当前已选层归一化；这是结构权重，不是吉凶总分。</p>
         </section>
       )}
-
-      <div className="index-grid">
-        {snapshot.index.map((row) => (
-          <button
-            key={row.palace}
-            className={`index-cell ${row.palace === palaceName ? 'active' : ''}`}
-            onClick={() => onSelectPalace(row.palace)}
-            title={`${row.scoreLabel}｜卡点 ${row.blockages}`}
-          >
-            <span className="idx-name">{LABEL(row.palace)}</span>
-            <span className="idx-major">{row.majors.length ? row.majors.join('·') : '空宫'}</span>
-            <span className={`idx-score ${row.score >= 0 ? 'plus' : 'minus'}`}>
-              {row.score > 0 ? '+' : ''}{row.score}
-              {row.blockages > 0 && <em>卡{row.blockages}</em>}
-            </span>
-          </button>
-        ))}
-      </div>
 
       {show('position') && (
         <section>

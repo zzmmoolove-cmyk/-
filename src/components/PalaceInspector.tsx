@@ -26,6 +26,8 @@ export default function PalaceInspector({
     () => (active ? weightedPalace(astrolabe, palaceName, layered ?? null, active) : null),
     [astrolabe, palaceName, active, layered],
   );
+  const flowStars = layered?.palaces[palaceName] ?? [];
+  const huaTags = weighted?.layers.flatMap((l) => l.mutagens.map((m) => ({ layer: l.label, text: m }))) ?? [];
 
   return (
     <aside className="inspector panel">
@@ -37,9 +39,14 @@ export default function PalaceInspector({
             {snap.palace.stem}{snap.palace.branch} · {snap.palace.isBody ? '身宫 · ' : ''}大限 {snap.palace.decadal || '—'}
           </div>
         </div>
-        <span className={`inspector-score ${snap.score.value >= 0 ? 'plus' : 'minus'}`}>
-          {snap.score.value >= 0 ? '+' : ''}{snap.score.value}
-        </span>
+        <div className="inspector-head-side">
+          <button className="inspector-card-link" onClick={onExpand} title="展开完整宫位卡">
+            宫位卡 <span>↗</span>
+          </button>
+          <span className={`inspector-score ${snap.score.value >= 0 ? 'plus' : 'minus'}`}>
+            {snap.score.value >= 0 ? '+' : ''}{snap.score.value}
+          </span>
+        </div>
       </div>
 
       {weighted && (
@@ -51,7 +58,7 @@ export default function PalaceInspector({
       )}
 
       <div className="inspector-stars">
-        {snap.stars.slice(0, 6).map((s) => (
+        {snap.stars.slice(0, 9).map((s) => (
           <button key={s.name} className="inspector-star" onClick={() => onSelectStar(s.name, palaceName)}>
             <b>{s.name}</b>
             <span>{s.brightness || '—'}{s.natalMutagen ? ` · ${s.natalMutagen}` : ''}</span>
@@ -59,6 +66,24 @@ export default function PalaceInspector({
         ))}
         {snap.stars.length === 0 && <p className="dim">空宫，借对宫参看。</p>}
       </div>
+
+      {flowStars.length > 0 && (
+        <div className="inspector-section">
+          <div className="inspector-label">本限流曜</div>
+          <div className="inspector-flow-stars">
+            {flowStars.map((s, i) => (
+              <span key={s.name + i} className={`inspector-flow-tag layer-${s.scope}`}>
+                {s.name}
+              </span>
+            ))}
+          </div>
+          {huaTags.length > 0 && (
+            <div className="inspector-flow-hua">
+              {huaTags.map((h, i) => <span key={h.text + i}>{h.layer} · {h.text}</span>)}
+            </div>
+          )}
+        </div>
+      )}
 
       <div className="inspector-section">
         <div className="inspector-label">三方四正</div>
@@ -89,9 +114,6 @@ export default function PalaceInspector({
 
       <p className="inspector-domain">{snap.palace.domain}</p>
 
-      <button className="btn ghost small inspector-expand" onClick={onExpand}>
-        展开完整宫位卡 →
-      </button>
     </aside>
   );
 }

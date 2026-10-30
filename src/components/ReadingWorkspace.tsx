@@ -120,90 +120,92 @@ export default function ReadingWorkspace({
         </div>
       </div>
 
-      <div className="scope-filter panel">
-        <div className="scope-filter-row">
-          <span className="scope-filter-label">时间</span>
-          <button
-            className={`scope-chip ${range === 'natal' ? 'active' : ''}`}
-            onClick={() => onActiveChange({ decadal: null, yearly: null, monthly: null, daily: null })}
-          >
-            本命
-          </button>
-          <span className="scope-filter-sep" />
-          <span className="scope-filter-label">大限</span>
-          {decadalOptions.map((d) => (
+      <div className="chart-top-rail">
+        <div className="scope-filter panel">
+          <div className="scope-filter-row">
+            <span className="scope-filter-label">时间</span>
             <button
-              key={d.index}
-              className={`scope-chip ${active.decadal === d.index ? 'active' : ''}`}
-              onClick={() => onActiveChange({ decadal: d.index, yearly: null, monthly: null, daily: null })}
-              title={d.label}
+              className={`scope-chip ${range === 'natal' ? 'active' : ''}`}
+              onClick={() => onActiveChange({ decadal: null, yearly: null, monthly: null, daily: null })}
             >
-              {d.label.split(' ')[0]} <em>{d.label.match(/\d+–\d+岁/)?.[0] ?? ''}</em>
+              本命
             </button>
-          ))}
-          <span className="scope-current">{rangeText}</span>
+            <span className="scope-filter-sep" />
+            <span className="scope-filter-label">大限</span>
+            {decadalOptions.map((d) => (
+              <button
+                key={d.index}
+                className={`scope-chip ${active.decadal === d.index ? 'active' : ''}`}
+                onClick={() => onActiveChange({ decadal: d.index, yearly: null, monthly: null, daily: null })}
+                title={d.label}
+              >
+                {d.label.split(' ')[0]} <em>{d.label.match(/\d+–\d+岁/)?.[0] ?? ''}</em>
+              </button>
+            ))}
+            <span className="scope-current">{rangeText}</span>
+          </div>
+
+          {active.decadal != null && (
+            <div className="scope-filter-row">
+              <span className="scope-filter-label">流年</span>
+              {years.map((year) => (
+                <button
+                  key={year}
+                  className={`scope-chip ${active.yearly === year ? 'active' : ''}`}
+                  onClick={() => onActiveChange({ decadal: active.decadal, yearly: year, monthly: null, daily: null })}
+                >
+                  {year}
+                </button>
+              ))}
+            </div>
+          )}
+
+          {active.yearly != null && (
+            <div className="scope-filter-row">
+              <span className="scope-filter-label">流月</span>
+              {Array.from({ length: 12 }, (_, i) => i + 1).map((month) => (
+                <button
+                  key={month}
+                  className={`scope-chip ${active.monthly === month ? 'active' : ''}`}
+                  onClick={() => onActiveChange({ decadal: active.decadal, yearly: active.yearly, monthly: month, daily: null })}
+                >
+                  {month}月
+                </button>
+              ))}
+            </div>
+          )}
+
+          {active.monthly != null && (
+            <div className="scope-filter-row">
+              <span className="scope-filter-label">流日</span>
+              {Array.from({ length: days }, (_, i) => i + 1).map((day) => {
+                const date = `${active.yearly}-${String(active.monthly).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                return (
+                  <button
+                    key={day}
+                    className={`scope-chip ${active.daily === date ? 'active' : ''}`}
+                    onClick={() => onActiveChange({ decadal: active.decadal, yearly: active.yearly, monthly: active.monthly, daily: date })}
+                  >
+                    {day}
+                  </button>
+                );
+              })}
+            </div>
+          )}
         </div>
 
-        {active.decadal != null && (
-          <div className="scope-filter-row">
-            <span className="scope-filter-label">流年</span>
-            {years.map((year) => (
-              <button
-                key={year}
-                className={`scope-chip ${active.yearly === year ? 'active' : ''}`}
-                onClick={() => onActiveChange({ decadal: active.decadal, yearly: year, monthly: null, daily: null })}
-              >
-                {year}
-              </button>
-            ))}
-          </div>
-        )}
-
-        {active.yearly != null && (
-          <div className="scope-filter-row">
-            <span className="scope-filter-label">流月</span>
-            {Array.from({ length: 12 }, (_, i) => i + 1).map((month) => (
-              <button
-                key={month}
-                className={`scope-chip ${active.monthly === month ? 'active' : ''}`}
-                onClick={() => onActiveChange({ decadal: active.decadal, yearly: active.yearly, monthly: month, daily: null })}
-              >
-                {month}月
-              </button>
-            ))}
-          </div>
-        )}
-
-        {active.monthly != null && (
-          <div className="scope-filter-row">
-            <span className="scope-filter-label">流日</span>
-            {Array.from({ length: days }, (_, i) => i + 1).map((day) => {
-              const date = `${active.yearly}-${String(active.monthly).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-              return (
-                <button
-                  key={day}
-                  className={`scope-chip ${active.daily === date ? 'active' : ''}`}
-                  onClick={() => onActiveChange({ decadal: active.decadal, yearly: active.yearly, monthly: active.monthly, daily: date })}
-                >
-                  {day}
-                </button>
-              );
-            })}
-          </div>
-        )}
-      </div>
-
-      <div className="view-bar scope-view-bar" role="group" aria-label="视图">
-        {VIEWS.map((v) => (
-          <button
-            key={v.key}
-            className={view === v.key ? 'active' : ''}
-            onClick={() => onViewChange(v.key)}
-            disabled={!astrolabe || (v.key === 'report' && range === 'natal')}
-          >
-            {v.label}
-          </button>
-        ))}
+        <div className="view-bar scope-view-bar" role="group" aria-label="视图">
+          {VIEWS.map((v) => (
+            <button
+              key={v.key}
+              className={view === v.key ? 'active' : ''}
+              onClick={() => onViewChange(v.key)}
+              disabled={!astrolabe || (v.key === 'report' && range === 'natal')}
+            >
+              {v.label}
+            </button>
+          ))}
+        </div>
       </div>
 
       {saveMsg && <p className="hint workspace-msg">{saveMsg}</p>}
@@ -228,11 +230,9 @@ export default function ReadingWorkspace({
                 options={options}
                 timeIndex={timeIndex}
                 layered={layered}
-                active={active}
                 selectedPalace={selectedPalace}
                 userLabel={userLabel}
                 onSelectPalace={onSelectPalace}
-                onOpenPalaceCard={(name) => { onSelectPalace(name); onViewChange('card'); }}
                 onSelectStar={onSelectStar}
               />
             )}
@@ -243,7 +243,6 @@ export default function ReadingWorkspace({
                   <PalaceReportPanel
                     astrolabe={astrolabe}
                     palaceName={selectedPalace}
-                    onSelectPalace={onSelectPalace}
                     onSelectStar={onSelectStar}
                     output={output}
                     active={active}

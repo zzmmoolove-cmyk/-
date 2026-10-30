@@ -1717,3 +1717,71 @@ html[data-theme='mystic'] .sidebar {
   vertical-align: 1px;
   white-space: nowrap;
 }
+
+/* —— 命盘顶部：时间筛选与视图贴合、吸顶 —— */
+.chart-top-rail {
+  position: sticky;
+  top: 58px;
+  z-index: 30;
+  margin: 0 0 7px;
+  padding-top: 2px;
+  background: var(--bg);
+  border-radius: 9px;
+}
+.chart-top-rail .scope-filter {
+  margin: 0;
+  border-radius: 9px 9px 0 0;
+  border-bottom: 0;
+  background: var(--panel);
+}
+.chart-top-rail .scope-view-bar {
+  margin: 0;
+  padding: 4px 8px 5px;
+  border: 1px solid var(--border);
+  border-top: 0;
+  border-radius: 0 0 9px 9px;
+  background: var(--panel);
+}
+.chart-current-palace {
+  margin-left: 8px;
+  padding: 1px 6px;
+  border: 1px solid rgba(201, 163, 92, 0.3);
+  border-radius: 3px;
+  font-size: 9px;
+  font-weight: 400;
+  color: var(--accent);
+  white-space: nowrap;
+}
+.chart-hint-line { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.chart-legend { margin-left: auto; display: inline-flex; gap: 7px; }
+
+/* —— 检查器：宫位卡入口 / 本限流曜 —— */
+.inspector-head-side { display: flex; flex-direction: column; align-items: flex-end; gap: 5px; }
+.inspector-card-link {
+  padding: 3px 7px;
+  border: 1px solid rgba(201, 163, 92, 0.32);
+  border-radius: 4px;
+  background: transparent;
+  color: var(--accent-soft);
+  font-size: 9.5px;
+  line-height: 1.2;
+  cursor: pointer;
+}
+.inspector-card-link:hover { border-color: var(--accent); color: var(--accent-soft); }
+.inspector-card-link span { color: var(--accent); }
+.inspector-flow-stars { display: flex; flex-wrap: wrap; gap: 3px; }
+.inspector-flow-tag { padding: 2px 5px; border: 1px solid currentColor; border-radius: 3px; font-size: 9.5px; }
+.inspector-flow-tag.layer-decadal { color: #d7b45a; }
+.inspector-flow-tag.layer-yearly { color: #6fc39a; }
+.inspector-flow-tag.layer-monthly { color: #7fa9ea; }
+.inspector-flow-tag.layer-daily { color: #b89ae8; }
+.inspector-flow-hua { display: flex; flex-wrap: wrap; gap: 3px 7px; margin-top: 4px; font-size: 8.5px; color: var(--text-dim); }
+
+@media (max-width: 760px) {
+  .chart-top-rail { top: 58px; }
+  .chart-current-palace { display: none; }
+  .chart-legend { margin-left: 0; width: 100%; }
+}
+
+.chart-head-tools { display: flex; align-items: center; gap: 6px; }
+.chart-palace-picker { width: auto; max-width: 120px; padding: 3px 6px; font-size: 10px; }

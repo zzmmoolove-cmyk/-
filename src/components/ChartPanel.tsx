@@ -2,9 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import type { MouseEvent as ReactMouseEvent } from 'react';
 import { Iztrolabe } from 'react-iztro';
 import type { Astrolabe, BirthInput, ChartOptions, Palace } from '../types';
-import { weightedPalace } from '../lib/scopePalace';
-import type { ActiveLayers } from '../lib/scope';
-import { LAYER_META, type LayeredData, type LayerScope } from '../lib/scope';
+import type { LayeredData, LayerScope } from '../lib/scope';
 import { getProfile } from '../lib/knowledge/starProfiles';
 import { PALACE_KB, PALACE_ORDER } from '../lib/knowledge/palaces';
 import {
@@ -19,12 +17,6 @@ import {
 } from '../lib/knowledge/foundations';
 import { fourTransformsOfStem } from '../lib/wuxing';
 import ConceptPanel, { type ConceptView } from './ConceptPanel';
-
-/** 把「运马/流马/月马/日马」拆成 范围字 + 星字，方便文字区分 */
-function splitStar(name: string): { scopeChar: string; starChar: string } {
-  if (name.length >= 2) return { scopeChar: name.slice(0, 1), starChar: name.slice(1) };
-  return { scopeChar: '', starChar: name };
-}
 
 const LABEL = (n: string) => (n.endsWith('宫') ? n : `${n}宫`);
 
@@ -90,11 +82,9 @@ export default function ChartPanel({
   options,
   timeIndex,
   layered,
-  active,
   selectedPalace,
   userLabel,
   onSelectPalace,
-  onOpenPalaceCard,
   onSelectStar,
 }: {
   astrolabe: Astrolabe | null;
@@ -102,11 +92,9 @@ export default function ChartPanel({
   options: ChartOptions;
   timeIndex: number;
   layered: LayeredData | null;
-  active?: ActiveLayers;
   selectedPalace: string | null;
   userLabel?: string;
   onSelectPalace: (name: string) => void;
-  onOpenPalaceCard?: (name: string) => void;
   onSelectStar: (name: string, palace?: string) => void;
 }) {
   const [tip, setTip] = useState<Tip | null>(null);
@@ -536,11 +524,25 @@ export default function ChartPanel({
           <h2>
             命盘
             {userLabel && <span className="dim"> · {userLabel}</span>}
-            <span className="dim">（悬停看批注，点击看档案）</span>
+            <span className="dim">（{dense ? '详盘：点宫位看检查器，点星曜看档案' : '切「详」显示流曜；点宫位看检查器'}）</span>
+            {selectedPalace && <span className="chart-current-palace">当前 · {LABEL(selectedPalace)}</span>}
           </h2>
-          <div className="chart-density" role="group" aria-label="盘面详简">
-            <button className={!dense ? 'active' : ''} onClick={() => setDense(false)} title="只看主星、辅星、杂曜与宫位">简</button>
-            <button className={dense ? 'active' : ''} onClick={() => setDense(true)} title="显示长生、岁前、流曜与运限标签">详</button>
+          <div className="chart-head-tools">
+            {dense && (
+              <select
+                className="chart-palace-picker"
+                value={selectedPalace ?? ''}
+                onChange={(e) => { if (e.target.value) onSelectPalace(e.target.value); }}
+                aria-label="详盘点选宫位"
+              >
+                <option value="">点选宫位…</option>
+                {astrolabe.palaces.map((p) => <option key={p.name} value={p.name}>{LABEL(p.name)}</option>)}
+              </select>
+            )}
+            <div className="chart-density" role="group" aria-label="盘面详简">
+              <button className={!dense ? 'active' : ''} onClick={() => setDense(false)} title="只看主星、辅星、杂曜与宫位">简</button>
+              <button className={dense ? 'active' : ''} onClick={() => setDense(true)} title="显示长生、岁前、流曜与运限标签">详</button>
+            </div>
           </div>
         </div>
 
@@ -580,149 +582,14 @@ export default function ChartPanel({
             </svg>
           </div>
         </div>
-        <div className="hint" style={{ marginTop: 6 }}>
+        <div className="hint chart-hint-line" style={{ marginTop: 6 }}>
           {dense ? '详版：含长生、岁前、流曜与运限标签' : '简版：隐藏神煞与流曜，切「详」展开'} · 排盘 iztro
-        </div>
-      </div>
-
-      <div className="panel">
-        <h2>
-          十二宫<span className="dim">（点击看本限加权、三方四正与检查器）</span>
-        </h2>
-        <div className="palace-grid">
-          {astrolabe.palaces.map((p: Palace) => {
-            const layerStars = layered?.palaces[p.name] ?? [];
-            const weight = active ? weightedPalace(astrolabe, p.name, layered, active) : null;
-            return (
-              <div
-                key={p.index}
-                role="button"
-                tabIndex={0}
-                className={`palace-card ${selectedPalace === p.name ? 'active' : ''}`}
-                onClick={() => onSelectPalace(p.name)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' || e.key === ' ') onSelectPalace(p.name);
-                }}
-              >
-                <div className="palace-card-head">
-                  <span className="palace-name">{p.name}</span>
-                  {p.isBodyPalace && <span className="badge badge-body">身宫</span>}
-                  {weight && <span className="palace-weight-badge">本限 {weight.total}</span>}
-                  {onOpenPalaceCard && (
-                    <button
-                      className="palace-open"
-                      title="展开完整宫位卡"
-                      onClick={(e) => { e.stopPropagation(); onOpenPalaceCard(p.name); }}
-                    >
-                      ↗
-                    </button>
-                  )}
-                </div>
-                <div className="palace-stars">
-                  {p.majorStars.length ? (
-                    p.majorStars.map((s) => {
-                      const ms = mutagenByStar.get(s.name) ?? [];
-                      return (
-                        <span
-                          key={s.name}
-                          className="star-tag major clickable"
-                          role="button"
-                          tabIndex={0}
-                          title={`查看 ${s.name} 档案`}
-                          onMouseEnter={(e) => {
-                            const t = starTip(s.name, p.name, e.currentTarget);
-                            if (t) setTip(t);
-                          }}
-                          onMouseLeave={() => setTip(null)}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            onSelectStar(s.name, p.name);
-                          }}
-                          onKeyDown={(e) => {
-                            if (e.key === 'Enter' || e.key === ' ') {
-                              e.stopPropagation();
-                              onSelectStar(s.name, p.name);
-                            }
-                          }}
-                        >
-                          {s.name}
-                          {ms.map((m) => (
-                            <em key={m.scope + m.mutagen} className={`mutagen layer-${m.scope}`}>
-                              {LAYER_META[m.scope].short}{m.mutagen}
-                            </em>
-                          ))}
-                        </span>
-                      );
-                    })
-                  ) : (
-                    <span className="empty">空宫</span>
-                  )}
-                  {p.minorStars.slice(0, 4).map((s) => (
-                    <span
-                      key={s.name}
-                      className="star-tag minor clickable"
-                      role="button"
-                      tabIndex={0}
-                      title={`查看 ${s.name} 档案`}
-                      onMouseEnter={(e) => {
-                        const t = starTip(s.name, p.name, e.currentTarget);
-                        if (t) setTip(t);
-                      }}
-                      onMouseLeave={() => setTip(null)}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onSelectStar(s.name, p.name);
-                      }}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter' || e.key === ' ') {
-                          e.stopPropagation();
-                          onSelectStar(s.name, p.name);
-                        }
-                      }}
-                    >
-                      {s.name}
-                    </span>
-                  ))}
-                  {layerStars.map((s, i) => {
-                    const { scopeChar, starChar } = splitStar(s.name);
-                    return (
-                      <span
-                        key={s.name + i}
-                        className={`star-tag layer-tag layer-${s.scope} clickable`}
-                        role="button"
-                        tabIndex={0}
-                        title={`查看 ${s.name} 说明`}
-                        onMouseEnter={(e) => {
-                          const t = starTip(s.name, p.name, e.currentTarget);
-                          if (t) setTip(t);
-                        }}
-                        onMouseLeave={() => setTip(null)}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          onSelectStar(s.name, p.name);
-                        }}
-                        onKeyDown={(e) => {
-                          if (e.key === 'Enter' || e.key === ' ') {
-                            e.stopPropagation();
-                            onSelectStar(s.name, p.name);
-                          }
-                        }}
-                      >
-                        <em className="scope-char">{scopeChar}</em>
-                        {starChar}
-                      </span>
-                    );
-                  })}
-                </div>
-              </div>
-            );
-          })}
-        </div>
-        <div className="legend">
-          <span className="lg"><i className="dot layer-decadal" />大限</span>
-          <span className="lg"><i className="dot layer-yearly" />流年</span>
-          <span className="lg"><i className="dot layer-monthly" />流月</span>
-          <span className="lg"><i className="dot layer-daily" />流日</span>
+          <span className="legend chart-legend">
+            <span className="lg"><i className="dot layer-decadal" />大限</span>
+            <span className="lg"><i className="dot layer-yearly" />流年</span>
+            <span className="lg"><i className="dot layer-monthly" />流月</span>
+            <span className="lg"><i className="dot layer-daily" />流日</span>
+          </span>
         </div>
       </div>
 
