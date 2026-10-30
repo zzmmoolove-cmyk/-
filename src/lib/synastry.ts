@@ -1,4 +1,5 @@
-// 双人合盘 v2.0：六维加权 + 星座关系类型 + A 的高分 B 画像。
+// 紫微双人合盘：五维加权（命宫/夫妻/福德/沟通/五行）+ A 的高分 B 画像。
+// 星座内容已完全分离到 astroSynastry；本文件不再读取太阳星座。
 // 关系参考，不是宿命判断，也不替代沟通与心理咨询。
 
 import type { Astrolabe, Palace, Star } from '../types';
@@ -9,7 +10,7 @@ import type { Relation as WuxingRelation } from './wuxing';
 export type SynastrySection = { title: string; body: string };
 
 export type SynastryDimension = {
-  key: 'core' | 'attraction' | 'spirit' | 'communication' | 'wuxing' | 'zodiac';
+  key: 'core' | 'attraction' | 'spirit' | 'communication' | 'wuxing';
   label: string;
   score: number;
   weight: number;
@@ -47,14 +48,12 @@ export type SynastryResult = {
   elements: { a: Element; b: Element; relation: WuxingRelation };
   dimensions: SynastryDimension[];
   archetype: SynastryArchetype;
-  zodiac: ZodiacInfo;
 };
 
 export type IdealPartner = {
   title: string;
   summary: string;
   stars: string[];
-  zodiacs: { sign: string; score: number; note: string }[];
   qualities: string[];
   avoid: string[];
   evidence: string[];
@@ -197,63 +196,95 @@ export function zodiacCompatibility(aSign: string, bSign: string): ZodiacInfo {
   return { a: A.name, b: B.name, elementA: A.el, elementB: B.el, score, label, note };
 }
 
-function zodiacArchetype(z: ZodiacInfo): SynastryArchetype {
-  const pair = [z.elementA, z.elementB].sort().join('');
-  const same = z.elementA === z.elementB;
-  if (same && z.elementA === '风') {
-    return {
-      key: 'air-air', title: '风象同频型', subtitle: '像双子 × 天秤：先聊得来，再谈长久',
-      description: '你们都重交流、社交与心智刺激，关系里最怕无聊，也最容易被对方的表达吸引。',
-      strengths: ['话题不断，能一起玩、一起见朋友', '给彼此空间，不靠黏人来确认爱', '冲突时讲道理比讲情绪更有效'],
-      watchouts: ['容易停留在「聊得很好」而回避落地', '情绪被理性覆盖，真正难受时反而不说', '选择太多，容易犹豫或把关系悬着'],
-    };
-  }
-  if (same && z.elementA === '火') {
-    return { key: 'fire-fire', title: '双火共振型', subtitle: '热烈、直接、一起往前冲', description: '你们互相点火，行动力和热情都很强；关系推进快，但需要有人负责降温。', strengths: ['互相鼓励，敢一起冒险', '不绕弯子，冲突后恢复快'], watchouts: ['火气上来时话太冲', '容易一起冲动做决定'] };
-  }
-  if (same && z.elementA === '土') {
-    return { key: 'earth-earth', title: '双土稳建型', subtitle: '稳定、务实、把日子过起来', description: '你们重视承诺与现实安排，关系像盖房子；稳，但也要防止太闷。', strengths: ['责任感和执行力强', '价值观与生活秩序容易对齐'], watchouts: ['容易把浪漫排在待办之后', '固执时谁也不先低头'] };
-  }
-  if (same && z.elementA === '水') {
-    return { key: 'water-water', title: '双水共感型', subtitle: '情绪同频，温柔但容易内耗', description: '你们对情绪的感知都很细，容易互相理解；也容易一起沉进情绪里。', strengths: ['共情力强，能接住彼此', '关系有柔软与想象力'], watchouts: ['不舒服时容易猜，而不是问', '边界模糊，容易互相拖累'] };
-  }
-  if (pair === '火风') {
-    return { key: 'fire-air', title: '火风点火型', subtitle: '一个点火，一个送风', description: '火象给行动，风象给想法与社交，组合很有活力；要防止热度来得快去得也快。', strengths: ['互相激发，玩得来也做得动', '一个人提想法，一个人敢推进'], watchouts: ['承诺容易停在口头', '注意力转移太快，忽略收尾'] };
-  }
-  if (pair === '水土') {
-    return { key: 'earth-water', title: '水土互养型', subtitle: '土给安全感，水给情绪滋养', description: '土象的稳定接住水象的敏感，水象的柔软让土象不那么硬；是很容易过日子的组合。', strengths: ['一个能落地，一个能共情', '对家庭与长期关系有耐心'], watchouts: ['土象容易嫌水象情绪多', '水象容易觉得土象不够表达'] };
-  }
-  if (pair === '火土') {
-    return { key: 'fire-earth', title: '火土磨合型', subtitle: '一个要快，一个要稳', description: '火象想马上行动，土象要先看风险；磨合好了是执行力，磨合不好是互相拖。', strengths: ['火象带来突破，土象负责兜底', '能把冲动变成可执行计划'], watchouts: ['节奏冲突时容易互相否定', '一个嫌慢，一个嫌冒进'] };
-  }
-  if (pair === '风水') {
-    return { key: 'air-water', title: '风水拉扯型', subtitle: '一个讲道理，一个讲感受', description: '风象想分析，水象想被理解；不是不相配，而是需要先接情绪再讲逻辑。', strengths: ['风象能帮水象抽离，水象能帮风象落地感受', '关系有深度也有话题'], watchouts: ['一方觉得对方冷，一方觉得对方情绪化', '容易在沟通方式上绕圈'] };
-  }
-  return { key: 'mixed', title: '互补张力型', subtitle: '不同，所以有吸引力', description: '你们的元素组合差异较大，吸引力来自不同；长期靠边界与翻译能力。', strengths: ['能补足彼此的盲区', '关系有新鲜感'], watchouts: ['默认对方和自己一样', '冲突时容易升级为价值观之争'] };
-}
-
-function archetypeFor(z: ZodiacInfo, aSoul?: string, sameStar?: boolean): SynastryArchetype {
-  const base = zodiacArchetype(z);
+function relationArchetype(
+  rel: WuxingRelation,
+  aSoul?: string,
+  bSoul?: string,
+  sameStar = false,
+  sameSpirit = false,
+  aFu?: string,
+): SynastryArchetype {
   if (sameStar && aSoul) {
     return {
-      ...base,
-      subtitle: `${base.subtitle} · 同主星共振`,
-      strengths: [`双方命宫同为「${aSoul}」，容易一眼认出彼此`, ...base.strengths].slice(0, 3),
-      watchouts: ['同星会放大同一种盲区，别把对方当成自己的延伸', ...base.watchouts].slice(0, 3),
+      key: 'same-star',
+      title: '同星共振型',
+      subtitle: `命宫同为「${aSoul}」：像照镜子，容易一眼认出彼此`,
+      description: '同一个主星落在双方命宫，价值观、反应方式和审美容易接近；默契高，但也会放大同一种盲区。',
+      strengths: ['沟通成本低，很多话不用解释', '容易玩到一起，审美与节奏接近', '对方像一面镜子，能看见自己的模式'],
+      watchouts: ['把对方当成自己的延伸，忽视差异', '同一种情绪会互相放大', '缺少互补时，容易一起卡在同一个地方'],
     };
   }
+  if (sameSpirit && aFu) {
+    return {
+      key: 'same-spirit',
+      title: '精神同好型',
+      subtitle: `福德宫同为「${aFu}」：恢复能量、取悦自己的方式很像`,
+      description: '双方的精神补给方式接近，容易一起放松、一起投入兴趣；但也要防止一起逃避现实安排。',
+      strengths: ['能理解对方为什么需要独处/爱好', '共同话题与放松方式多', '关系里有“自己人”的松弛感'],
+      watchouts: ['一起逃避该面对的现实问题', '把精神共鸣当成全部，忽略生活协作', '情绪低落时容易一起下沉'],
+    };
+  }
+  const base = {
+    key: 'relation',
+    title: '互补经营型',
+    subtitle: `命宫 ${aSoul ?? '空宫'} × ${bSoul ?? '空宫'}：${REL_WORD[rel]}`,
+    description: '双方命宫结构不同，吸引力来自差异；长期靠边界、翻译与具体协作。',
+    strengths: ['能补足彼此的盲区', '关系有新鲜感与成长空间', '各自保留独立节奏'],
+    watchouts: ['默认对方和自己一样', '冲突时容易升级为价值观之争', '需要主动翻译表达方式'],
+  };
+  switch (rel) {
+    case '生我':
+      return {
+        ...base,
+        key: 'supported',
+        title: '对方托举型',
+        subtitle: `命宫 ${aSoul ?? '空宫'} × ${bSoul ?? '空宫'}：对方的能量更能托住你`,
+        description: 'B 的命宫五行生 A，容易在 A 累的时候接住 A；被支持的一方要留意别把照顾当成理所当然。',
+        strengths: ['B 更容易接住 A 的情绪与节奏', 'A 在关系里更容易放松', '适合一起做长期、需要耐心的事'],
+        watchouts: ['A 容易依赖 B 的支持', 'B 长期付出后可能累而不说', '把“被照顾”误当成“被爱”'],
+      };
+    case '同我':
+      return {
+        ...base,
+        key: 'same-element',
+        title: '同气连枝型',
+        subtitle: `命宫 ${aSoul ?? '空宫'} × ${bSoul ?? '空宫'}：同一种五行节奏`,
+        description: '双方命宫五行相同，节奏与反应方式接近；同频感强，也容易一起放大同一种情绪。',
+        strengths: ['同频感强，容易理解对方的反应', '生活节奏容易对齐', '冲突后恢复速度接近'],
+        watchouts: ['一起放大焦虑或固执', '缺少互补，容易一起卡住', '把“像”误当成“适合”'],
+      };
+    case '我生':
+      return {
+        ...base,
+        key: 'giving',
+        title: '你主动滋养型',
+        subtitle: `命宫 ${aSoul ?? '空宫'} × ${bSoul ?? '空宫'}：你更容易先付出`,
+        description: 'A 的命宫五行生 B，A 更容易主动照顾、推动关系；要留意自己的需求有没有被看见。',
+        strengths: ['A 有带动力，关系容易往前走', 'B 能接住 A 的照顾', '适合一起把想法落地'],
+        watchouts: ['A 过度付出后产生委屈', 'B 容易习惯被安排', '“我为你做了这么多”变成隐性账本'],
+      };
+    case '我克':
+      return {
+        ...base,
+        key: 'leading',
+        title: '你主导修正型',
+        subtitle: `命宫 ${aSoul ?? '空宫'} × ${bSoul ?? '空宫'}：你容易想带节奏`,
+        description: 'A 的命宫五行克 B，A 容易想主导、修正或安排 B；把“为你好”换成具体请求，会少很多摩擦。',
+        strengths: ['A 有方向感，能推进关系', 'B 能被带着走出惯性', '遇到外部问题时行动力强'],
+        watchouts: ['A 容易控制或挑剔', 'B 容易觉得被否定', '把建议说成命令'],
+      };
+    case '克我':
+      return {
+        ...base,
+        key: 'pressured',
+        title: '对方压节奏型',
+        subtitle: `命宫 ${aSoul ?? '空宫'} × ${bSoul ?? '空宫'}：对方的节奏更容易压到你`,
+        description: 'B 的命宫五行克 A，A 容易感到被要求、被推动；冲突时先停一下，别在情绪最高点做决定。',
+        strengths: ['B 能帮 A 建立边界与执行力', '关系有张力，也有吸引力', 'A 能在关系里长出主体性'],
+        watchouts: ['A 容易压抑后爆发', 'B 容易显得强势', '把“被推着走”误当成“被爱”'],
+      };
+  }
   return base;
-}
-
-function zodiacRank(aSign: string, limit = 4): { sign: string; score: number; note: string }[] {
-  return ZODIAC_SIGNS
-    .filter((s) => s.name !== aSign)
-    .map((s) => {
-      const z = zodiacCompatibility(aSign, s.name);
-      return { sign: s.name, score: z.score, note: z.note };
-    })
-    .sort((a, b) => b.score - a.score)
-    .slice(0, limit);
 }
 
 export function compareCharts(a: Astrolabe, b: Astrolabe, aName: string, bName: string): SynastryResult {
@@ -274,8 +305,8 @@ export function compareCharts(a: Astrolabe, b: Astrolabe, aName: string, bName: 
   const bEl = elementOfStar(bSoul) ?? elementOf(b.soul) ?? '土';
   const rel = relationOf(aEl, bEl);
   const relBack = relationOf(bEl, aEl);
-  const zodiac = zodiacCompatibility(a.sign, b.sign);
   const sameStar = Boolean(aSoul && bSoul && aSoul === bSoul);
+  const sameSpirit = Boolean(aFu && bFu && aFu === bFu);
   const shared = sharedKeywords(aSoul, bSoul);
 
   const coreRaw =
@@ -329,51 +360,44 @@ export function compareCharts(a: Astrolabe, b: Astrolabe, aName: string, bName: 
 
   const dimensions: SynastryDimension[] = [
     {
-      key: 'core', label: '核心性格', score: round(clamp(coreRaw)), weight: 22,
+      key: 'core', label: '核心性格', score: round(clamp(coreRaw)), weight: 24,
       contribution: 0,
       summary: `命宫 ${aSoul ? `${aSoul}（${aEl}）` : `空宫（命主${a.soul}·${aEl}）`} × ${bSoul ? `${bSoul}（${bEl}）` : `空宫（命主${b.soul}·${bEl}）`}：${REL_WORD[rel]}；${shared.length ? `共同关键词 ${shared.slice(0, 3).join('、')}` : '关键词交集不多'}。`,
       evidence: [`${aName}命宫：${aSoul ?? `空宫，命主${a.soul}`}${profileKeywords(aSoul) ? `（${profileKeywords(aSoul)}）` : ''}`, `${bName}命宫：${bSoul ?? `空宫，命主${b.soul}`}${profileKeywords(bSoul) ? `（${profileKeywords(bSoul)}）` : ''}`],
     },
     {
-      key: 'attraction', label: '情感吸引', score: round(clamp(attractionRaw)), weight: 20,
+      key: 'attraction', label: '情感吸引', score: round(clamp(attractionRaw)), weight: 22,
       contribution: 0,
       summary: `夫妻宫与对方命宫互相照见：${aSpouse ?? '空宫'} × ${bSoul ?? '空宫'}；${bSpouse ?? '空宫'} × ${aSoul ?? '空宫'}。`,
       evidence: [`${aName}夫妻宫：${aSpouse ?? '空宫'}${aSpouseEl ? `（${aSpouseEl}）` : ''}`, `${bName}夫妻宫：${bSpouse ?? '空宫'}${bSpouseEl ? `（${bSpouseEl}）` : ''}`],
     },
     {
-      key: 'spirit', label: '精神共鸣', score: round(clamp(spiritRaw)), weight: 15,
+      key: 'spirit', label: '精神共鸣', score: round(clamp(spiritRaw)), weight: 18,
       contribution: 0,
       summary: `福德宫 ${aFu ?? '空宫'} × ${bFu ?? '空宫'}：${aFu && bFu && aFu === bFu ? '取悦自己的方式很像' : '恢复能量的方式不同，需要留空间'}。`,
       evidence: [`${aName}福德宫：${aFu ?? '空宫'}`, `${bName}福德宫：${bFu ?? '空宫'}`],
     },
     {
-      key: 'communication', label: '沟通节奏', score: round(clamp(communicationRaw)), weight: 15,
+      key: 'communication', label: '沟通节奏', score: round(clamp(communicationRaw)), weight: 17,
       contribution: 0,
       summary: `${REL_WORD[rel]}；${shared.length ? `能共享 ${shared.slice(0, 3).join('、')} 的语言` : '表达方式需要互相翻译'}。`,
       evidence: [`命宫五行：${aEl} × ${bEl}`, `共同关键词：${shared.length ? shared.join('、') : '较少'}`],
     },
     {
-      key: 'wuxing', label: '五行互补', score: round(clamp(wuxingRaw)), weight: 16,
+      key: 'wuxing', label: '五行互补', score: round(clamp(wuxingRaw)), weight: 19,
       contribution: 0,
       summary: `${aEl} × ${bEl}：${REL_WORD[rel]} / ${REL_WORD[relBack]}；${REL_SCORE[rel] >= 80 ? '相互生扶' : REL_SCORE[rel] >= 60 ? '有补有耗' : '需要主动调频'}。`,
       evidence: [`${aName}：${aEl}`, `${bName}：${bEl}`, `关系：${rel} / ${relBack}`],
-    },
-    {
-      key: 'zodiac', label: '星座默契', score: round(zodiac.score), weight: 12,
-      contribution: 0,
-      summary: `${zodiac.a} × ${zodiac.b}：${zodiac.label}。${zodiac.note}`,
-      evidence: [zodiac.note],
     },
   ];
 
   dimensions.forEach((d) => { d.contribution = Number(((d.score * d.weight) / 100).toFixed(1)); });
   const score = round(clamp(dimensions.reduce((sum, d) => sum + (d.score * d.weight) / 100, 0), 30, 95));
   const grade = score >= 85 ? '高度同频' : score >= 72 ? '同频互补' : score >= 58 ? '可磨合' : '张力型';
-  const archetype = archetypeFor(zodiac, aSoul, sameStar);
+  const archetype = relationArchetype(rel, aSoul, bSoul, sameStar, sameSpirit, aFu);
 
   const keywords = Array.from(new Set([
     archetype.title,
-    zodiac.label,
     REL_WORD[rel],
     attractionRaw >= 72 ? '吸引力' : '需磨合',
     ...profileKeywords(aSpouse, 2).split(' · '),
@@ -442,7 +466,6 @@ export function compareCharts(a: Astrolabe, b: Astrolabe, aName: string, bName: 
     elements: { a: aEl, b: bEl, relation: rel },
     dimensions,
     archetype,
-    zodiac,
   };
 }
 
@@ -462,7 +485,6 @@ export function idealPartnerProfile(a: Astrolabe, aName: string): IdealPartner {
   const qualities = [ELEMENT_QUALITY[feed], ...(spouse ? (profileOf(spouse)?.keywords ?? []).slice(0, 2) : [])]
     .filter((x, i, arr) => arr.indexOf(x) === i)
     .slice(0, 3);
-  const zodiacs = a.sign ? zodiacRank(a.sign, 4) : [];
   const avoid = [
     spouseSha.length ? `少碰把「${[...new Set(spouseSha)].join('、')}」特质放大的人：控制、拉扯或情绪忽冷忽热。` : '少碰过度控制、只会消耗你边界的人。',
     '不需要找和你完全相同的人；高分 B 是能补位，而不是复制你。',
@@ -472,22 +494,19 @@ export function idealPartnerProfile(a: Astrolabe, aName: string): IdealPartner {
     title,
     summary: `${aName} 的夫妻宫主星是「${spouse ?? '空宫'}」，${spouse ? `五行属${baseEl}，更适合找能生扶${baseEl}的${feed}型，或同${baseEl}型` : `本命${baseEl}气偏重，适合找能承接你节奏的人`}。`,
     stars,
-    zodiacs,
     qualities,
     avoid,
     evidence: [
       `夫妻宫：${spouse ?? '空宫'}${profileKeywords(spouse, 2) ? `（${profileKeywords(spouse, 2)}）` : ''}`,
       `福德宫：${fu ?? '空宫'}`,
-      `太阳星座：${a.sign || '未知'}`,
     ],
   };
 }
 
 export function synastryText(r: SynastryResult, aName: string, bName: string): string {
   return [
-    `【紫微合盘 v2】${aName} × ${bName}`,
+    `【紫微合盘 v3】${aName} × ${bName}`,
     `加权总分 ${r.score} · ${r.grade}｜关系类型：${r.archetype.title}`,
-    `星座：${r.zodiac.a} × ${r.zodiac.b}（${r.zodiac.label}）`,
     `五行：${r.elements.a} × ${r.elements.b}（${REL_WORD[r.elements.relation]}）`,
     `关键词：${r.keywords.join(' · ')}`,
     '',
@@ -504,7 +523,7 @@ export function synastryText(r: SynastryResult, aName: string, bName: string): s
     '【相处建议】',
     ...r.advice.map((a) => `· ${a}`),
     '',
-    '总分是六维加权，不是感情好坏；低分也可能代表高吸引。',
+    '总分是五维加权，不是感情好坏；低分也可能代表高吸引。',
     '传统命理参考，不构成情感、心理、法律建议。',
   ].join('\n');
 }

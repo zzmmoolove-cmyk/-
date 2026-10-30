@@ -299,7 +299,7 @@ export default function SynastryTool({
   const topAdvice = result
     ? [
       weakestDim ? `最需要练：${weakestDim.label} —— ${weakestDim.summary}` : '',
-      astroResult?.advice[1] ?? '',
+      '星座层面：先看双方上升节奏能不能接住，再看太阳表达是否同频；具体放到「星座」板块单独看。',
       bazi?.advice[0] ?? '',
     ].filter(Boolean)
     : [];
@@ -337,7 +337,7 @@ export default function SynastryTool({
       <div className="tool-pane">
         <div className="tool-intro">
           <h3>双人合盘</h3>
-          <p>六维加权看关系结构；先给你一份高分 B 画像，再选 B 做具体合盘。</p>
+          <p>紫微五维看命盘结构，星座与八字各自独立成板；先给你一份高分 B 画像，再选 B 做具体合盘。</p>
         </div>
         {ideal && <IdealBProfile ideal={ideal} />}
         <div className="tool-empty slim">
@@ -374,7 +374,7 @@ export default function SynastryTool({
     <div className="tool-pane">
       <div className="tool-intro">
         <h3>双人合盘</h3>
-        <p>六维加权看关系结构；先看你的高分 B 画像，再选 B 做具体合盘。A 使用当前盘，B 从已保存用户里选。</p>
+        <p>紫微五维看命盘结构，星座与八字各自独立成板；先看你的高分 B 画像，再选 B 做具体合盘。A 使用当前盘，B 从已保存用户里选。</p>
       </div>
 
       <div className="tool-form synastry-form">

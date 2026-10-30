@@ -10,7 +10,7 @@ export default function SynastryBreakdown({ result }: { result: SynastryResult }
             <h4>{result.archetype.title}</h4>
             <p>{result.archetype.subtitle}</p>
           </div>
-          <span className="synastry-zodiac">{result.zodiac.a} × {result.zodiac.b}</span>
+          <span className="synastry-scope-tag">紫微盘 · 命宫 / 夫妻 / 福德</span>
         </div>
         <p className="synastry-archetype-desc">{result.archetype.description}</p>
         <div className="synastry-archetype-grid">
@@ -41,7 +41,7 @@ export default function SynastryBreakdown({ result }: { result: SynastryResult }
           ))}
         </div>
         <p className="hint" style={{ margin: '8px 0 0' }}>
-          总分 = 核心性格 22% + 情感吸引 20% + 精神共鸣 15% + 沟通节奏 15% + 五行互补 16% + 星座默契 12%；各项贡献相加后四舍五入。
+          总分 = 核心性格 24% + 情感吸引 22% + 精神共鸣 18% + 沟通节奏 17% + 五行互补 19%；各项贡献相加后四舍五入。五个维度只取命宫、夫妻宫、福德宫与命宫五行。
         </p>
       </section>
     </div>

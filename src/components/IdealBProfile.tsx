@@ -20,12 +20,10 @@ export default function IdealBProfile({ ideal }: { ideal: IdealPartner }) {
           </div>
         </div>
         <div>
-          <em>星座高分区</em>
-          <div className="ideal-tags">
-            {ideal.zodiacs.length
-              ? ideal.zodiacs.map((z) => <span key={z.sign}>{z.sign} {z.score}</span>)
-              : <span>星座资料待补</span>}
-          </div>
+          <em>关系宫位</em>
+          <ul className="ideal-list">
+            {ideal.evidence.map((e) => <li key={e}>{e}</li>)}
+          </ul>
         </div>
         <div>
           <em>你需要的特质</em>
@@ -41,8 +39,7 @@ export default function IdealBProfile({ ideal }: { ideal: IdealPartner }) {
         </div>
       </div>
 
-      <p className="ideal-evidence">{ideal.evidence.join(' · ')}</p>
-      <p className="hint" style={{ margin: '4px 0 0' }}>这是从 A 的夫妻宫、福德宫与太阳星座推出来的「更适合你的类型」，不是具体某个人；具体合盘仍要看 B 的真实命盘。</p>
+      <p className="hint" style={{ margin: '8px 0 0' }}>这是从 A 的夫妻宫、福德宫与命宫结构推出来的「更适合你的类型」；具体合盘仍要看 B 的真实命盘。</p>
     </section>
   );
 }
