@@ -2971,3 +2971,27 @@ html[data-theme='paper'] .master-switch.on .master-switch-track i {
 .scope-surround em { font-style: normal; font-size: 7.5px; color: var(--accent); }
 .scope-surround b { display: block; margin-top: 1px; font-size: 9px; font-weight: 500; color: var(--text); }
 .scope-surround span { display: block; margin-top: 1px; font-size: 8px; color: var(--text-dim); }
+
+/* 时间筛选不做横向滚动：所有行自然换行，日期全部可见 */
+.scope-filter-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  overflow: visible;
+  white-space: normal;
+  row-gap: 2px;
+}
+
+.scope-filter-row::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
+}
+
+.scope-chip {
+  flex: 0 0 auto;
+}
+
+.scope-current {
+  min-height: 18px;
+}
