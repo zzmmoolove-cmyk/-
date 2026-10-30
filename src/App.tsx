@@ -841,7 +841,7 @@ export default function App() {
                 <div>
                   <h2>服务</h2>
                   <p className="dim">
-                    {currentProfile.name ? `当前客户：${currentProfile.name} · ${currentProfile.relation}` : '起名 / 择日 / 合盘，先在左侧选择客户'}
+                    {currentProfile.name ? `当前客户：${currentProfile.name} · ${currentProfile.relation}` : '起名可独立择日；合盘需要 A/B 两位客户'}
                   </p>
                 </div>
                 <button

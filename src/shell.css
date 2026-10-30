@@ -1213,3 +1213,47 @@ html[data-theme='mystic'] .sidebar {
   cursor: pointer;
 }
 .today-filter:focus { outline: none; border-color: var(--accent); }
+
+/* —— 起名：择日 12 时辰 + 古籍 —— */
+.tool-subhead { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; margin-bottom: 8px; }
+.tool-subhead h4 { margin: 0; font-family: var(--font-display); font-size: 16px; letter-spacing: 1px; color: var(--accent-soft); }
+.tool-subhead span { font-size: 10px; color: var(--text-dim); }
+.naming-time-section, .naming-form-section { margin-top: 14px; padding-top: 12px; border-top: 1px dashed var(--border); }
+.naming-time-form { grid-template-columns: minmax(0, 1fr) 110px 155px; }
+.naming-analyze-field .btn { width: 100%; }
+.time-slot-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; margin-top: 10px; }
+.time-slot {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+  padding: 8px 9px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--panel-2);
+  color: var(--text);
+  text-align: left;
+  cursor: pointer;
+}
+.time-slot:hover { border-color: rgba(201, 163, 92, 0.5); }
+.time-slot.active { border-color: var(--accent); box-shadow: inset 0 0 0 1px rgba(201, 163, 92, 0.25); }
+.time-slot.best { background: rgba(201, 163, 92, 0.06); }
+.time-slot-head { display: flex; align-items: baseline; gap: 5px; flex-wrap: wrap; }
+.time-slot-head b { font-size: 12.5px; color: var(--accent-soft); }
+.time-slot-head em { font-style: normal; font-size: 8.5px; color: var(--text-dim); }
+.slot-best { padding: 1px 4px; border: 1px solid rgba(201, 163, 92, 0.4); border-radius: 3px; font-size: 8px; color: var(--accent); }
+.time-slot-score { font-size: 19px; font-weight: 700; color: var(--text); line-height: 1.1; }
+.time-slot-score span { margin-left: 3px; font-size: 9px; font-weight: 400; color: var(--text-dim); }
+.time-slot p { margin: 1px 0; font-size: 9.5px; line-height: 1.45; color: var(--text-dim); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.time-slot-balance { font-style: normal; margin-top: auto; font-size: 8.5px; color: var(--text-dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.selected-slot { display: flex; flex-wrap: wrap; align-items: baseline; gap: 7px; margin-top: 8px; padding: 7px 9px; border-left: 2px solid var(--accent); background: var(--panel-2); font-size: 11px; color: var(--text-dim); }
+.selected-slot b { color: var(--accent-soft); }
+.selected-slot em { font-style: normal; margin-left: auto; font-size: 10px; }
+.naming-classics { margin-top: 12px; padding-top: 10px; border-top: 1px dashed var(--border); }
+.naming-classics .classic-quote { margin: 6px 0; }
+
+@media (max-width: 800px) {
+  .naming-time-form { grid-template-columns: 1fr 1fr; }
+  .naming-analyze-field { grid-column: 1 / -1; }
+  .time-slot-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}

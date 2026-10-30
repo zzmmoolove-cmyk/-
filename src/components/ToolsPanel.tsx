@@ -56,7 +56,7 @@ export default function ToolsPanel({
       </div>
 
       {tool === 'naming' && (
-        <NamingTool astrolabe={astrolabe} userLabel={userLabel} defaultSurname={defaultSurname} onSaveService={saveForCurrent} />
+        <NamingTool astrolabe={astrolabe} userLabel={userLabel} defaultSurname={defaultSurname} options={options} onSaveService={saveForCurrent} />
       )}
       {tool === 'dates' && <DateSelectTool astrolabe={astrolabe} userLabel={userLabel} onSaveService={saveForCurrent} />}
       {tool === 'synastry' && (
