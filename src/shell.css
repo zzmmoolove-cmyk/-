@@ -3623,3 +3623,41 @@ textarea {
 .chart-meta { margin-bottom: 5px; font-size: 11px; }
 .chart-meta em { font-size: 9.5px; }
 .chart-meta-hua i { font-size: 9.5px; }
+
+/* 运限短标签：只留文字，放在宫名右侧 */
+.chart-scroll .iztro-palace-name {
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 2px 4px;
+}
+
+.chart-scope-name-labels {
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 2px 5px;
+  margin-left: 3px;
+  line-height: 1;
+}
+
+.chart-scope-name-labels .chart-scope-label {
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  font-size: 10px;
+  line-height: 1.1;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  text-align: left;
+}
+
+.chart-scope-name-labels .chart-scope-label.layer-decadal { color: #e4c06d !important; }
+.chart-scope-name-labels .chart-scope-label.layer-yearly { color: #82d3aa !important; }
+.chart-scope-name-labels .chart-scope-label.layer-monthly { color: #91b6ef !important; }
+.chart-scope-name-labels .chart-scope-label.layer-daily { color: #c6abf0 !important; }
+
+/* 旧 fate 容器隐藏，避免残留天干字 */
+.chart-scroll .iztro-palace-fate { display: none !important; }

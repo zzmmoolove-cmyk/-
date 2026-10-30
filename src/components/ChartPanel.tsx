@@ -176,24 +176,33 @@ export default function ChartPanel({
       container.querySelectorAll<HTMLElement>('.iztro-palace').forEach((p) => {
         const text = p.querySelector('.iztro-palace-name-wrapper')?.textContent ?? '';
         const base = PALACE_ORDER.find((n) => text.includes(n));
-        const host = p.querySelector<HTMLElement>('.iztro-palace-fate');
-        if (host) {
-          host.replaceChildren();
-          host.classList.add('chart-scope-labels-host');
+        // 第三方天干小字直接去掉，不再作为标签容器。
+        const fate = p.querySelector<HTMLElement>('.iztro-palace-fate');
+        if (fate) {
+          fate.replaceChildren();
+          fate.style.display = 'none';
+        }
+
+        // 运限短标签放到宫名大字右侧：只留文字，不加框。
+        const nameEl = p.querySelector<HTMLElement>('.iztro-palace-name');
+        nameEl?.querySelector('.chart-scope-name-labels')?.remove();
+        if (base && nameEl) {
           const labels: HTMLElement[] = [];
-          if (base) {
-            scopes.forEach((scope) => {
-              const flow = maps[scope]?.[base];
-              if (!flow) return;
-              const label = document.createElement('span');
-              label.className = `chart-scope-label layer-${scope}`;
-              label.textContent = `${prefix[scope]}${short[flow] ?? flow.replace('宫', '').slice(0, 1)}`;
-              label.title = `${scopeLabel[scope]} · ${flow}`;
-              labels.push(label);
-            });
+          scopes.forEach((scope) => {
+            const flow = maps[scope]?.[base];
+            if (!flow) return;
+            const label = document.createElement('span');
+            label.className = `chart-scope-label layer-${scope}`;
+            label.textContent = `${prefix[scope]}${short[flow] ?? flow.replace('宫', '').slice(0, 1)}`;
+            label.title = `${scopeLabel[scope]} · ${flow}`;
+            labels.push(label);
+          });
+          if (labels.length) {
+            const host = document.createElement('span');
+            host.className = 'chart-scope-name-labels';
+            host.append(...labels);
+            nameEl.append(host);
           }
-          host.append(...labels);
-          host.style.display = labels.length ? 'grid' : 'none';
         }
 
         p.querySelectorAll<HTMLElement>('.iztro-palace-horo-star .iztro-star').forEach((star) => {
