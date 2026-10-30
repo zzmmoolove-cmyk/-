@@ -729,28 +729,6 @@ export default function App() {
             </div>
           </div>
 
-          <div className="side-section">
-            <div className="side-label">主客户</div>
-            {primary ? (
-              <button className="side-primary" onClick={() => setSection('master')} title="前往命主页面切换主客户">
-                <span className="side-avatar">{Array.from(primary.name)[0] || '客'}</span>
-                <span className="side-primary-main">
-                  <b>{primary.name}</b>
-                  <em>主客户开关已打开 · 管理命主</em>
-                </span>
-                <span className="side-primary-arrow">→</span>
-              </button>
-            ) : (
-              <button className="side-primary empty" onClick={() => setSection('master')}>
-                <span className="side-primary-main">
-                  <b>还没有主客户</b>
-                  <em>去命主页打开开关</em>
-                </span>
-                <span className="side-primary-arrow">→</span>
-              </button>
-            )}
-          </div>
-
           <SidebarToday
             primary={primary}
             options={options}
