@@ -39,6 +39,8 @@ import {
 } from './lib/scope';
 import { getRelations, type Relations } from './lib/relations';
 import { computeTimeIndex } from './lib/truesolar';
+import { clientCounts, clientGroup, clientKindLabel, CLIENT_GROUPS, type ClientFilter } from './lib/clientGroups';
+import { seedCelebrityExamples } from './lib/celebrityExamples';
 import { loadOutputProfile, saveOutputProfile, type OutputProfile } from './lib/output';
 import { FLOW_PROFILES, PROFILE_STATS, STAR_PROFILES } from './lib/knowledge/starProfiles';
 
@@ -214,7 +216,7 @@ export default function App() {
   const [activeLayers, setActiveLayers] = useState<ActiveLayers>({ decadal: null, yearly: null, monthly: null, daily: null });
   const [selectedPalace, setSelectedPalace] = useState<string | null>('命宫');
   const [aiConfig, setAiConfig] = useState<AiConfig>(loadAiConfig);
-  const [users, setUsers] = useState<UserRecord[]>(loadUsers);
+  const [users, setUsers] = useState<UserRecord[]>(() => seedCelebrityExamples(loadUsers()));
   const [readings, setReadings] = useState<ReadingRecord[]>(loadReadings);
   const [services, setServices] = useState<ServiceRecord[]>(loadServices);
   const [serviceOpenId, setServiceOpenId] = useState<string | null>(null);
@@ -230,6 +232,7 @@ export default function App() {
   const [switcherOpen, setSwitcherOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [settingsTab, setSettingsTab] = useState<SettingsTab>('chart');
+  const [clientFilter, setClientFilter] = useState<ClientFilter>('all');
   const [primaryId, setPrimaryId] = useState<string | null>(() => {
     try {
       return localStorage.getItem(PRIMARY_CLIENT_KEY);
@@ -322,6 +325,11 @@ export default function App() {
   );
 
   const profileUser = useMemo(() => users.find((u) => u.id === profileId) ?? null, [users, profileId]);
+  const filterCounts = useMemo(() => clientCounts(users), [users]);
+  const filteredClients = useMemo(
+    () => (clientFilter === 'all' ? users : users.filter((u) => clientGroup(u) === clientFilter)),
+    [users, clientFilter],
+  );
   const openService = useMemo(() => services.find((s) => s.id === serviceOpenId) ?? null, [services, serviceOpenId]);
 
   const flash = (msg: string) => {
@@ -428,13 +436,16 @@ export default function App() {
     const now = new Date().toLocaleString('zh-CN');
     const id = activeUserId ?? String(Date.now());
     const payload = { ...next, ...options };
+    const existing = users.find((u) => u.id === id);
     const record: UserRecord = {
       id,
       name: displayName,
       relation: profile.relation,
       note: profile.note,
-      savedAt: users.find((u) => u.id === id)?.savedAt ?? now,
+      savedAt: existing?.savedAt ?? now,
       updatedAt: now,
+      category: existing?.category,
+      isExample: existing?.isExample,
       payload,
     };
     setUsers((prev) => [record, ...prev.filter((u) => u.id !== id)].slice(0, 100));
@@ -546,6 +557,7 @@ export default function App() {
 
   const newClient = () => {
     newUser();
+    setClientFilter('all');
     setEditorOpen(true);
     setSwitcherOpen(false);
     setProfileOpen(false);
@@ -719,12 +731,23 @@ export default function App() {
                 onClick={() => { setSection('clients'); setShowClientList(true); }}
                 title="查看全部客户"
               >
-                最近客户 <span className="side-count">{users.length}</span>
+                最近客户 <span className="side-count">{filteredClients.length}</span>
               </button>
               <button className="side-plus" onClick={newClient} title="新建客户" aria-label="新建客户">+</button>
             </div>
+            <select
+              className="side-filter"
+              value={clientFilter}
+              onChange={(e) => setClientFilter(e.target.value as ClientFilter)}
+              aria-label="筛选客户"
+            >
+              <option value="all">全部 · {users.length}</option>
+              {CLIENT_GROUPS.map((g) => (
+                <option key={g.key} value={g.key}>{g.label} · {filterCounts[g.key]}</option>
+              ))}
+            </select>
             <div className="side-clients">
-              {users.slice(0, 6).map((u) => (
+              {filteredClients.slice(0, 6).map((u) => (
                 <button
                   key={u.id}
                   className={`side-client ${u.id === activeUserId ? 'active' : ''}`}
@@ -733,11 +756,15 @@ export default function App() {
                   <span className="side-avatar">{Array.from(u.name)[0] || '客'}</span>
                   <span className="side-client-main">
                     <b>{u.name}</b>
-                    <em>{u.relation} · {u.payload.birthday || '生辰未填'}</em>
+                    <em>{clientKindLabel(u)} · {u.payload.birthday || '生辰未填'}</em>
                   </span>
                 </button>
               ))}
-              {!users.length && <p className="dim" style={{ padding: '4px 9px', margin: 0 }}>还没有客户</p>}
+              {!filteredClients.length && (
+                <p className="dim" style={{ padding: '4px 9px', margin: 0 }}>
+                  {users.length ? '这一类还没有客户。' : '还没有客户'}
+                </p>
+              )}
             </div>
           </div>
 
@@ -755,6 +782,9 @@ export default function App() {
               primaryId={primaryId}
               options={options}
               hasChart={Boolean(astrolabe)}
+              clientFilter={clientFilter}
+              filterCounts={filterCounts}
+              onClientFilter={setClientFilter}
               onOpenClient={openClient}
               onNewClient={newClient}
               onOpenServices={() => setSection('services')}

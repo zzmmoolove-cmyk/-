@@ -1,5 +1,6 @@
-import type { ChartOptions, UserRecord } from '../types';
+import type { ChartOptions, ClientCategory, UserRecord } from '../types';
 import { solarToCalendar } from '../lib/calendar';
+import { CLIENT_GROUPS, clientGroup, clientKindLabel, type ClientFilter } from '../lib/clientGroups';
 import DailyFortune from './DailyFortune';
 
 function todayIso(): string {
@@ -13,6 +14,9 @@ export default function TodayPanel({
   primaryId,
   options,
   hasChart,
+  clientFilter,
+  filterCounts,
+  onClientFilter,
   onOpenClient,
   onNewClient,
   onOpenServices,
@@ -24,6 +28,9 @@ export default function TodayPanel({
   primaryId: string | null;
   options: ChartOptions;
   hasChart: boolean;
+  clientFilter: ClientFilter;
+  filterCounts: Record<ClientCategory, number>;
+  onClientFilter: (f: ClientFilter) => void;
   onOpenClient: (id: string) => void;
   onNewClient: () => void;
   onOpenServices: () => void;
@@ -39,7 +46,8 @@ export default function TodayPanel({
   }
   const active = users.find((u) => u.id === activeUserId);
   const primary = users.find((u) => u.id === primaryId) ?? null;
-  const recent = users.slice(0, 5);
+  const filteredClients = clientFilter === 'all' ? users : users.filter((u) => clientGroup(u) === clientFilter);
+  const recent = filteredClients.slice(0, 5);
 
   return (
     <div className="today-page">
@@ -61,7 +69,7 @@ export default function TodayPanel({
               <select value={primaryId ?? ''} onChange={(e) => onPrimaryChange(e.target.value)}>
                 <option value="">选择主客户…</option>
                 {users.map((u) => (
-                  <option key={u.id} value={u.id}>{u.name} · {u.relation} · {u.payload.birthday}</option>
+                  <option key={u.id} value={u.id}>{u.name} · {clientKindLabel(u)} · {u.payload.birthday}</option>
                 ))}
               </select>
               {primary && <button className="btn ghost small" onClick={() => onOpenClient(primary.id)}>打开解盘</button>}
@@ -70,7 +78,7 @@ export default function TodayPanel({
               <div className="primary-meta">
                 <span className="side-avatar">{Array.from(primary.name)[0] || '客'}</span>
                 <div>
-                  <b>{primary.name} · {primary.relation}</b>
+                  <b>{primary.name} · {clientKindLabel(primary)}</b>
                   <em>{primary.payload.birthday} {primary.payload.clockTime} · {primary.payload.gender} · 流日以本命盘为底</em>
                 </div>
               </div>
@@ -99,8 +107,14 @@ export default function TodayPanel({
       )}
 
       <section className="today-section">
-        <div className="today-section-title">
-          最近客户 <span className="dim">{users.length} 位</span>
+        <div className="today-recent-head">
+          <div className="today-section-title">
+            最近客户 <span className="dim">{filteredClients.length} 位</span>
+          </div>
+          <select className="today-filter" value={clientFilter} onChange={(e) => onClientFilter(e.target.value as ClientFilter)} aria-label="筛选最近客户">
+            <option value="all">全部 · {users.length}</option>
+            {CLIENT_GROUPS.map((g) => <option key={g.key} value={g.key}>{g.label} · {filterCounts[g.key]}</option>)}
+          </select>
         </div>
         {recent.length ? (
           <div className="today-clients">
@@ -109,7 +123,7 @@ export default function TodayPanel({
                 <span className="today-avatar">{Array.from(u.name)[0] || '客'}</span>
                 <span className="today-client-main">
                   <b>{u.name}</b>
-                  <em>{u.relation} · {u.payload.birthday || '生辰未填'}</em>
+                  <em>{clientKindLabel(u)} · {u.payload.birthday || '生辰未填'}</em>
                 </span>
                 <span className="today-client-arrow">→</span>
               </button>
@@ -117,8 +131,8 @@ export default function TodayPanel({
           </div>
         ) : (
           <div className="today-empty">
-            <p>今天还没有客户。</p>
-            <button className="btn" onClick={onNewClient}>新建第一位客户</button>
+            <p>{users.length ? '这一类还没有客户。' : '今天还没有客户。'}</p>
+            <button className="btn" onClick={onNewClient}>{users.length ? '新建客户' : '新建第一位客户'}</button>
           </div>
         )}
       </section>

@@ -1184,3 +1184,32 @@ html[data-theme='mystic'] .sidebar {
   }
   .side-label-clients .side-label-link { font-size: 10px !important; }
 }
+
+/* —— 最近客户筛选 —— */
+.side-filter {
+  width: 100%;
+  margin: 3px 0 6px;
+  padding: 5px 7px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--panel-2);
+  color: var(--text);
+  font-size: 10.5px;
+  cursor: pointer;
+}
+.side-filter:focus { outline: none; border-color: var(--accent); }
+
+/* —— 今日最近客户筛选 —— */
+.today-recent-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 9px; }
+.today-recent-head .today-section-title { margin-bottom: 0; }
+.today-filter {
+  width: auto;
+  padding: 5px 7px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--panel-2);
+  color: var(--text);
+  font-size: 10.5px;
+  cursor: pointer;
+}
+.today-filter:focus { outline: none; border-color: var(--accent); }

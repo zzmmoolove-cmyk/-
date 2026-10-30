@@ -82,6 +82,8 @@ export type UserProfile = {
   note: string;
 };
 
+export type ClientCategory = 'family' | 'friend' | 'work' | 'client' | 'celebrity' | 'other';
+
 /** 一条用户档案：姓名/关系 + 出生信息 + 排盘设置 */
 export type UserRecord = {
   id: string;
@@ -90,6 +92,8 @@ export type UserRecord = {
   note: string;
   savedAt: string;
   updatedAt: string;
+  category?: ClientCategory;
+  isExample?: boolean;
   payload: BirthInput & ChartOptions;
 };
 

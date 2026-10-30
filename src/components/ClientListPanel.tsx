@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 import type { UserRecord } from '../types';
+import { clientKindLabel } from '../lib/clientGroups';
 
 export default function ClientListPanel({
   users,
@@ -51,7 +52,7 @@ export default function ClientListPanel({
               <span className="client-avatar">{Array.from(u.name)[0] || '客'}</span>
               <div className="client-main">
                 <b>{u.name}</b>
-                <span>{u.relation} · {u.payload.birthday || '生辰未填'} {u.payload.clockTime || ''}</span>
+                <span>{clientKindLabel(u)} · {u.payload.birthday || '生辰未填'} {u.payload.clockTime || ''}</span>
               </div>
               <div className="client-side">
                 <span>{u.updatedAt || u.savedAt}</span>
