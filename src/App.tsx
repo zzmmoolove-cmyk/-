@@ -226,7 +226,7 @@ export default function App() {
   const [currentProfile, setCurrentProfile] = useState<UserProfile>({ name: '', relation: '本人', note: '' });
   const [dirty, setDirty] = useState(false);
   const [section, setSection] = useState<'today' | 'clients' | 'services' | 'library'>('today');
-  const [view, setView] = useState<'chart' | 'card' | 'summary'>('chart');
+  const [view, setView] = useState<'chart' | 'card' | 'summary' | 'report'>('chart');
   const [showClientList, setShowClientList] = useState(false);
   const [profileId, setProfileId] = useState<string | null>(null);
   const [profileOpen, setProfileOpen] = useState(false);

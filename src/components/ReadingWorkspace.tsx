@@ -1,8 +1,7 @@
-import { useState } from 'react';
 import type { Astrolabe, BirthInput, ChartOptions } from '../types';
 import type { AiConfig } from '../lib/ai';
 import {
-  getDecadalYearRange,
+  daysInMonth,
   type ActiveLayers,
   type LayeredData,
 } from '../lib/scope';
@@ -14,23 +13,16 @@ import SummaryPanel from './SummaryPanel';
 import ScopeReportPanel from './ScopeReportPanel';
 import PalaceDetail from './PalaceDetail';
 import PalaceInspector from './PalaceInspector';
-import ScopeNav from './ScopeNav';
+import ScopeFocusReport from './ScopeFocusReport';
 
 type RangeKey = 'natal' | 'decadal' | 'yearly' | 'monthly' | 'daily';
-type ViewKey = 'chart' | 'card' | 'summary';
-
-const RANGES: { key: RangeKey; label: string }[] = [
-  { key: 'natal', label: '本命' },
-  { key: 'decadal', label: '大限' },
-  { key: 'yearly', label: '流年' },
-  { key: 'monthly', label: '流月' },
-  { key: 'daily', label: '流日' },
-];
+type ViewKey = 'chart' | 'card' | 'summary' | 'report';
 
 const VIEWS: { key: ViewKey; label: string }[] = [
   { key: 'chart', label: '命盘' },
   { key: 'card', label: '宫位卡' },
   { key: 'summary', label: '综述' },
+  { key: 'report', label: '运限报告' },
 ];
 
 function rangeOf(active: ActiveLayers): RangeKey {
@@ -98,9 +90,9 @@ export default function ReadingWorkspace({
   hasKey: boolean;
   output: OutputProfile;
 }) {
-  const [timeOpen, setTimeOpen] = useState(false);
   const range = rangeOf(active);
-  const currentYear = new Date().getFullYear();
+  const years = yearRange ? Array.from({ length: yearRange[1] - yearRange[0] + 1 }, (_, i) => yearRange[0] + i) : [];
+  const days = active.yearly != null && active.monthly != null ? daysInMonth(active.yearly, active.monthly) : 0;
 
   const rangeText =
     range === 'decadal'
@@ -112,36 +104,6 @@ export default function ReadingWorkspace({
           : range === 'daily'
             ? `${active.daily} 流日`
             : '本命盘';
-
-  const setRange = (next: RangeKey) => {
-    if (next === 'natal') {
-      onActiveChange({ decadal: null, yearly: null, monthly: null, daily: null });
-      return;
-    }
-    if (!raw) return;
-    const dec = active.decadal ?? decadalOptions[0]?.index ?? 0;
-    if (next === 'decadal') {
-      onActiveChange({ decadal: dec, yearly: null, monthly: null, daily: null });
-      return;
-    }
-    const years = getDecadalYearRange(raw as never, dec) ?? [currentYear, currentYear];
-    const year = active.yearly ?? Math.min(Math.max(currentYear, years[0]), years[1]);
-    if (next === 'yearly') {
-      onActiveChange({ decadal: dec, yearly: year, monthly: null, daily: null });
-      return;
-    }
-    const month = active.monthly ?? 1;
-    if (next === 'monthly') {
-      onActiveChange({ decadal: dec, yearly: year, monthly: month, daily: null });
-      return;
-    }
-    onActiveChange({
-      decadal: dec,
-      yearly: year,
-      monthly: month,
-      daily: active.daily ?? `${year}-${String(month).padStart(2, '0')}-01`,
-    });
-  };
 
   return (
     <div className="reading-workspace">
@@ -158,23 +120,90 @@ export default function ReadingWorkspace({
         </div>
       </div>
 
-      <div className="range-view-bars">
-        <div className="range-bar" role="group" aria-label="时间范围">
-          {RANGES.map((r) => (
-            <button key={r.key} className={range === r.key ? 'active' : ''} onClick={() => setRange(r.key)} disabled={!astrolabe && r.key !== 'natal'}>
-              {r.label}
+      <div className="scope-filter panel">
+        <div className="scope-filter-row">
+          <span className="scope-filter-label">时间</span>
+          <button
+            className={`scope-chip ${range === 'natal' ? 'active' : ''}`}
+            onClick={() => onActiveChange({ decadal: null, yearly: null, monthly: null, daily: null })}
+          >
+            本命
+          </button>
+          <span className="scope-filter-sep" />
+          <span className="scope-filter-label">大限</span>
+          {decadalOptions.map((d) => (
+            <button
+              key={d.index}
+              className={`scope-chip ${active.decadal === d.index ? 'active' : ''}`}
+              onClick={() => onActiveChange({ decadal: d.index, yearly: null, monthly: null, daily: null })}
+              title={d.label}
+            >
+              {d.label.split(' ')[0]} <em>{d.label.match(/\d+–\d+岁/)?.[0] ?? ''}</em>
             </button>
           ))}
-          <button className="range-time" onClick={() => setTimeOpen(true)} disabled={!astrolabe}>选择时间…</button>
-          <span className="range-current">{rangeText}</span>
+          <span className="scope-current">{rangeText}</span>
         </div>
-        <div className="view-bar" role="group" aria-label="视图">
-          {VIEWS.map((v) => (
-            <button key={v.key} className={view === v.key ? 'active' : ''} onClick={() => onViewChange(v.key)} disabled={!astrolabe}>
-              {v.label}
-            </button>
-          ))}
-        </div>
+
+        {active.decadal != null && (
+          <div className="scope-filter-row">
+            <span className="scope-filter-label">流年</span>
+            {years.map((year) => (
+              <button
+                key={year}
+                className={`scope-chip ${active.yearly === year ? 'active' : ''}`}
+                onClick={() => onActiveChange({ decadal: active.decadal, yearly: year, monthly: null, daily: null })}
+              >
+                {year}
+              </button>
+            ))}
+          </div>
+        )}
+
+        {active.yearly != null && (
+          <div className="scope-filter-row">
+            <span className="scope-filter-label">流月</span>
+            {Array.from({ length: 12 }, (_, i) => i + 1).map((month) => (
+              <button
+                key={month}
+                className={`scope-chip ${active.monthly === month ? 'active' : ''}`}
+                onClick={() => onActiveChange({ decadal: active.decadal, yearly: active.yearly, monthly: month, daily: null })}
+              >
+                {month}月
+              </button>
+            ))}
+          </div>
+        )}
+
+        {active.monthly != null && (
+          <div className="scope-filter-row">
+            <span className="scope-filter-label">流日</span>
+            {Array.from({ length: days }, (_, i) => i + 1).map((day) => {
+              const date = `${active.yearly}-${String(active.monthly).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+              return (
+                <button
+                  key={day}
+                  className={`scope-chip ${active.daily === date ? 'active' : ''}`}
+                  onClick={() => onActiveChange({ decadal: active.decadal, yearly: active.yearly, monthly: active.monthly, daily: date })}
+                >
+                  {day}
+                </button>
+              );
+            })}
+          </div>
+        )}
+      </div>
+
+      <div className="view-bar scope-view-bar" role="group" aria-label="视图">
+        {VIEWS.map((v) => (
+          <button
+            key={v.key}
+            className={view === v.key ? 'active' : ''}
+            onClick={() => onViewChange(v.key)}
+            disabled={!astrolabe || (v.key === 'report' && range === 'natal')}
+          >
+            {v.label}
+          </button>
+        ))}
       </div>
 
       {saveMsg && <p className="hint workspace-msg">{saveMsg}</p>}
@@ -190,7 +219,7 @@ export default function ReadingWorkspace({
           <button className="btn" onClick={onOpenEditor}>补全出生信息 → 排盘</button>
         </div>
       ) : (
-        <div className={`reading-grid ${selectedPalace && view !== 'card' ? 'has-inspector' : ''}`}>
+        <div className={`reading-grid ${selectedPalace && view !== 'card' && view !== 'report' ? 'has-inspector' : ''}`}>
           <div className="reading-main">
             {view === 'chart' && (
               <ChartPanel
@@ -247,9 +276,15 @@ export default function ReadingWorkspace({
                 <SummaryPanel astrolabe={astrolabe} aiConfig={hasKey ? aiConfig : null} />
               </>
             )}
+
+            {view === 'report' && (
+              raw && range !== 'natal'
+                ? <ScopeFocusReport astrolabe={astrolabe} raw={raw} active={active} userLabel={userLabel} />
+                : <div className="panel empty-state">先在上方选一个大限、流年、流月或流日，再生成对应报告。</div>
+            )}
           </div>
 
-          {selectedPalace && view !== 'card' && (
+          {selectedPalace && view !== 'card' && view !== 'report' && (
             <PalaceInspector
               astrolabe={astrolabe}
               palaceName={selectedPalace}
@@ -260,31 +295,6 @@ export default function ReadingWorkspace({
         </div>
       )}
 
-      {timeOpen && (
-        <div className="modal-backdrop" onClick={() => setTimeOpen(false)}>
-          <div className="modal time-sheet" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-head">
-              <div>
-                <h2>选择时间范围</h2>
-                <div className="modal-sub">按大限 → 流年 → 流月 → 流日逐级选择</div>
-              </div>
-              <button className="modal-close" onClick={() => setTimeOpen(false)}>×</button>
-            </div>
-            <div className="modal-body">
-              <ScopeNav
-                decadalOptions={decadalOptions}
-                yearRange={yearRange}
-                active={active}
-                onActiveChange={onActiveChange}
-              />
-            </div>
-            <div className="client-sheet-actions">
-              <button className="btn" onClick={() => setTimeOpen(false)}>完成</button>
-              <button className="btn ghost" onClick={() => { onActiveChange({ decadal: null, yearly: null, monthly: null, daily: null }); }}>回到本命</button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

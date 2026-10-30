@@ -129,7 +129,7 @@ export type ReadingRecord = {
   clientName: string;
   createdAt: string;
   rangeLabel: string;
-  view: 'chart' | 'card' | 'summary';
+  view: 'chart' | 'card' | 'summary' | 'report';
   palace: string;
   layers: {
     decadal: number | null;
