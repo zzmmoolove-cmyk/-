@@ -93,6 +93,30 @@ export type UserRecord = {
   payload: BirthInput & ChartOptions;
 };
 
+export type ServiceType = 'naming' | 'dates' | 'synastry' | 'team';
+export type ServiceStatus = 'draft' | 'delivered';
+
+export type ServiceDraft = {
+  type: ServiceType;
+  title: string;
+  summary: string;
+  detail: string;
+  clientIds?: string[];
+  clientNames?: string[];
+};
+
+export type ServiceRecord = {
+  id: string;
+  type: ServiceType;
+  title: string;
+  summary: string;
+  detail: string;
+  clientIds: string[];
+  clientNames: string[];
+  createdAt: string;
+  status: ServiceStatus;
+};
+
 export type ReadingRecord = {
   id: string;
   clientId: string;

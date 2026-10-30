@@ -6,6 +6,9 @@ import type {
   ChartOptions,
   HistoryItem,
   ReadingRecord,
+  ServiceDraft,
+  ServiceRecord,
+  ServiceStatus,
   UserProfile,
   UserRecord,
   UserSummary,
@@ -17,6 +20,8 @@ import ReadingWorkspace from './components/ReadingWorkspace';
 import TodayPanel from './components/TodayPanel';
 import ClientListPanel from './components/ClientListPanel';
 import ClientProfileSheet from './components/ClientProfileSheet';
+import ServiceRecordList from './components/ServiceRecordList';
+import ServiceRecordSheet from './components/ServiceRecordSheet';
 import ClientSwitcher from './components/ClientSwitcher';
 import LibraryPage, { type LibraryTab } from './components/LibraryPage';
 import OutputSheet from './components/OutputSheet';
@@ -68,6 +73,7 @@ const AI_STORAGE_KEY = 'ziwei-ai-config-v1';
 const USERS_STORAGE_KEY = 'ziwei-users-v2';
 const LEGACY_HISTORY_KEY = 'ziwei-history-v1';
 const READINGS_STORAGE_KEY = 'ziwei-readings-v1';
+const SERVICES_STORAGE_KEY = 'ziwei-services-v1';
 
 function loadAiConfig(): AiConfig {
   try {
@@ -102,6 +108,19 @@ function loadUsers(): UserRecord[] {
         updatedAt: h.savedAt,
         payload: h.payload,
       }));
+    }
+  } catch {
+    /* ignore */
+  }
+  return [];
+}
+
+function loadServices(): ServiceRecord[] {
+  try {
+    const raw = localStorage.getItem(SERVICES_STORAGE_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw) as ServiceRecord[];
+      if (Array.isArray(parsed)) return parsed.filter((r) => r && r.id);
     }
   } catch {
     /* ignore */
@@ -195,6 +214,8 @@ export default function App() {
   const [aiConfig, setAiConfig] = useState<AiConfig>(loadAiConfig);
   const [users, setUsers] = useState<UserRecord[]>(loadUsers);
   const [readings, setReadings] = useState<ReadingRecord[]>(loadReadings);
+  const [services, setServices] = useState<ServiceRecord[]>(loadServices);
+  const [serviceOpenId, setServiceOpenId] = useState<string | null>(null);
   const [activeUserId, setActiveUserId] = useState<string | null>(null);
   const [currentProfile, setCurrentProfile] = useState<UserProfile>({ name: '', relation: '本人', note: '' });
   const [dirty, setDirty] = useState(false);
@@ -255,6 +276,14 @@ export default function App() {
     saveOutputProfile(outputProfile);
   }, [outputProfile]);
 
+  useEffect(() => {
+    try {
+      localStorage.setItem(SERVICES_STORAGE_KEY, JSON.stringify(services));
+    } catch {
+      /* ignore */
+    }
+  }, [services]);
+
   const timeIndex = useMemo(() => computeTimeIndex(input), [input]);
 
   const userSummaries: UserSummary[] = useMemo(
@@ -270,6 +299,7 @@ export default function App() {
   );
 
   const profileUser = useMemo(() => users.find((u) => u.id === profileId) ?? null, [users, profileId]);
+  const openService = useMemo(() => services.find((s) => s.id === serviceOpenId) ?? null, [services, serviceOpenId]);
 
   const flash = (msg: string) => {
     setSaveMsg(msg);
@@ -409,9 +439,39 @@ export default function App() {
     generate(inputFromPayload(record.payload), optionsFromPayload(record.payload));
   };
 
+  const saveService = (draft: ServiceDraft) => {
+    const record: ServiceRecord = {
+      ...draft,
+      id: `${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+      clientIds: draft.clientIds ?? (activeUserId ? [activeUserId] : []),
+      clientNames: draft.clientNames ?? (currentProfile.name ? [currentProfile.name] : []),
+      createdAt: new Date().toLocaleString('zh-CN'),
+      status: 'draft',
+    };
+    setServices((prev) => [record, ...prev].slice(0, 300));
+    flash('✓ 服务记录已保存');
+  };
+
+  const setServiceStatus = (id: string, status: ServiceStatus) => {
+    setServices((prev) => prev.map((s) => (s.id === id ? { ...s, status } : s)));
+  };
+
+  const deleteService = (id: string) => {
+    setServices((prev) => prev.filter((s) => s.id !== id));
+    setServiceOpenId(null);
+  };
+
   const deleteUser = (id: string) => {
     setUsers((prev) => prev.filter((u) => u.id !== id));
     setReadings((prev) => prev.filter((r) => r.clientId !== id));
+    setServices((prev) => prev.flatMap((s) => {
+      const idx = s.clientIds.indexOf(id);
+      if (idx < 0) return [s];
+      const clientIds = s.clientIds.filter((x) => x !== id);
+      const clientNames = s.clientNames.filter((_, i) => i !== idx);
+      return clientIds.length ? [{ ...s, clientIds, clientNames }] : [];
+    }));
+    setServiceOpenId((prev) => (prev ? null : prev));
     if (profileId === id) {
       setProfileOpen(false);
       setProfileId(null);
@@ -710,15 +770,33 @@ export default function App() {
                     {currentProfile.name ? `当前客户：${currentProfile.name} · ${currentProfile.relation}` : '起名 / 择日 / 合盘，先在左侧选择客户'}
                   </p>
                 </div>
+                <button
+                  className="btn"
+                  onClick={() => document.getElementById('service-new')?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
+                >
+                  + 新建服务
+                </button>
               </div>
-              <ToolsPanel
-                astrolabe={astrolabe}
-                users={users}
-                activeUserId={activeUserId}
-                userName={currentProfile.name}
-                userLabel={currentProfile.name ? `${currentProfile.name} · ${currentProfile.relation}` : ''}
-                options={options}
-              />
+
+              <section className="service-history">
+                <div className="service-history-head">
+                  <h3>服务记录</h3>
+                  <span className="dim">{services.length} 条 · 点开可标记交付 / 复制</span>
+                </div>
+                <ServiceRecordList records={services} onOpen={setServiceOpenId} />
+              </section>
+
+              <div id="service-new" className="service-new-block">
+                <ToolsPanel
+                  astrolabe={astrolabe}
+                  users={users}
+                  activeUserId={activeUserId}
+                  userName={currentProfile.name}
+                  userLabel={currentProfile.name ? `${currentProfile.name} · ${currentProfile.relation}` : ''}
+                  options={options}
+                  onSaveService={saveService}
+                />
+              </div>
             </div>
           )}
 
@@ -745,6 +823,7 @@ export default function App() {
         <ClientProfileSheet
           user={profileUser}
           readings={readings}
+          services={services}
           onClose={() => setProfileOpen(false)}
           onOpenChart={() => openClient(profileUser.id)}
           onEdit={() => {
@@ -757,6 +836,7 @@ export default function App() {
             setProfileOpen(false);
           }}
           onOpenReading={openReading}
+          onOpenService={(id) => { setProfileOpen(false); setServiceOpenId(id); }}
           onDelete={() => {
             deleteUser(profileUser.id);
             setProfileOpen(false);
@@ -821,6 +901,15 @@ export default function App() {
             </div>
           </div>
         </div>
+      )}
+
+      {openService && (
+        <ServiceRecordSheet
+          record={openService}
+          onClose={() => setServiceOpenId(null)}
+          onStatus={(status) => setServiceStatus(openService.id, status)}
+          onDelete={() => deleteService(openService.id)}
+        />
       )}
 
       <OutputSheet

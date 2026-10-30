@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import type { Astrolabe, ChartOptions, UserRecord } from '../types';
+import type { Astrolabe, ChartOptions, ServiceDraft, UserRecord } from '../types';
 import NamingTool from './NamingTool';
 import DateSelectTool from './DateSelectTool';
 import SynastryTool from './SynastryTool';
@@ -20,6 +20,7 @@ export default function ToolsPanel({
   userName,
   userLabel,
   options,
+  onSaveService,
 }: {
   astrolabe: Astrolabe | null;
   users: UserRecord[];
@@ -27,9 +28,15 @@ export default function ToolsPanel({
   userName?: string;
   userLabel?: string;
   options: ChartOptions;
+  onSaveService?: (draft: ServiceDraft) => void;
 }) {
   const [tool, setTool] = useState<ToolKey>('naming');
   const defaultSurname = userName ? Array.from(userName)[0] : '';
+  const saveForCurrent = (draft: ServiceDraft) => onSaveService?.({
+    ...draft,
+    clientIds: activeUserId ? [activeUserId] : [],
+    clientNames: userName ? [userName] : [],
+  });
 
   return (
     <div className="panel tools-panel">
@@ -47,9 +54,9 @@ export default function ToolsPanel({
       </div>
 
       {tool === 'naming' && (
-        <NamingTool astrolabe={astrolabe} userLabel={userLabel} defaultSurname={defaultSurname} />
+        <NamingTool astrolabe={astrolabe} userLabel={userLabel} defaultSurname={defaultSurname} onSaveService={saveForCurrent} />
       )}
-      {tool === 'dates' && <DateSelectTool astrolabe={astrolabe} userLabel={userLabel} />}
+      {tool === 'dates' && <DateSelectTool astrolabe={astrolabe} userLabel={userLabel} onSaveService={saveForCurrent} />}
       {tool === 'synastry' && (
         <SynastryTool
           astrolabe={astrolabe}
@@ -57,6 +64,7 @@ export default function ToolsPanel({
           activeUserId={activeUserId}
           userName={userName || userLabel?.split(' · ')[0] || '你'}
           options={options}
+          onSaveService={onSaveService}
         />
       )}
       {tool === 'team' && (

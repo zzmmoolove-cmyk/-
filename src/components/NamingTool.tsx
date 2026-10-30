@@ -1,17 +1,33 @@
 import { useEffect, useState } from 'react';
-import type { Astrolabe } from '../types';
+import type { Astrolabe, ServiceDraft } from '../types';
 import { generateNames, type NamingResult, type NamingStyle } from '../lib/naming';
 
 const STYLES: NamingStyle[] = ['文雅', '清朗', '大气', '温润'];
+
+function namingDetail(result: NamingResult, userLabel: string | undefined, chineseDate: string): string {
+  return [
+    `【起名参考】${userLabel ? `${userLabel} · ` : ''}${chineseDate}`,
+    `五行粗算：${result.balance.label}｜日主：${result.balance.dayMaster || '—'} ${result.balance.dayMasterElement ?? ''}`,
+    `建议补：${result.balance.need.join('、') || '—'}｜偏旺：${result.balance.avoid.join('、') || '—'}`,
+    '',
+    ...result.candidates.map(
+      (c) => `${c.full}（${c.pinyin}）｜${c.elements.join('·')}｜${c.strokes.join('+')}画｜${c.score}分\n${c.meanings.join('；')}\n${c.reasons.join(' · ')}`,
+    ),
+    '',
+    result.note,
+  ].join('\n');
+}
 
 export default function NamingTool({
   astrolabe,
   userLabel,
   defaultSurname,
+  onSaveService,
 }: {
   astrolabe: Astrolabe | null;
   userLabel?: string;
   defaultSurname?: string;
+  onSaveService?: (draft: ServiceDraft) => void;
 }) {
   const [surname, setSurname] = useState(defaultSurname ?? '');
   const [single, setSingle] = useState(false);
@@ -62,19 +78,8 @@ export default function NamingTool({
 
   const copyAll = async () => {
     if (!result) return;
-    const lines = [
-      `【起名参考】${userLabel ? `${userLabel} · ` : ''}${astrolabe.chineseDate}`,
-      `五行粗算：${result.balance.label}｜日主：${result.balance.dayMaster || '—'} ${result.balance.dayMasterElement ?? ''}`,
-      `建议补：${result.balance.need.join('、') || '—'}｜偏旺：${result.balance.avoid.join('、') || '—'}`,
-      '',
-      ...result.candidates.map(
-        (c) => `${c.full}（${c.pinyin}）｜${c.elements.join('·')}｜${c.strokes.join('+')}画｜${c.score}分\n${c.meanings.join('；')}\n${c.reasons.join(' · ')}`,
-      ),
-      '',
-      result.note,
-    ];
     try {
-      await navigator.clipboard.writeText(lines.join('\n'));
+      await navigator.clipboard.writeText(namingDetail(result, userLabel, astrolabe.chineseDate));
       setCopied(true);
       window.setTimeout(() => setCopied(false), 1800);
     } catch {
@@ -122,6 +127,20 @@ export default function NamingTool({
           <>
             <button className="btn ghost" onClick={() => { const s = seed + 1; setSeed(s); run(s); }}>换一批</button>
             <button className="btn ghost" onClick={copyAll}>{copied ? '✓ 已复制' : '复制全部'}</button>
+            <button
+              className="btn ghost"
+              onClick={() => {
+                if (!result) return;
+                onSaveService?.({
+                  type: 'naming',
+                  title: `${userLabel || '客户'} · 起名`,
+                  summary: `候选：${result.candidates.map((c) => c.full).join('、')}`,
+                  detail: namingDetail(result, userLabel, astrolabe.chineseDate),
+                });
+              }}
+            >
+              保存为服务记录
+            </button>
           </>
         )}
       </div>

@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { astro } from 'iztro';
-import type { Astrolabe, ChartOptions, UserRecord } from '../types';
+import type { Astrolabe, ChartOptions, ServiceDraft, UserRecord } from '../types';
 import { buildAstrolabe } from '../lib/buildChart';
 import { compareCharts, synastryText } from '../lib/synastry';
 
@@ -144,12 +144,14 @@ export default function SynastryTool({
   activeUserId,
   userName,
   options,
+  onSaveService,
 }: {
   astrolabe: Astrolabe | null;
   users: UserRecord[];
   activeUserId: string | null;
   userName?: string;
   options: ChartOptions;
+  onSaveService?: (draft: ServiceDraft) => void;
 }) {
   const candidates = useMemo(
     () => users.filter((u) => u.id !== activeUserId),
@@ -291,6 +293,19 @@ export default function SynastryTool({
           <div className="tool-actions">
             <button className="btn" onClick={() => downloadCard(result, userName || '你', bRecord.name)}>保存分享卡</button>
             <button className="btn ghost" onClick={copy}>{copied ? '✓ 已复制' : '复制合盘文案'}</button>
+            <button
+              className="btn ghost"
+              onClick={() => onSaveService?.({
+                type: 'synastry',
+                title: `${userName || '你'} × ${bRecord.name} · 合盘`,
+                summary: `${result.grade} · ${result.score} 分 · ${result.oneLine}`,
+                detail: synastryText(result, userName || '你', bRecord.name),
+                clientIds: [activeUserId, bRecord.id].filter((x): x is string => Boolean(x)),
+                clientNames: [userName || '你', bRecord.name],
+              })}
+            >
+              保存为服务记录
+            </button>
           </div>
           <p className="tool-note">
             分数看的是结构匹配与张力，不是感情好坏；低分也可能代表高吸引。合盘是关系参考，不替代沟通、心理咨询或法律意见。

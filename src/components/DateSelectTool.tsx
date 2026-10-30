@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import type { Astrolabe } from '../types';
+import type { Astrolabe, ServiceDraft } from '../types';
 import { EVENT_RULES, pickDates, type DateSelectResult, type EventKey } from '../lib/dateselect';
 
 function today(): string {
@@ -12,12 +12,27 @@ function pretty(date: string): string {
   return `${Number(m)}月${Number(d)}日`;
 }
 
+function dateDetail(result: DateSelectResult, userLabel?: string): string {
+  return [
+    `【择日参考】${result.event}${userLabel ? ` · ${userLabel}` : ''}`,
+    `范围：${result.start} 起 ${result.days} 天${result.zodiac ? `｜生肖：${result.zodiac}` : ''}`,
+    '',
+    ...result.candidates.map(
+      (c) => `${c.date}（${c.weekday}）${c.level} ${c.score}分\n${c.lunar} · ${c.dayGZ} · 冲${c.chong} 煞${c.sha}\n宜${c.yi.slice(0, 6).join('、')}\n忌${c.ji.slice(0, 6).join('、')}\n${[...c.reasons, ...c.warnings].join(' · ')}`,
+    ),
+    '',
+    result.note,
+  ].join('\n');
+}
+
 export default function DateSelectTool({
   astrolabe,
   userLabel,
+  onSaveService,
 }: {
   astrolabe: Astrolabe | null;
   userLabel?: string;
+  onSaveService?: (draft: ServiceDraft) => void;
 }) {
   const [event, setEvent] = useState<EventKey>('嫁娶');
   const [start, setStart] = useState(today);
@@ -51,17 +66,7 @@ export default function DateSelectTool({
 
   const copyAll = () => {
     if (!result) return;
-    const lines = [
-      `【择日参考】${result.event}${userLabel ? ` · ${userLabel}` : ''}`,
-      `范围：${result.start} 起 ${result.days} 天${result.zodiac ? `｜生肖：${result.zodiac}` : ''}`,
-      '',
-      ...result.candidates.map(
-        (c) => `${c.date}（${c.weekday}）${c.level} ${c.score}分\n${c.lunar} · ${c.dayGZ} · 冲${c.chong} 煞${c.sha}\n宜${c.yi.slice(0, 6).join('、')}\n忌${c.ji.slice(0, 6).join('、')}\n${[...c.reasons, ...c.warnings].join(' · ')}`,
-      ),
-      '',
-      result.note,
-    ];
-    copy(lines.join('\n'), 'all');
+    copy(dateDetail(result, userLabel), 'all');
   };
 
   return (
@@ -110,6 +115,19 @@ export default function DateSelectTool({
       <div className="tool-actions">
         <button className="btn" onClick={run}>开始择日</button>
         {result && <button className="btn ghost" onClick={copyAll}>{copied === 'all' ? '✓ 已复制' : '复制全部'}</button>}
+        {result && (
+          <button
+            className="btn ghost"
+            onClick={() => onSaveService?.({
+              type: 'dates',
+              title: `${userLabel || '客户'} · 择日 · ${result.event}`,
+              summary: `首选 ${result.candidates[0]?.date ?? '—'} · ${result.candidates[0]?.level ?? ''}`,
+              detail: dateDetail(result, userLabel),
+            })}
+          >
+            保存为服务记录
+          </button>
+        )}
         {astrolabe && <span className="hint" style={{ margin: 0 }}>已带入当前用户生肖：{astrolabe.zodiac}</span>}
       </div>
 

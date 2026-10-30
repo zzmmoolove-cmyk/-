@@ -1,5 +1,6 @@
-import type { ReadingRecord, UserRecord } from '../types';
+import type { ReadingRecord, ServiceRecord, UserRecord } from '../types';
 import { encodeChart } from '../lib/chartcode';
+import ServiceRecordList from './ServiceRecordList';
 
 async function copyText(text: string) {
   try {
@@ -12,23 +13,28 @@ async function copyText(text: string) {
 export default function ClientProfileSheet({
   user,
   readings,
+  services,
   onClose,
   onOpenChart,
   onEdit,
   onNewService,
   onOpenReading,
+  onOpenService,
   onDelete,
 }: {
   user: UserRecord;
   readings: ReadingRecord[];
+  services: ServiceRecord[];
   onClose: () => void;
   onOpenChart: () => void;
   onEdit: () => void;
   onNewService: () => void;
   onOpenReading: (r: ReadingRecord) => void;
+  onOpenService: (id: string) => void;
   onDelete: () => void;
 }) {
   const mine = readings.filter((r) => r.clientId === user.id);
+  const myServices = services.filter((s) => s.clientIds.includes(user.id));
 
   return (
     <div className="modal-backdrop" onClick={onClose}>
@@ -73,8 +79,11 @@ export default function ClientProfileSheet({
           </div>
 
           <div className="sheet-section">
-            <div className="sheet-section-head"><h3>服务</h3></div>
-            <p className="dim">起名 / 择日 / 合盘在「服务」里新建，记录功能下一步接入。</p>
+            <div className="sheet-section-head">
+              <h3>服务记录</h3>
+              <span className="dim">{myServices.length} 条</span>
+            </div>
+            <ServiceRecordList records={myServices} onOpen={onOpenService} emptyText="还没有服务记录。到「服务」生成起名 / 择日 / 合盘后保存。" />
           </div>
         </div>
 
