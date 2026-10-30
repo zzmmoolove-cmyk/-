@@ -1852,3 +1852,8 @@ html[data-theme='mystic'] .sidebar {
 .side-today-mini em { flex: 0 0 24px; font-style: normal; color: var(--accent); }
 
 .side-today-cal-label { margin-bottom: 1px; font-size: 8px; letter-spacing: 1px; color: var(--text-dim); }
+
+.master-toolbar .master-new { flex: 0 0 auto; margin-left: auto; width: auto; padding: 8px 14px; }
+@media (max-width: 760px) {
+  .master-toolbar .master-new { margin-left: 0; width: 100%; }
+}

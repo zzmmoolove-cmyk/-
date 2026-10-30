@@ -34,29 +34,8 @@ export default function ClientListPanel({
     if (!q) return byGroup;
     return byGroup.filter((u) => `${u.name}${u.relation}${u.note}${u.payload.birthday}`.includes(q));
   }, [users, query, clientFilter]);
-  const primary = users.find((u) => u.id === primaryId) ?? null;
-
   return (
     <div className="client-list-page master-page">
-      <div className="master-hero">
-        <div>
-          <div className="inspector-eyebrow">命主</div>
-          <h2>谁是你现在的主客户？</h2>
-          <p className="dim">把开关打开的人就是主客户。主客户决定今日流日、三系统首页与服务记录的默认基准；其他人仍可单独排盘。</p>
-        </div>
-        <div className="master-hero-actions">
-          {primary ? (
-            <div className="master-current">
-              <span className="client-avatar">{Array.from(primary.name)[0] || '客'}</span>
-              <div><em>当前主客户</em><b>{primary.name}</b></div>
-            </div>
-          ) : (
-            <p className="master-no-primary">还没有打开主客户开关</p>
-          )}
-          <button className="btn" onClick={onNew}>+ 新建命主</button>
-        </div>
-      </div>
-
       <div className="client-toolbar master-toolbar">
         <input value={query} placeholder="搜索姓名 / 关系 / 生日" onChange={(e) => setQuery(e.target.value)} />
         <select value={clientFilter} onChange={(e) => onClientFilter(e.target.value as ClientFilter)} aria-label="筛选命主">
@@ -64,6 +43,7 @@ export default function ClientListPanel({
           {CLIENT_GROUPS.map((g) => <option key={g.key} value={g.key}>{g.label} · {filterCounts[g.key]}</option>)}
         </select>
         <span className="hint">共 {filtered.length} 位</span>
+        <button className="btn master-new" onClick={onNew}>+ 新建命主</button>
       </div>
 
       {filtered.length ? (
