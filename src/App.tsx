@@ -39,7 +39,7 @@ import {
 } from './lib/scope';
 import { getRelations, type Relations } from './lib/relations';
 import { computeTimeIndex } from './lib/truesolar';
-import { clientCounts, clientGroup, clientKindLabel, CLIENT_GROUPS, type ClientFilter } from './lib/clientGroups';
+import { clientCounts, type ClientFilter } from './lib/clientGroups';
 import { seedCelebrityExamples } from './lib/celebrityExamples';
 import { loadOutputProfile, saveOutputProfile, type OutputProfile } from './lib/output';
 import { FLOW_PROFILES, PROFILE_STATS, STAR_PROFILES } from './lib/knowledge/starProfiles';
@@ -225,7 +225,7 @@ export default function App() {
   const [activeUserId, setActiveUserId] = useState<string | null>(null);
   const [currentProfile, setCurrentProfile] = useState<UserProfile>({ name: '', relation: '本人', note: '' });
   const [dirty, setDirty] = useState(false);
-  const [section, setSection] = useState<'today' | 'clients' | 'services' | 'library'>('today');
+  const [section, setSection] = useState<'master' | 'today' | 'clients' | 'services' | 'library'>('master');
   const [view, setView] = useState<'chart' | 'card' | 'summary' | 'report'>('chart');
   const [showClientList, setShowClientList] = useState(false);
   const [profileId, setProfileId] = useState<string | null>(null);
@@ -328,10 +328,7 @@ export default function App() {
 
   const profileUser = useMemo(() => users.find((u) => u.id === profileId) ?? null, [users, profileId]);
   const filterCounts = useMemo(() => clientCounts(users), [users]);
-  const filteredClients = useMemo(
-    () => (clientFilter === 'all' ? users : users.filter((u) => clientGroup(u) === clientFilter)),
-    [users, clientFilter],
-  );
+  const primary = users.find((u) => u.id === primaryId) ?? null;
   const openService = useMemo(() => services.find((s) => s.id === serviceOpenId) ?? null, [services, serviceOpenId]);
 
   const flash = (msg: string) => {
@@ -537,8 +534,8 @@ export default function App() {
       setAstrolabe(null);
       setRaw(null);
       setDirty(false);
-      setSection('clients');
-      setShowClientList(true);
+      setSection('master');
+      setShowClientList(false);
     }
   };
 
@@ -677,11 +674,16 @@ export default function App() {
   };
 
   const topState = activeUserId ? (dirty ? '已修改' : '已保存') : currentProfile.name ? '未保存' : '';
+  const topProfile = currentProfile.name
+    ? { name: currentProfile.name, relation: currentProfile.relation }
+    : primary
+      ? { name: primary.name, relation: primary.relation }
+      : null;
 
   return (
     <div className="app">
       <header className="app-topbar">
-        <div className="topbar-brand" onClick={() => setSection('today')}>
+        <div className="topbar-brand" onClick={() => setSection('master')}>
           <Sigil />
           <div>
             <h1>紫微斗数</h1>
@@ -690,10 +692,10 @@ export default function App() {
         </div>
 
         <button className="top-client" onClick={() => setSwitcherOpen(true)}>
-          <span className="top-avatar">{Array.from(currentProfile.name || '客')[0]}</span>
+          <span className="top-avatar">{Array.from(topProfile?.name || '客')[0]}</span>
           <span>
-            <b>{currentProfile.name || '选择客户'}</b>
-            <em>{currentProfile.name ? currentProfile.relation : '按客户工作'}</em>
+            <b>{topProfile?.name || '选择客户'}</b>
+            <em>{topProfile ? `${topProfile.relation}${activeUserId ? '' : ' · 主客户'}` : '按客户工作'}</em>
           </span>
           {topState && <span className={`top-state ${activeUserId && !dirty ? 'saved' : 'dirty'}`}>{topState}</span>}
         </button>
@@ -714,6 +716,9 @@ export default function App() {
           <div className="side-section">
             <div className="side-label">工作台</div>
             <div className="side-nav">
+              <button className={`side-nav-item ${section === 'master' || section === 'clients' ? 'active' : ''}`} onClick={() => setSection('master')}>
+                <span className="side-icon">◉</span>命主
+              </button>
               <button className={`side-nav-item ${section === 'today' ? 'active' : ''}`} onClick={() => setSection('today')}>
                 <span className="side-icon">✦</span>今日
               </button>
@@ -727,47 +732,25 @@ export default function App() {
           </div>
 
           <div className="side-section">
-            <div className="side-label side-label-clients">
-              <button
-                className="side-label-link"
-                onClick={() => { setSection('clients'); setShowClientList(true); }}
-                title="查看全部客户"
-              >
-                最近客户 <span className="side-count">{filteredClients.length}</span>
+            <div className="side-label">主客户</div>
+            {primary ? (
+              <button className="side-primary" onClick={() => setSection('master')} title="前往命主页面切换主客户">
+                <span className="side-avatar">{Array.from(primary.name)[0] || '客'}</span>
+                <span className="side-primary-main">
+                  <b>{primary.name}</b>
+                  <em>主客户开关已打开 · 管理命主</em>
+                </span>
+                <span className="side-primary-arrow">→</span>
               </button>
-              <button className="side-plus" onClick={newClient} title="新建客户" aria-label="新建客户">+</button>
-            </div>
-            <select
-              className="side-filter"
-              value={clientFilter}
-              onChange={(e) => setClientFilter(e.target.value as ClientFilter)}
-              aria-label="筛选客户"
-            >
-              <option value="all">全部 · {users.length}</option>
-              {CLIENT_GROUPS.map((g) => (
-                <option key={g.key} value={g.key}>{g.label} · {filterCounts[g.key]}</option>
-              ))}
-            </select>
-            <div className="side-clients">
-              {filteredClients.slice(0, 6).map((u) => (
-                <button
-                  key={u.id}
-                  className={`side-client ${u.id === activeUserId ? 'active' : ''}`}
-                  onClick={() => openClient(u.id)}
-                >
-                  <span className="side-avatar">{Array.from(u.name)[0] || '客'}</span>
-                  <span className="side-client-main">
-                    <b>{u.name}</b>
-                    <em>{clientKindLabel(u)} · {u.payload.birthday || '生辰未填'}</em>
-                  </span>
-                </button>
-              ))}
-              {!filteredClients.length && (
-                <p className="dim" style={{ padding: '4px 9px', margin: 0 }}>
-                  {users.length ? '这一类还没有客户。' : '还没有客户'}
-                </p>
-              )}
-            </div>
+            ) : (
+              <button className="side-primary empty" onClick={() => setSection('master')}>
+                <span className="side-primary-main">
+                  <b>还没有主客户</b>
+                  <em>去命主页打开开关</em>
+                </span>
+                <span className="side-primary-arrow">→</span>
+              </button>
+            )}
           </div>
 
           <div className="side-foot">
@@ -784,9 +767,6 @@ export default function App() {
               primaryId={primaryId}
               options={options}
               hasChart={Boolean(astrolabe)}
-              clientFilter={clientFilter}
-              filterCounts={filterCounts}
-              onClientFilter={setClientFilter}
               onOpenClient={openClient}
               onNewClient={newClient}
               onOpenServices={() => setSection('services')}
@@ -795,11 +775,32 @@ export default function App() {
             />
           )}
 
+          {section === 'master' && (
+            <ClientListPanel
+              users={users}
+              activeUserId={activeUserId}
+              primaryId={primaryId}
+              clientFilter={clientFilter}
+              filterCounts={filterCounts}
+              onClientFilter={setClientFilter}
+              onPrimaryChange={setPrimaryId}
+              onOpen={openClient}
+              onProfile={openProfile}
+              onNew={newClient}
+              onDelete={deleteUser}
+            />
+          )}
+
           {section === 'clients' &&
             (showClientList || !astrolabe ? (
               <ClientListPanel
                 users={users}
                 activeUserId={activeUserId}
+                primaryId={primaryId}
+                clientFilter={clientFilter}
+                filterCounts={filterCounts}
+                onClientFilter={setClientFilter}
+                onPrimaryChange={setPrimaryId}
                 onOpen={openClient}
                 onProfile={openProfile}
                 onNew={newClient}

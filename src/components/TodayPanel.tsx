@@ -1,6 +1,6 @@
-import type { ChartOptions, ClientCategory, UserRecord } from '../types';
+import type { ChartOptions, UserRecord } from '../types';
 import { solarToCalendar } from '../lib/calendar';
-import { CLIENT_GROUPS, clientGroup, clientKindLabel, type ClientFilter } from '../lib/clientGroups';
+import { clientKindLabel } from '../lib/clientGroups';
 import DailyFortune from './DailyFortune';
 
 function todayIso(): string {
@@ -14,9 +14,6 @@ export default function TodayPanel({
   primaryId,
   options,
   hasChart,
-  clientFilter,
-  filterCounts,
-  onClientFilter,
   onOpenClient,
   onNewClient,
   onOpenServices,
@@ -28,9 +25,6 @@ export default function TodayPanel({
   primaryId: string | null;
   options: ChartOptions;
   hasChart: boolean;
-  clientFilter: ClientFilter;
-  filterCounts: Record<ClientCategory, number>;
-  onClientFilter: (f: ClientFilter) => void;
   onOpenClient: (id: string) => void;
   onNewClient: () => void;
   onOpenServices: () => void;
@@ -46,8 +40,6 @@ export default function TodayPanel({
   }
   const active = users.find((u) => u.id === activeUserId);
   const primary = users.find((u) => u.id === primaryId) ?? null;
-  const filteredClients = clientFilter === 'all' ? users : users.filter((u) => clientGroup(u) === clientFilter);
-  const recent = filteredClients.slice(0, 5);
 
   return (
     <div className="today-page">
@@ -107,40 +99,9 @@ export default function TodayPanel({
       )}
 
       <section className="today-section">
-        <div className="today-recent-head">
-          <div className="today-section-title">
-            最近客户 <span className="dim">{filteredClients.length} 位</span>
-          </div>
-          <select className="today-filter" value={clientFilter} onChange={(e) => onClientFilter(e.target.value as ClientFilter)} aria-label="筛选最近客户">
-            <option value="all">全部 · {users.length}</option>
-            {CLIENT_GROUPS.map((g) => <option key={g.key} value={g.key}>{g.label} · {filterCounts[g.key]}</option>)}
-          </select>
-        </div>
-        {recent.length ? (
-          <div className="today-clients">
-            {recent.map((u) => (
-              <button key={u.id} className="today-client" onClick={() => onOpenClient(u.id)}>
-                <span className="today-avatar">{Array.from(u.name)[0] || '客'}</span>
-                <span className="today-client-main">
-                  <b>{u.name}</b>
-                  <em>{clientKindLabel(u)} · {u.payload.birthday || '生辰未填'}</em>
-                </span>
-                <span className="today-client-arrow">→</span>
-              </button>
-            ))}
-          </div>
-        ) : (
-          <div className="today-empty">
-            <p>{users.length ? '这一类还没有客户。' : '今天还没有客户。'}</p>
-            <button className="btn" onClick={onNewClient}>{users.length ? '新建客户' : '新建第一位客户'}</button>
-          </div>
-        )}
-      </section>
-
-      <section className="today-section">
         <div className="today-section-title">快捷</div>
         <div className="today-shortcuts">
-          <button onClick={onNewClient}><b>新建客户</b><span>录生辰，起一张盘</span></button>
+          <button onClick={onNewClient}><b>新建命主</b><span>录生辰，起一张盘</span></button>
           <button onClick={onOpenServices}><b>服务</b><span>起名 / 择日 / 合盘</span></button>
           <button onClick={onOpenLibrary}><b>资料</b><span>星曜手册 / 古籍 / 数据</span></button>
         </div>

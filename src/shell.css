@@ -1654,3 +1654,66 @@ html[data-theme='mystic'] .sidebar {
 .palace-open:hover { color: var(--accent-soft); }
 
 .synastry-scope-tag { padding: 2px 8px; border: 1px solid var(--border); border-radius: 99px; font-size: 9.5px; color: var(--text-dim); white-space: nowrap; }
+
+/* —— 命主首页 —— */
+.master-page { max-width: 1040px; }
+.master-hero { display: flex; align-items: flex-start; justify-content: space-between; gap: 20px; padding: 18px 20px; margin-bottom: 12px; border: 1px solid var(--border); border-radius: 12px; background: linear-gradient(135deg, rgba(201,163,92,.07), transparent 55%), var(--panel); }
+.master-hero h2 { margin: 4px 0 6px; font-family: var(--font-display); font-size: 30px; letter-spacing: 2px; color: var(--accent-soft); }
+.master-hero p { max-width: 620px; margin: 0; font-size: 12px; line-height: 1.75; color: var(--text-dim); }
+.master-hero-actions { flex: 0 0 auto; display: flex; flex-direction: column; align-items: flex-end; gap: 8px; }
+.master-current { display: flex; align-items: center; gap: 8px; padding: 6px 9px; border: 1px solid var(--border); border-radius: 8px; background: var(--panel-2); }
+.master-current em { display: block; font-style: normal; font-size: 8.5px; color: var(--text-dim); }
+.master-current b { display: block; font-size: 12px; color: var(--text); }
+.master-no-primary { margin: 0; font-size: 10px; color: var(--text-dim); }
+.master-toolbar { display: flex; align-items: center; gap: 8px; }
+.master-toolbar input { flex: 1; max-width: 360px; }
+.master-toolbar select { width: auto; min-width: 110px; }
+.master-toolbar .hint { margin: 0; white-space: nowrap; }
+.master-row { padding: 11px 10px; border: 1px solid transparent; border-radius: 8px; margin-bottom: 4px; }
+.master-row:hover { border-color: var(--border); }
+.master-row.is-primary { border-color: rgba(201,163,92,.35); background: rgba(201,163,92,.055); }
+.master-row.active:not(.is-primary) { background: var(--panel-2); }
+.master-badge { padding: 1px 5px; border: 1px solid rgba(201,163,92,.35); border-radius: 3px; font-size: 8px; font-weight: 400; color: var(--accent); vertical-align: 1px; }
+.master-switch { flex: 0 0 auto; display: flex; align-items: center; gap: 6px; padding: 4px 6px; border: 0; border-radius: 6px; background: transparent; color: var(--text-dim); cursor: pointer; }
+.master-switch em { font-style: normal; font-size: 9.5px; white-space: nowrap; }
+.master-switch-track { width: 30px; height: 17px; padding: 2px; border: 1px solid var(--border); border-radius: 99px; background: rgba(255,255,255,.05); transition: background .15s, border-color .15s; }
+.master-switch-track i { display: block; width: 11px; height: 11px; border-radius: 50%; background: var(--text-dim); transition: transform .15s, background .15s; }
+.master-switch.on .master-switch-track { border-color: var(--accent); background: rgba(201,163,92,.25); }
+.master-switch.on .master-switch-track i { transform: translateX(13px); background: var(--accent); }
+.master-switch.on em { color: var(--accent-soft); }
+.master-row .client-actions { align-items: center; }
+.master-row .btn.small { width: auto; padding: 3px 7px; font-size: 10px; }
+.master-foot { margin-top: 10px; }
+.side-primary { display: flex; align-items: center; gap: 8px; width: 100%; padding: 8px; border: 1px solid var(--border); border-radius: 8px; background: var(--panel-2); color: var(--text); text-align: left; cursor: pointer; }
+.side-primary:hover { border-color: var(--accent); }
+.side-primary-main { min-width: 0; flex: 1; }
+.side-primary-main b { display: block; font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.side-primary-main em { display: block; margin-top: 1px; font-style: normal; font-size: 9px; color: var(--text-dim); }
+.side-primary-arrow { color: var(--text-dim); font-size: 12px; }
+.side-primary.empty { border-style: dashed; }
+
+@media (max-width: 760px) {
+  .master-hero { flex-direction: column; padding: 14px; }
+  .master-hero-actions { align-items: flex-start; flex-direction: row; flex-wrap: wrap; }
+  .master-hero h2 { font-size: 23px; }
+  .master-toolbar { flex-wrap: wrap; }
+  .master-row { align-items: flex-start; flex-wrap: wrap; }
+  .master-switch { margin-left: auto; }
+  .master-row .client-side { width: 100%; align-items: flex-start; }
+  .master-row .client-actions { width: 100%; justify-content: flex-end; }
+}
+
+/* 修正 .client-main span 的块级规则误伤主客户徽章 */
+.client-main .master-badge {
+  display: inline-block;
+  width: auto;
+  margin: 0 0 0 5px;
+  padding: 1px 5px;
+  border: 1px solid rgba(201, 163, 92, 0.35);
+  border-radius: 3px;
+  font-size: 8px;
+  font-weight: 400;
+  color: var(--accent);
+  vertical-align: 1px;
+  white-space: nowrap;
+}
