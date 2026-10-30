@@ -49,25 +49,29 @@ type Tip = {
 type LinkSegment = { x1: number; y1: number; x2: number; y2: number };
 
 /** 计算某宫到对宫、两个三合宫的虚线端点（取宫格朝盘心的边缘） */
-function computeLinks(container: HTMLElement, idx: number): LinkSegment[] {
+function computeLinks(container: HTMLElement, idx: number, scale = 1): LinkSegment[] {
   const cells = Array.from(container.querySelectorAll('.iztro-palace')) as HTMLElement[];
   if (cells.length < 12 || idx < 0) return [];
   const cRect = container.getBoundingClientRect();
-  const center = { x: cRect.width / 2, y: cRect.height / 2 };
+  const width = cRect.width / scale;
+  const height = cRect.height / scale;
+  const center = { x: width / 2, y: height / 2 };
   const point = (i: number) => {
     const r = cells[i].getBoundingClientRect();
-    const cx = r.left - cRect.left + r.width / 2;
-    const cy = r.top - cRect.top + r.height / 2;
+    const rw = r.width / scale;
+    const rh = r.height / scale;
+    const cx = (r.left - cRect.left) / scale + rw / 2;
+    const cy = (r.top - cRect.top) / scale + rh / 2;
     const dx = center.x - cx;
     const dy = center.y - cy;
-    const halfW = r.width / 2 - 3;
-    const halfH = r.height / 2 - 3;
-    const scale = Math.min(
+    const halfW = rw / 2 - 3;
+    const halfH = rh / 2 - 3;
+    const k = Math.min(
       Math.abs(dx) > 0.01 ? halfW / Math.abs(dx) : 1,
       Math.abs(dy) > 0.01 ? halfH / Math.abs(dy) : 1,
       1,
     );
-    return { x: cx + dx * scale, y: cy + dy * scale };
+    return { x: cx + dx * k, y: cy + dy * k };
   };
   const self = point(idx);
   return [(idx + 6) % 12, (idx + 4) % 12, (idx + 8) % 12].map((t) => {
@@ -108,6 +112,10 @@ export default function ChartPanel({
     }
   });
   const chartInnerRef = useRef<HTMLDivElement | null>(null);
+  const chartFrameRef = useRef<HTMLDivElement | null>(null);
+  const chartScrollRef = useRef<HTMLDivElement | null>(null);
+  const [fitScale, setFitScale] = useState(1);
+  const [fitToScreen, setFitToScreen] = useState(true);
   const hoverIdxRef = useRef<number | null>(null);
 
   useEffect(() => {
@@ -137,7 +145,7 @@ export default function ChartPanel({
     const draw = () => {
       const idx = hoverIdxRef.current ?? astrolabe.palaces.findIndex((p) => p.name === selectedPalace);
       const container = chartInnerRef.current;
-      setLinks(container && idx >= 0 ? computeLinks(container, idx) : []);
+      setLinks(container && idx >= 0 ? computeLinks(container, idx, fitScale) : []);
     };
     const timer = window.setTimeout(draw, 80);
     const retry = window.setTimeout(draw, 360);
@@ -148,7 +156,7 @@ export default function ChartPanel({
       window.clearTimeout(retry);
       window.removeEventListener('resize', onResize);
     };
-  }, [astrolabe, selectedPalace, options, dense]);
+  }, [astrolabe, selectedPalace, options, dense, fitScale]);
 
   // 运限宫位短标签：大命 / 年命 / 月命 / 日命；同时删掉第三方「流年·丙」天干小字。
   useEffect(() => {
@@ -206,6 +214,55 @@ export default function ChartPanel({
       window.removeEventListener('resize', onResize);
     };
   }, [astrolabe, layered, dense, options]);
+
+  // 命盘自适应：保持盘面排版，整体缩放到一屏内；窄屏不缩放，允许自然滚动。
+  useEffect(() => {
+    if (!astrolabe) return;
+    const fit = () => {
+      const inner = chartInnerRef.current;
+      const frame = chartFrameRef.current;
+      const scroll = chartScrollRef.current;
+      if (!inner || !frame || !scroll) return;
+
+      inner.style.transform = 'none';
+      inner.style.width = '';
+      inner.style.maxWidth = '';
+      frame.style.width = '100%';
+      frame.style.height = 'auto';
+      scroll.style.height = 'auto';
+
+      const naturalW = inner.offsetWidth;
+      const naturalH = inner.offsetHeight;
+      if (!fitToScreen || window.innerWidth < 760 || !naturalW || !naturalH) {
+        setFitScale(1);
+        return;
+      }
+
+      const top = frame.getBoundingClientRect().top + window.scrollY;
+      const availableH = window.innerHeight - top - 26;
+      const availableW = scroll.clientWidth - 2;
+      const scale = Math.max(0.45, Math.min(1, availableH / naturalH, availableW / naturalW));
+
+      setFitScale(scale);
+      inner.style.width = `${naturalW}px`;
+      inner.style.maxWidth = 'none';
+      inner.style.transformOrigin = 'top left';
+      inner.style.transform = `scale(${scale})`;
+      frame.style.width = `${naturalW * scale}px`;
+      frame.style.height = `${naturalH * scale}px`;
+      scroll.style.height = `${naturalH * scale}px`;
+    };
+
+    const timer = window.setTimeout(fit, 80);
+    const retry = window.setTimeout(fit, 380);
+    const onResize = () => fit();
+    window.addEventListener('resize', onResize);
+    return () => {
+      window.clearTimeout(timer);
+      window.clearTimeout(retry);
+      window.removeEventListener('resize', onResize);
+    };
+  }, [astrolabe, layered, dense, options, fitToScreen]);
 
   if (!astrolabe) {
     return (
@@ -597,6 +654,7 @@ export default function ChartPanel({
               </select>
             )}
             <div className="chart-density" role="group" aria-label="盘面详简">
+              <button className={fitToScreen ? 'active' : ''} onClick={() => setFitToScreen((v) => !v)} title={fitToScreen ? '当前为适应屏幕，点击恢复原尺寸' : '当前为原尺寸，点击适应屏幕'}>{fitToScreen ? '适屏' : '原大'}</button>
               <button className={!dense ? 'active' : ''} onClick={() => setDense(false)} title="只看主星、辅星、杂曜与宫位">简</button>
               <button className={dense ? 'active' : ''} onClick={() => setDense(true)} title="显示长生、岁前、流曜与运限标签">详</button>
             </div>
@@ -616,12 +674,14 @@ export default function ChartPanel({
 
         <div
           className="chart-scroll"
+          ref={chartScrollRef}
           onClick={handleChartClick}
           onMouseOver={handleChartOver}
           onMouseOut={handleChartOut}
           onMouseLeave={handleChartLeave}
         >
-          <div className={`chart-inner ${dense ? 'chart-dense' : 'chart-simple'}`} ref={chartInnerRef}>
+          <div className="chart-fit-frame" ref={chartFrameRef}>
+            <div className={`chart-inner ${dense ? 'chart-dense' : 'chart-simple'}`} ref={chartInnerRef}>
             <Iztrolabe
               birthday={input.birthday}
               birthTime={timeIndex}
@@ -637,6 +697,7 @@ export default function ChartPanel({
                 <line key={i} x1={l.x1} y1={l.y1} x2={l.x2} y2={l.y2} />
               ))}
             </svg>
+            </div>
           </div>
         </div>
         <div className="hint chart-hint-line" style={{ marginTop: 6 }}>

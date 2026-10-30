@@ -3593,3 +3593,33 @@ textarea {
   .scope-summary-cols { grid-template-columns: 1fr; }
   .chart-scope-label { font-size: 9px; }
 }
+
+/* 命盘按可用高度整体缩放，保证一屏可见 */
+.chart-scroll {
+  overflow: hidden;
+  align-items: flex-start;
+}
+.chart-fit-frame {
+  position: relative;
+  flex: 0 0 auto;
+  margin: 0 auto;
+}
+.chart-inner {
+  transform-origin: top left;
+}
+@media (max-width: 760px) {
+  .chart-scroll { overflow-x: auto; overflow-y: hidden; }
+  .chart-fit-frame { margin: 0; }
+}
+
+/* 压缩命盘页顶部，让适屏缩放不要过度 */
+.workspace-head { margin-bottom: 8px; align-items: center; }
+.workspace-title .inspector-eyebrow { display: none; }
+.workspace-title h2 { margin: 0 0 2px; font-size: 23px; }
+.workspace-title p { font-size: 10px; }
+.workspace-actions .btn { min-height: 28px; height: 28px; padding: 4px 9px; font-size: 9.5px; }
+.chart-head { margin-bottom: 4px; }
+.chart-head h2 { font-size: 18px; }
+.chart-meta { margin-bottom: 5px; font-size: 11px; }
+.chart-meta em { font-size: 9.5px; }
+.chart-meta-hua i { font-size: 9.5px; }
