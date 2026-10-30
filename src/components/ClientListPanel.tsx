@@ -28,7 +28,7 @@ export default function ClientListPanel({
       <div className="page-head">
         <div>
           <h2>客户</h2>
-          <p className="dim">共 {users.length} 位 · 点客户进入解盘，`档案` 查看记录</p>
+          <p className="dim">共 {users.length} 位 · 点客户进入解盘；档案查看记录</p>
         </div>
         <button className="btn" onClick={onNew}>+ 新建客户</button>
       </div>

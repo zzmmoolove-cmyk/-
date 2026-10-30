@@ -703,12 +703,6 @@ export default function App() {
               <button className={`side-nav-item ${section === 'today' ? 'active' : ''}`} onClick={() => setSection('today')}>
                 <span className="side-icon">✦</span>今日
               </button>
-              <button
-                className={`side-nav-item ${section === 'clients' ? 'active' : ''}`}
-                onClick={() => { setSection('clients'); setShowClientList(true); }}
-              >
-                <span className="side-icon">◉</span>客户<span className="side-count">{users.length}</span>
-              </button>
               <button className={`side-nav-item ${section === 'services' ? 'active' : ''}`} onClick={() => setSection('services')}>
                 <span className="side-icon">◇</span>服务
               </button>
@@ -719,9 +713,15 @@ export default function App() {
           </div>
 
           <div className="side-section">
-            <div className="side-label">
-              最近客户
-              <button onClick={newClient} title="新建客户">+</button>
+            <div className="side-label side-label-clients">
+              <button
+                className="side-label-link"
+                onClick={() => { setSection('clients'); setShowClientList(true); }}
+                title="查看全部客户"
+              >
+                最近客户 <span className="side-count">{users.length}</span>
+              </button>
+              <button className="side-plus" onClick={newClient} title="新建客户" aria-label="新建客户">+</button>
             </div>
             <div className="side-clients">
               {users.slice(0, 6).map((u) => (
@@ -739,7 +739,6 @@ export default function App() {
               ))}
               {!users.length && <p className="dim" style={{ padding: '4px 9px', margin: 0 }}>还没有客户</p>}
             </div>
-            <button className="side-new" onClick={newClient}>+ 新建客户</button>
           </div>
 
           <div className="side-foot">

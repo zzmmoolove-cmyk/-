@@ -1140,3 +1140,47 @@ html[data-theme='mystic'] .sidebar {
   .daily-head { flex-direction: column; }
   .daily-date { width: 100% !important; }
 }
+
+/* —— 最近客户：合并客户入口 —— */
+.side-label-link {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 5px;
+  padding: 0 !important;
+  background: none !important;
+  border: 0 !important;
+  color: var(--text-dim) !important;
+  font-size: 10px !important;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+.side-label-link:hover { color: var(--accent-soft) !important; }
+.side-label .side-count {
+  margin-left: 2px;
+  font-size: 9px;
+  letter-spacing: 0;
+  color: var(--accent);
+}
+.side-plus {
+  width: 22px;
+  height: 22px;
+  display: inline-grid;
+  place-items: center;
+  padding: 0 !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 5px;
+  background: var(--panel-2) !important;
+  color: var(--accent-soft) !important;
+  font-size: 15px !important;
+  line-height: 1 !important;
+}
+.side-plus:hover { border-color: var(--accent) !important; }
+
+@media (max-width: 900px) {
+  .side-label-clients {
+    display: flex;
+    padding: 3px 0 5px;
+  }
+  .side-label-clients .side-label-link { font-size: 10px !important; }
+}
