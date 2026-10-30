@@ -1257,3 +1257,61 @@ html[data-theme='mystic'] .sidebar {
   .naming-analyze-field { grid-column: 1 / -1; }
   .time-slot-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
+
+/* —— 合盘 v2：B 画像 + 关系类型 + 六维加权 —— */
+.ideal-b-card {
+  margin: 12px 0;
+  padding: 13px 14px;
+  border: 1px solid rgba(201, 163, 92, 0.28);
+  border-radius: 11px;
+  background: linear-gradient(135deg, rgba(201, 163, 92, 0.07), rgba(201, 163, 92, 0.01));
+}
+.ideal-b-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; margin-bottom: 10px; }
+.ideal-b-head h4 { margin: 3px 0 4px; font-family: var(--font-display); font-size: 20px; letter-spacing: 1.5px; color: var(--accent-soft); }
+.ideal-b-head p { margin: 0; font-size: 11.5px; line-height: 1.65; color: var(--text-dim); max-width: 760px; }
+.ideal-b-badge { flex: 0 0 auto; padding: 2px 6px; border: 1px solid var(--border); border-radius: 999px; font-size: 9px; color: var(--text-dim); }
+.ideal-b-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 16px; }
+.ideal-b-grid > div > em { display: block; margin-bottom: 4px; font-style: normal; font-size: 9.5px; letter-spacing: 1px; color: var(--text-dim); }
+.ideal-tags { display: flex; flex-wrap: wrap; gap: 4px; }
+.ideal-tags span { padding: 2px 6px; border: 1px solid var(--border); border-radius: 4px; background: var(--panel-2); font-size: 10.5px; color: var(--accent-soft); }
+.ideal-list { margin: 0; padding-left: 15px; }
+.ideal-list li { margin: 2px 0; font-size: 11px; line-height: 1.55; color: var(--text); }
+.ideal-list.warn li { color: var(--danger); }
+.ideal-evidence { margin: 10px 0 0; padding-top: 7px; border-top: 1px dashed var(--border); font-size: 10px; line-height: 1.6; color: var(--text-dim); }
+
+.synastry-breakdown { margin: 12px 0; }
+.synastry-archetype {
+  padding: 13px 14px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--panel-2);
+}
+.synastry-archetype-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
+.synastry-archetype-head h4 { margin: 3px 0 2px; font-family: var(--font-display); font-size: 21px; letter-spacing: 1.5px; color: var(--accent-soft); }
+.synastry-archetype-head p { margin: 0; font-size: 11px; color: var(--text-dim); }
+.synastry-zodiac { flex: 0 0 auto; padding: 3px 7px; border: 1px solid var(--border); border-radius: 999px; font-size: 10px; color: var(--text-dim); }
+.synastry-archetype-desc { margin: 8px 0; font-size: 12px; line-height: 1.7; color: var(--text); }
+.synastry-archetype-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.synastry-archetype-grid em { font-style: normal; font-size: 10px; color: var(--accent); }
+.synastry-archetype-grid ul { margin: 3px 0 0; padding-left: 15px; }
+.synastry-archetype-grid li { margin: 2px 0; font-size: 10.5px; line-height: 1.55; color: var(--text-dim); }
+.synastry-dimensions { margin-top: 10px; padding: 13px 14px; border: 1px solid var(--border); border-radius: 10px; background: var(--panel); }
+.synastry-dim-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; margin-bottom: 8px; }
+.synastry-dim-head h4 { margin: 3px 0 0; font-family: var(--font-display); font-size: 19px; letter-spacing: 1px; color: var(--accent-soft); }
+.synastry-formula { padding: 4px 7px; border: 1px solid var(--border); border-radius: 5px; font-size: 10px; color: var(--text-dim); }
+.dim-list { display: flex; flex-direction: column; gap: 8px; }
+.dim-row { padding: 7px 9px; border: 1px solid var(--border); border-radius: 7px; background: var(--panel-2); }
+.dim-top { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
+.dim-top b { font-size: 12px; color: var(--text); }
+.dim-top span { font-size: 9.5px; color: var(--text-dim); }
+.dim-bar { height: 4px; margin: 5px 0; border-radius: 999px; background: rgba(255, 255, 255, 0.06); overflow: hidden; }
+.dim-bar i { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, var(--accent), var(--accent-soft)); }
+.dim-row p { margin: 2px 0; font-size: 10.5px; line-height: 1.6; color: var(--text); }
+.dim-evidence { font-size: 9.5px; line-height: 1.55; color: var(--text-dim); }
+.synastry-grade-line { margin-top: 3px; font-size: 10.5px; color: var(--text-dim); letter-spacing: 1px; }
+
+@media (max-width: 700px) {
+  .ideal-b-grid, .synastry-archetype-grid { grid-template-columns: 1fr; }
+  .ideal-b-head { flex-direction: column; }
+  .synastry-dim-head { flex-direction: column; }
+}

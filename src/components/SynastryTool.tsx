@@ -2,8 +2,10 @@ import { useMemo, useState } from 'react';
 import { astro } from 'iztro';
 import type { Astrolabe, BirthInput, ChartOptions, ServiceDraft, UserProfile, UserRecord } from '../types';
 import { buildAstrolabe } from '../lib/buildChart';
-import { compareCharts, synastryText } from '../lib/synastry';
+import { compareCharts, idealPartnerProfile, synastryText } from '../lib/synastry';
 import QuickClientSheet from './QuickClientSheet';
+import IdealBProfile from './IdealBProfile';
+import SynastryBreakdown from './SynastryBreakdown';
 
 function optionsFrom(p: UserRecord['payload']): ChartOptions {
   return {
@@ -69,7 +71,7 @@ function downloadCard(result: ReturnType<typeof compareCharts>, aName: string, b
 
   ctx.fillStyle = '#f1e6cf';
   ctx.font = '600 34px "Songti SC", "Noto Serif SC", serif';
-  ctx.fillText(result.grade, 450, 580);
+  ctx.fillText(`${result.grade} · ${result.archetype.title}`, 450, 580);
 
   ctx.fillStyle = 'rgba(201,163,92,.8)';
   ctx.font = '400 20px -apple-system, "PingFang SC", sans-serif';
@@ -199,6 +201,11 @@ export default function SynastryTool({
     return compareCharts(astrolabe, bChart, userName || '你', bRecord?.name || '对方');
   }, [astrolabe, bChart, userName, bRecord]);
 
+  const ideal = useMemo(
+    () => (astrolabe ? idealPartnerProfile(astrolabe, userName || '你') : null),
+    [astrolabe, userName],
+  );
+
   if (!astrolabe) {
     return (
       <div className="tool-empty">
@@ -217,8 +224,9 @@ export default function SynastryTool({
       <div className="tool-pane">
         <div className="tool-intro">
           <h3>双人合盘</h3>
-          <p>用命宫、夫妻宫、福德宫的主星五行与星性，看吸引力、沟通方式与容易卡住的地方。</p>
+          <p>六维加权看关系结构；先给你一份高分 B 画像，再选 B 做具体合盘。</p>
         </div>
+        {ideal && <IdealBProfile ideal={ideal} />}
         <div className="tool-empty slim">
           <p className="empty-kicker">还差 B 盘</p>
           <p className="dim">新建 B 只保存档案，不会切换当前 A 盘。</p>
@@ -252,7 +260,7 @@ export default function SynastryTool({
     <div className="tool-pane">
       <div className="tool-intro">
         <h3>双人合盘</h3>
-        <p>用命宫、夫妻宫、福德宫的主星五行与星性，看吸引力、沟通方式与容易卡住的地方。A 使用当前盘，B 从已保存用户里选。</p>
+        <p>六维加权看关系结构；先看你的高分 B 画像，再选 B 做具体合盘。A 使用当前盘，B 从已保存用户里选。</p>
       </div>
 
       <div className="tool-form synastry-form">
@@ -275,12 +283,13 @@ export default function SynastryTool({
         </div>
       </div>
 
+      {ideal && <IdealBProfile ideal={ideal} />}
       {!bChart && <p className="hint">B 盘生成失败，请检查对方出生信息。</p>}
 
       {result && bRecord && (
         <div className="synastry-result">
           <div className="synastry-card">
-            <div className="synastry-card-top">紫微合盘 · {result.grade}</div>
+            <div className="synastry-card-top">紫微合盘 · {result.archetype.title}</div>
             <div className="synastry-names">
               <span>{userName || '你'}</span>
               <em>×</em>
@@ -288,9 +297,12 @@ export default function SynastryTool({
             </div>
             <div className="synastry-score">{result.score}</div>
             <div className="synastry-kws">{result.keywords.map((k) => <span key={k}>{k}</span>)}</div>
+            <div className="synastry-grade-line">{result.grade} · 加权总分</div>
             <p className="synastry-oneline">{result.oneLine}</p>
             <div className="synastry-card-foot">五行 {result.elements.a} × {result.elements.b} · 关系参考</div>
           </div>
+
+          <SynastryBreakdown result={result} />
 
           <div className="synastry-sections">
             {result.sections.map((s) => (
@@ -315,7 +327,7 @@ export default function SynastryTool({
               onClick={() => onSaveService?.({
                 type: 'synastry',
                 title: `${userName || '你'} × ${bRecord.name} · 合盘`,
-                summary: `${result.grade} · ${result.score} 分 · ${result.oneLine}`,
+                summary: `${result.grade} · ${result.score} 分 · ${result.archetype.title} · ${result.oneLine}`,
                 detail: synastryText(result, userName || '你', bRecord.name),
                 clientIds: [activeUserId, bRecord.id].filter((x): x is string => Boolean(x)),
                 clientNames: [userName || '你', bRecord.name],
