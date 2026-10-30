@@ -156,6 +156,10 @@ export default function ScopeFocusReport({
             <p>{report.focusFlowStars.join('、') || '本层无流曜落此宫'}</p>
           </div>
           <div>
+            <em>本命底色</em>
+            <p>{report.focusStar ? `${report.focusStar}（${report.focusStarKeywords || '未收录关键词'}）：${report.focusStarFix}` : '空宫借对宫；先借力与明确边界。'}</p>
+          </div>
+          <div>
             <em>判断层级</em>
             <p>{report.levelLabel}只回答这一层的主题；不把当日提醒放大成人生命题。</p>
           </div>
@@ -171,6 +175,23 @@ export default function ScopeFocusReport({
           ))}
         </div>
       </section>
+
+      {report.patterns.length > 0 && (
+        <section className="scope-report-section">
+          <div className="scope-section-head">
+            <h3>本命格局</h3>
+            <span className="dim">只列本命盘实际命中的结构，不套用未触发格局</span>
+          </div>
+          <div className="scope-pattern-grid">
+            {report.patterns.map((p) => (
+              <div key={p.name} className={`scope-pattern ${p.type === '吉' ? 'pattern-good' : p.type === '凶' ? 'pattern-caution' : ''}`}>
+                <div><b>{p.name}</b><span>{p.type}</span></div>
+                <p>{p.desc}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
 
       <section className="scope-report-section">
         <div className="scope-section-head">
@@ -267,6 +288,19 @@ export default function ScopeFocusReport({
               <dt>权重</dt><dd>本命 50%、大限 20%、流年 15%、流月 10%、流日 5%，按已选层归一化。</dd>
             </dl>
           </div>
+        </div>
+        <div className="scope-methods">
+          <h4>方法与文献</h4>
+          <p>推断顺序：本命主星与宫位 → 本命四化 → 大限/流年/流月/流日四化 → 叠宫 → 下一级窗口 → 现实条件。宫位/四化以三合派常用口径为主，不采用完整飞星派飞化；分层权重是本工具的产品化透明规则，不是古籍原法。</p>
+          <ul className="scope-references">
+            {report.references.map((r) => (
+              <li key={r.url}>
+                <a href={r.url} target="_blank" rel="noreferrer">{r.label}</a>
+                <span>{r.note}</span>
+              </li>
+            ))}
+          </ul>
+          <p className="scope-method-note">文献用于核对术语、文本源流与咨询边界，不用于宣称紫微斗数已被实证证明可预测具体事件；本报告仍只作文化咨询与自我反思。</p>
         </div>
         <p className="hint">{report.caveat}</p>
       </details>

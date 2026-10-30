@@ -3112,3 +3112,27 @@ html[data-theme='paper'] .chart-scope-label.layer-daily { color: #67508c; backgr
 .chart-simple .iztro-palace-fate.chart-scope-labels-host {
   display: grid !important;
 }
+
+/* 本命格局 / 方法文献 */
+.scope-structure { grid-template-columns: 1fr 1fr; }
+.scope-pattern-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-top: 8px; }
+.scope-pattern { padding: 8px 10px; border: 1px solid var(--hairline); border-left: 2px solid var(--hairline); border-radius: 5px; background: var(--panel-2); }
+.scope-pattern.pattern-good { border-left-color: rgba(118, 185, 155, 0.7); }
+.scope-pattern.pattern-caution { border-left-color: rgba(207, 156, 98, 0.8); }
+.scope-pattern > div { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
+.scope-pattern b { font-family: var(--font-display); font-size: 12px; font-weight: 500; color: var(--accent-soft); }
+.scope-pattern span { font-size: 8px; letter-spacing: 0.1em; color: var(--text-dim); }
+.scope-pattern p { margin: 4px 0 0; font-size: 9.5px; line-height: 1.6; color: var(--text-dim); }
+.scope-methods { grid-column: 1 / -1; margin-top: 4px; padding-top: 8px; border-top: 1px dashed var(--hairline); }
+.scope-methods > p { margin: 0 0 6px; font-size: 9px; line-height: 1.65; color: var(--text-dim); }
+.scope-references { margin: 0; padding: 0; list-style: none; display: grid; grid-template-columns: 1fr 1fr; gap: 4px 12px; }
+.scope-references li { min-width: 0; }
+.scope-references a { display: block; font-size: 8.5px; line-height: 1.45; color: var(--accent-soft); text-decoration: none; }
+.scope-references a:hover { text-decoration: underline; }
+.scope-references span { display: block; margin-top: 1px; font-size: 8px; line-height: 1.45; color: var(--text-dim); }
+.scope-method-note { margin-top: 6px !important; padding-top: 5px; border-top: 1px dashed var(--hairline); color: var(--text-dim); }
+@media (max-width: 900px) {
+  .scope-structure { grid-template-columns: 1fr; }
+  .scope-pattern-grid { grid-template-columns: 1fr; }
+  .scope-references { grid-template-columns: 1fr; }
+}

@@ -2,6 +2,8 @@
 // 统一输出「摘要 → 时间定位 → 叠宫 → 分领域 → 窗口 → 行动/边界 → 证据」。
 
 import type { Astrolabe, BirthInput, ChartOptions, Palace } from '../types';
+import { profileOf } from './wuxing';
+import { PATTERNS } from './knowledge/patterns';
 import {
   daysInMonth,
   getDecadalYearRange,
@@ -90,6 +92,8 @@ export type DomainInsight = {
   stars: string[];
   mutagens: string[];
   evidence: string;
+  starBasis: string;
+  starAdvice: string;
   advice: string;
   boundary: string;
 };
@@ -112,6 +116,10 @@ export type ScopeReport = {
   chain: ChainRow[];
   overlapRows: OverlapRow[];
   surroundings: SurroundRow[];
+  patterns: { name: string; type: string; desc: string }[];
+  focusStar: string;
+  focusStarKeywords: string;
+  focusStarFix: string;
   focusPalace: string;
   focusStars: string[];
   focusFlowStars: string[];
@@ -125,6 +133,7 @@ export type ScopeReport = {
   boundaries: string[];
   parameters: { label: string; value: string }[];
   evidence: string[];
+  references: { label: string; url: string; note: string }[];
   caveat: string;
 };
 
@@ -234,7 +243,7 @@ function domainScore(a: Astrolabe, layers: LayerInfo[], base: string): {
           s += m.mutagen === '忌' ? -8 : m.mutagen === '权' ? 5 : m.mutagen === '科' ? 4 : 8;
         }
       });
-      evidence.push(`${layer.label}${flow}叠本命${base}：${layerStars.slice(0, 5).join('、') || '空宫'}`);
+      evidence.push(`${layer.label}${flow}叠本命${base}：流曜 ${layerStars.slice(0, 5).join('、') || '无'}`);
     }
     stars.push(...layerStars);
     total += s * (layer.weight / 100);
@@ -339,6 +348,15 @@ export function buildScopeReport(
   const focusNatalStars = natalPalace ? natalStars(natalPalace) : [];
   const focusFlowStars = (focus.palaces[focusPalace] ?? []).map((s) => s.name);
 
+  const focusNatalPalace = natalPalace;
+  const focusOpposite = astrolabe.palaces[(Math.max(0, astrolabe.palaces.findIndex((p) => p.name === focusPalace)) + 6) % 12];
+  const focusMajor = focusNatalPalace?.majorStars[0]?.name ?? focusOpposite?.majorStars[0]?.name ?? '';
+  const focusProfile = focusMajor ? profileOf(focusMajor) : undefined;
+  const patterns = PATTERNS
+    .filter((p) => { try { return p.match(astrolabe.palaces); } catch { return false; } })
+    .slice(0, 3)
+    .map((p) => ({ name: p.name, type: p.type, desc: p.desc }));
+
   const chain: ChainRow[] = layers.map((l) => ({
     layer: l.key,
     layerLabel: l.label,
@@ -389,6 +407,26 @@ export function buildScopeReport(
     const base = baseForFlow(focus, d.flow) ?? d.flow;
     const detail = domainScore(astrolabe, layers, base);
     const levelWord = detail.score >= 62 ? '机会' : detail.score <= 48 ? '压力' : '观察';
+    const p = astrolabe.palaces.find((x) => x.name === base);
+    const op = astrolabe.palaces[(Math.max(0, astrolabe.palaces.findIndex((x) => x.name === base)) + 6) % 12];
+    const major = p?.majorStars[0]?.name ?? op?.majorStars[0]?.name ?? '';
+    const profile = major ? profileOf(major) : undefined;
+    const palaceLine = profile?.palaces?.[base as keyof NonNullable<typeof profile.palaces>] ?? profile?.essence ?? '';
+    const starBasis = major
+      ? `${major}在${base}${p?.majorStars.length ? '' : '（空宫借对宫）'}：${palaceLine}`
+      : '空宫且对宫无主星，借三方与流曜参看。';
+    const starAdvice = profile
+      ? `${major}的用星提醒：${profile.use.fix}`
+      : '空宫先借力：把资源、合作对象与边界写清楚，再决定行动。';
+    const huaAdvice = detail.mutagens.some((m) => m.endsWith('忌'))
+      ? '此宫见化忌：先处理旧账、缺口与边界，再谈推进。'
+      : detail.mutagens.some((m) => m.endsWith('禄'))
+        ? '此宫见化禄：适合做一个可验收的小推进，不要一次押满。'
+        : detail.mutagens.some((m) => m.endsWith('权'))
+          ? '此宫见化权：主动定义规则、责任与决策权。'
+          : detail.mutagens.some((m) => m.endsWith('科'))
+            ? '此宫见化科：用资料、文书、证据与专业表达说话。'
+            : '';
     return {
       key: d.key,
       label: d.label,
@@ -397,8 +435,10 @@ export function buildScopeReport(
       level: levelWord,
       stars: detail.stars,
       mutagens: detail.mutagens,
-      evidence: detail.evidence,
-      advice: d.advice,
+      evidence: `${detail.evidence}。${starBasis}`,
+      starBasis,
+      starAdvice,
+      advice: `${d.advice}${starAdvice ? ` ${starAdvice}` : ''}${huaAdvice ? ` ${huaAdvice}` : ''}`,
       boundary: d.boundary,
     };
   });
@@ -415,10 +455,12 @@ export function buildScopeReport(
           ? `${active.yearly} 年 ${active.monthly} 月`
           : active.daily ?? '流日';
   const levelLabel = LEVEL_LABEL[level];
-  const theme = `${top.label}为主，${risk.label}留缓冲`;
-  const oneLine = `${subject} · ${periodTitle}：${theme}。这是${levelLabel}的结构提示，不是事件判决。`;
+  const starTheme = focusProfile ? `${focusProfile.keywords.slice(0, 2).join('·')}底色` : '空宫借力';
+  const patternTheme = patterns[0]?.name ? `；命局见「${patterns[0].name}」` : '';
+  const theme = `${starTheme}，${top.label}为主，${risk.label}留缓冲`;
+  const oneLine = `${subject} · ${periodTitle}：${focusMajor || '空宫'}${focusProfile ? `（${focusProfile.keywords.slice(0, 3).join('、')}）` : ''}落本命${focusPalace}${patternTheme}。这是${levelLabel}的结构提示，不是事件判决。`;
   const actions = Array.from(new Set([
-    levelActions(level)[0],
+    focusProfile ? `先用${focusMajor}的方式破局：${focusProfile.use.fix}` : levelActions(level)[0],
     top.advice,
     risk.boundary ? `${risk.label}：${risk.boundary}` : levelActions(level)[1],
   ])).slice(0, 3);
@@ -462,6 +504,10 @@ export function buildScopeReport(
     layers,
     chain,
     overlapRows,
+    patterns,
+    focusStar: focusMajor,
+    focusStarKeywords: focusProfile?.keywords.slice(0, 4).join('、') ?? '',
+    focusStarFix: focusProfile?.use.fix ?? '空宫先借力，明确资源与边界。',
     surroundings,
     focusPalace,
     focusStars: focusNatalStars,
@@ -478,7 +524,15 @@ export function buildScopeReport(
     evidence: [
       `本命命宫：${astrolabe.palaces.find((p) => p.name === '命宫')?.name ?? '命宫'}；当前${LAYER_NAME[level]}命宫落本命${focusPalace}`,
       ...chain.map((c) => `${c.layerLabel}：${c.flowPalace}叠本命${c.basePalace}`),
-      ...transforms.slice(0, 6).map((t) => `${t.layerLabel}${t.star}化${t.mutagen}落${t.basePalace}（${t.flowPalace}）`),
+      ...patterns.map((p) => `格局：${p.name}（${p.type}）— ${p.desc}`),
+      ...transforms.slice(0, 8).map((t) => `${t.layerLabel}${t.star}化${t.mutagen}落${t.basePalace}（${t.flowPalace}）`),
+    ],
+    references: [
+      { label: '《紫微斗數全書》', url: 'https://zh.wikisource.org/wiki/%E7%B4%AB%E5%BE%AE%E6%96%97%E6%95%B8%E5%85%A8%E6%9B%B8', note: '古籍原文：十四主星、四化、大限/流年等基本口径。' },
+      { label: '唐宋佛道經典及易學傳承對紫微斗數全書影響之探討（輔仁大學，2019）', url: 'https://ndltd.ncl.edu.tw/cgi-bin/gs32/gsweb.cgi?o=dnclcdr&s=id=%22108FGU00183005%22.&searchmode=basic', note: '學位論文：紫微斗數全書的文本與思想來源。' },
+      { label: '紫微斗數命理師在助人歷程上之語言技巧的研究（中國文化大學）', url: 'http://ir.lib.pccu.edu.tw/handle/987654321/20075', note: '質性研究：命理諮詢中的語言、詮釋與助人邊界。' },
+      { label: '面對生涯難題的另一種思考：以紫微斗數作為成人生涯輔導媒介的當事人經驗探究（清華大學）', url: 'https://etd.lib.nthu.edu.tw/thesis/detail/8d414830eb2aae52fa8a8b3571be251d/', note: '質性研究：作為生涯輔導媒介的使用經驗與限制。' },
+      { label: '中華傳統術數之量化指標發展與信效度分析', url: 'https://shenghsuanlin.web.nycu.edu.tw/wp-content/uploads/sites/349/2020/02/%e4%b8%ad%e8%8f%af%e5%82%b3%e7%b5%b1%e8%a1%93%e6%95%b8%e4%b9%8b%e9%87%8f%e5%8c%96%e6%8c%87%e6%a8%99%e7%99%bc%e5%b1%95%e8%88%87%e4%bf%a1%e6%95%88%e5%ba%a6%e5%88%86%e6%9e%90%e3%80%82%e7%ac%ac%e5%8d%81%e5%b1%86%e3%80%90%e4%b8%ad%e8%8f%af%e5%82%b3%e7%b5%b1%e8%a1%93%e6%95%b8%e6%96%87%e5%8c%96%e5%ad%b8%e8%a1%93%e7%a0%94%e8%a8%8e%e6%9c%83%e3%80%91%e8%ab%96%e6%96%87%e9%9b%86.pdf', note: '方法論參考：術數指標化與信效度的限制。' },
     ],
     caveat: '紫微斗数为传统文化咨询工具，报告只呈现结构与条件，不构成医疗、法律、财务、心理或婚姻决策建议；不作绝对化、恐吓式断语。',
   };
