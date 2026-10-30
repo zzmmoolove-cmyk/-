@@ -22,7 +22,6 @@ import SidebarToday from './components/SidebarToday';
 import DraggableClientPill from './components/DraggableClientPill';
 import ClientListPanel from './components/ClientListPanel';
 import ClientProfileSheet from './components/ClientProfileSheet';
-import ServiceRecordList from './components/ServiceRecordList';
 import ServiceRecordSheet from './components/ServiceRecordSheet';
 import ClientSwitcher from './components/ClientSwitcher';
 import LibraryPage from './components/LibraryPage';
@@ -824,42 +823,17 @@ export default function App() {
 
           {section === 'services' && (
             <div className="services-page">
-              <div className="page-head">
-                <div>
-                  <h2>服务</h2>
-                  <p className="dim">
-                    {currentProfile.name ? `当前客户：${currentProfile.name} · ${currentProfile.relation}` : '起名可独立择日；合盘需要 A/B 两位客户'}
-                  </p>
-                </div>
-                <button
-                  className="btn"
-                  onClick={() => document.getElementById('service-new')?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
-                >
-                  + 新建服务
-                </button>
-              </div>
-
-              <section className="service-history">
-                <div className="service-history-head">
-                  <h3>服务记录</h3>
-                  <span className="dim">{services.length} 条 · 点开可标记交付 / 复制</span>
-                </div>
-                <ServiceRecordList records={services} onOpen={setServiceOpenId} />
-              </section>
-
-              <div id="service-new" className="service-new-block">
-                <ToolsPanel
-                  astrolabe={astrolabe}
-                  raw={raw}
-                  users={users}
-                  activeUserId={activeUserId}
-                  userName={currentProfile.name}
-                  userLabel={currentProfile.name ? `${currentProfile.name} · ${currentProfile.relation}` : ''}
-                  options={options}
-                  onSaveService={saveService}
-                  onCreateClient={createClient}
-                />
-              </div>
+              <ToolsPanel
+                astrolabe={astrolabe}
+                raw={raw}
+                users={users}
+                activeUserId={activeUserId}
+                userName={currentProfile.name}
+                userLabel={currentProfile.name ? `${currentProfile.name} · ${currentProfile.relation}` : ''}
+                options={options}
+                onSaveService={saveService}
+                onCreateClient={createClient}
+              />
             </div>
           )}
 
