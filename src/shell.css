@@ -3136,3 +3136,460 @@ html[data-theme='paper'] .chart-scope-label.layer-daily { color: #67508c; backgr
   .scope-pattern-grid { grid-template-columns: 1fr; }
   .scope-references { grid-template-columns: 1fr; }
 }
+
+/* ============================================================
+   可读性最终调整：正文与关键标签整体放大一档
+   —— 不改信息结构，只改字号/行高/间距
+   ============================================================ */
+
+body {
+  font-size: 15px;
+  line-height: 1.68;
+}
+
+.app-body {
+  grid-template-columns: 276px minmax(0, 1fr);
+}
+
+.sidebar {
+  padding: 18px 14px 26px;
+}
+
+.side-label {
+  padding: 4px 10px 8px;
+  font-size: 9.5px;
+  letter-spacing: 0.18em;
+}
+
+.side-nav-item {
+  padding: 9px 11px;
+  font-size: 13.5px;
+}
+
+.side-nav-item .side-icon {
+  width: 20px;
+  font-size: 12px;
+}
+
+.side-today-date b {
+  font-size: 20px;
+}
+
+.side-today-date em {
+  font-size: 10px;
+}
+
+.side-today-cal-label {
+  font-size: 8.5px;
+}
+
+.side-today-gz {
+  font-size: 10.5px;
+}
+
+.side-today-chong,
+.side-today-yiji {
+  font-size: 10px;
+}
+
+.side-today-fortune-head {
+  font-size: 9.5px;
+}
+
+.side-today-row b {
+  font-size: 11.5px;
+}
+
+.side-today-row p {
+  font-size: 10.5px;
+  line-height: 1.6;
+}
+
+.side-today-mini span {
+  font-size: 10px;
+}
+
+.side-today-more {
+  font-size: 10.5px;
+}
+
+.side-foot {
+  font-size: 9.5px;
+}
+
+.topbar-brand h1 {
+  font-size: 18px;
+}
+
+.topbar-brand span {
+  font-size: 9px;
+}
+
+.topbar-btn {
+  font-size: 12px;
+}
+
+.client-pill-float b {
+  font-size: 13px;
+}
+
+.client-pill-float em {
+  font-size: 10.5px;
+}
+
+/* 命主列表 */
+.master-toolbar input,
+.master-toolbar select {
+  height: 40px;
+  font-size: 13px;
+}
+
+.master-toolbar .hint {
+  font-size: 10.5px;
+}
+
+.master-toolbar .master-new {
+  height: 40px;
+  font-size: 12.5px;
+}
+
+.client-main b {
+  font-size: 15px;
+}
+
+.client-main span {
+  font-size: 11.5px;
+}
+
+.master-switch em {
+  font-size: 10px;
+}
+
+.master-badge {
+  font-size: 8.5px;
+}
+
+.master-row .btn.small.primary {
+  height: 32px;
+  padding: 0 12px;
+  font-size: 10.5px;
+}
+
+.master-foot {
+  font-size: 10.5px;
+}
+
+/* 时间筛选 */
+.scope-filter-label {
+  min-width: 34px;
+  font-size: 10px;
+}
+
+.scope-chip {
+  padding: 4px 7px;
+  font-size: 11px;
+}
+
+.scope-chip em {
+  font-size: 8.5px;
+}
+
+.scope-current {
+  font-size: 10px;
+}
+
+.scope-view-bar button {
+  padding: 5px 12px;
+  font-size: 11px;
+}
+
+/* 命盘与检查器 */
+.chart-head h2 {
+  font-size: 19px;
+}
+
+.chart-current-palace {
+  font-size: 9.5px;
+}
+
+.chart-density button {
+  font-size: 10.5px;
+}
+
+.chart-scroll .iztro-palace-name {
+  font-size: 15.5px;
+}
+
+.chart-scroll .iztro-star {
+  font-size: 12.5px;
+}
+
+.chart-scroll .iztro-palace-major .iztro-star {
+  font-size: 14px;
+}
+
+.chart-scroll .iztro-palace-lft24,
+.chart-scroll .iztro-palace-rgt24 {
+  font-size: 11px;
+}
+
+.chart-scroll .iztro-palace-gz {
+  font-size: 12px;
+}
+
+.chart-scope-label {
+  font-size: 9.5px;
+  padding: 2px 2px;
+}
+
+.chart-scroll .iztro-palace-horo-star .iztro-star {
+  font-size: 11.5px;
+}
+
+.inspector-head h2 {
+  font-size: 24px;
+}
+
+.inspector-eyebrow {
+  font-size: 9px;
+}
+
+.inspector-sub {
+  font-size: 10.5px;
+}
+
+.inspector-star b {
+  font-size: 12.5px;
+}
+
+.inspector-star span {
+  font-size: 9.5px;
+}
+
+.inspector-section .inspector-label {
+  font-size: 9.5px;
+}
+
+.inspector-blockage {
+  font-size: 10.5px;
+}
+
+.inspector-domain {
+  font-size: 11px;
+  line-height: 1.65;
+}
+
+.inspector-card-link {
+  font-size: 10px;
+  padding: 4px 8px;
+}
+
+/* 服务工具 */
+.tool-nav-item {
+  padding: 10px 12px;
+}
+
+.tool-nav-item b {
+  font-size: 13px;
+}
+
+.tool-nav-item span {
+  font-size: 9.5px;
+}
+
+/* 运限报告：正文与建议放大 */
+.scope-report-head h2 {
+  font-size: 26px;
+}
+
+.scope-report-head p {
+  font-size: 13px;
+  line-height: 1.75;
+}
+
+.scope-kicker {
+  font-size: 9.5px;
+}
+
+.scope-summary-cols li {
+  font-size: 12px;
+  line-height: 1.65;
+}
+
+.scope-summary-cols li b {
+  font-size: 12.5px;
+}
+
+.scope-summary-side > p {
+  font-size: 10.5px;
+}
+
+.scope-weight-pills span {
+  font-size: 9.5px;
+}
+
+.scope-action-list span {
+  font-size: 11.5px;
+}
+
+.scope-section-head h3 {
+  font-size: 18px;
+}
+
+.scope-section-head .dim {
+  font-size: 10px;
+}
+
+.scope-params span {
+  font-size: 9px;
+}
+
+.scope-params b {
+  font-size: 10.5px;
+}
+
+.scope-chain b {
+  font-size: 12px;
+}
+
+.scope-chain span {
+  font-size: 9.5px;
+}
+
+.scope-structure em {
+  font-size: 9px;
+}
+
+.scope-structure p {
+  font-size: 11.5px;
+  line-height: 1.65;
+}
+
+.scope-transform-label {
+  font-size: 10px;
+}
+
+.scope-mutagen-list .hw {
+  font-size: 10px;
+}
+
+.scope-domain-card {
+  padding: 11px 13px;
+}
+
+.scope-domain-head em {
+  font-size: 9px;
+}
+
+.scope-domain-head b {
+  font-size: 13px;
+}
+
+.scope-domain-evidence {
+  font-size: 11px;
+  line-height: 1.65;
+}
+
+.scope-domain-advice {
+  font-size: 12px;
+  line-height: 1.65;
+}
+
+.scope-domain-boundary {
+  font-size: 10px;
+  line-height: 1.6;
+}
+
+.semantic-pill,
+.semantic-label {
+  font-size: 9px;
+}
+
+.scope-window b {
+  font-size: 12px;
+}
+
+.scope-window p {
+  font-size: 10.5px;
+}
+
+.scope-authority-grid p {
+  font-size: 10.5px;
+}
+
+.scope-authority ul.notes li {
+  font-size: 10px;
+}
+
+.scope-observables li {
+  font-size: 10.5px;
+}
+
+.scope-pattern b {
+  font-size: 13px;
+}
+
+.scope-pattern p {
+  font-size: 10.5px;
+}
+
+.scope-evidence > summary {
+  font-size: 10.5px;
+}
+
+.scope-evidence-body h4 {
+  font-size: 12px;
+}
+
+.scope-evidence-body li,
+.scope-evidence-body dd {
+  font-size: 10px;
+}
+
+.scope-overlap table {
+  font-size: 10px;
+}
+
+.scope-overlap thead th {
+  font-size: 9px;
+}
+
+.scope-report-foot {
+  font-size: 9.5px;
+}
+
+/* 通用辅助文本 */
+.hint {
+  font-size: 12px;
+}
+
+input,
+select,
+textarea {
+  font-size: 13px;
+}
+
+.btn {
+  min-height: 36px;
+  font-size: 12.5px;
+}
+
+.btn.small {
+  min-height: 30px;
+  font-size: 11px;
+}
+
+@media (max-width: 900px) {
+  .app-body { grid-template-columns: 1fr; }
+  .sidebar { padding: 10px 12px 12px; }
+}
+
+@media (max-width: 760px) {
+  body { font-size: 14.5px; }
+  .scope-chip { font-size: 10.5px; }
+  .scope-filter-label { font-size: 9px; }
+  .scope-report-head h2 { font-size: 23px; }
+  .scope-domain-grid { grid-template-columns: 1fr; }
+  .scope-summary-cols { grid-template-columns: 1fr; }
+  .chart-scope-label { font-size: 9px; }
+}
