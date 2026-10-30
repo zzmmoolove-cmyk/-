@@ -3104,3 +3104,11 @@ html[data-theme='paper'] .chart-scope-label.layer-daily { color: #67508c; backgr
   background: rgba(184, 154, 232, 0.1) !important;
   box-shadow: inset 0 0 0 1px rgba(184, 154, 232, 0.4) !important;
 }
+
+/* 简版也显示运限宫位短标签：补一行，不挤压主星 */
+.chart-simple .iztro-palace {
+  grid-template-rows: 1fr auto auto auto 40px;
+}
+.chart-simple .iztro-palace-fate.chart-scope-labels-host {
+  display: grid !important;
+}
