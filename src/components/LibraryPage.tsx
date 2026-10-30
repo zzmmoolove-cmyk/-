@@ -10,13 +10,7 @@ const TABS: { key: LibraryTab; label: string }[] = [
   { key: 'classics', label: '古籍' },
 ];
 
-export default function LibraryPage({
-  onOpenCalendar,
-  onOpenData,
-}: {
-  onOpenCalendar: () => void;
-  onOpenData: () => void;
-}) {
+export default function LibraryPage({ onOpenData }: { onOpenData: () => void }) {
   const [tab, setTab] = useState<LibraryTab>('manual');
   const stars = useMemo(() => Object.values(STAR_PROFILES), []);
   const [query, setQuery] = useState('');
@@ -34,10 +28,9 @@ export default function LibraryPage({
       <div className="page-head">
         <div>
           <h2>资料</h2>
-          <p className="dim">星曜手册与古籍。万年历、数据在右上角；排盘与 AI 设置收进站点右上角「设置」。</p>
+          <p className="dim">星曜手册与古籍。万年历已移到「今日」；数据在右上角；排盘与 AI 设置收进站点右上角「设置」。</p>
         </div>
         <div className="library-head-actions">
-          <button className="btn ghost small" onClick={onOpenCalendar}>万年历</button>
           <button className="btn ghost small" onClick={onOpenData}>数据</button>
         </div>
       </div>

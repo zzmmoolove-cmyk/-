@@ -4,6 +4,24 @@ import { astro } from 'iztro';
 import type { Astrolabe, BirthInput, ChartOptions } from '../types';
 import { computeTimeIndex } from './truesolar';
 
+
+/** 生成 iztro 原始盘对象（保留 horoscope/decadalList 方法），供流日/运限计算。 */
+export function buildRawAstrolabe(input: BirthInput, options: ChartOptions): Record<string, unknown> {
+  astro.config({
+    algorithm: options.algorithm,
+    yearDivide: options.yearDivide,
+    ageDivide: options.ageDivide,
+    horoscopeDivide: options.horoscopeDivide,
+    dayDivide: options.dayDivide,
+  });
+  const ti = computeTimeIndex(input);
+  const a =
+    input.birthdayType === 'lunar'
+      ? astro.byLunar(input.birthday, ti, input.gender, input.isLeapMonth, input.fixLeap, 'zh-CN')
+      : astro.bySolar(input.birthday, ti, input.gender, input.fixLeap, 'zh-CN');
+  return a as unknown as Record<string, unknown>;
+}
+
 export function buildAstrolabe(input: BirthInput, options: ChartOptions): Astrolabe {
   astro.config({
     algorithm: options.algorithm,

@@ -25,7 +25,6 @@ import ServiceRecordSheet from './components/ServiceRecordSheet';
 import ClientSwitcher from './components/ClientSwitcher';
 import LibraryPage from './components/LibraryPage';
 import SettingsSheet, { type SettingsTab } from './components/SettingsSheet';
-import CalendarSheet from './components/CalendarSheet';
 import OutputSheet from './components/OutputSheet';
 import StarProfilePanel from './components/StarProfilePanel';
 import { AI_PROVIDERS, type AiConfig, type AiProvider } from './lib/ai';
@@ -76,6 +75,7 @@ const USERS_STORAGE_KEY = 'ziwei-users-v2';
 const LEGACY_HISTORY_KEY = 'ziwei-history-v1';
 const READINGS_STORAGE_KEY = 'ziwei-readings-v1';
 const SERVICES_STORAGE_KEY = 'ziwei-services-v1';
+const PRIMARY_CLIENT_KEY = 'ziwei-primary-client-v1';
 
 function loadAiConfig(): AiConfig {
   try {
@@ -230,7 +230,13 @@ export default function App() {
   const [switcherOpen, setSwitcherOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [settingsTab, setSettingsTab] = useState<SettingsTab>('chart');
-  const [calendarOpen, setCalendarOpen] = useState(false);
+  const [primaryId, setPrimaryId] = useState<string | null>(() => {
+    try {
+      return localStorage.getItem(PRIMARY_CLIENT_KEY);
+    } catch {
+      return null;
+    }
+  });
   const [outputProfile, setOutputProfile] = useState<OutputProfile>(loadOutputProfile);
   const [exportOpen, setExportOpen] = useState(false);
   const [saveMsg, setSaveMsg] = useState<string | null>(null);
@@ -287,6 +293,19 @@ export default function App() {
       /* ignore */
     }
   }, [services]);
+
+  useEffect(() => {
+    try {
+      if (primaryId) localStorage.setItem(PRIMARY_CLIENT_KEY, primaryId);
+      else localStorage.removeItem(PRIMARY_CLIENT_KEY);
+    } catch {
+      /* ignore */
+    }
+  }, [primaryId]);
+
+  useEffect(() => {
+    if (primaryId && !users.some((u) => u.id === primaryId)) setPrimaryId(null);
+  }, [users, primaryId]);
 
   const timeIndex = useMemo(() => computeTimeIndex(input), [input]);
 
@@ -420,6 +439,7 @@ export default function App() {
     };
     setUsers((prev) => [record, ...prev.filter((u) => u.id !== id)].slice(0, 100));
     setActiveUserId(id);
+    if (!primaryId) setPrimaryId(id);
     setCurrentProfile({ ...profile, name: displayName });
     setDirty(false);
     setSection('clients');
@@ -493,6 +513,7 @@ export default function App() {
       return clientIds.length ? [{ ...s, clientIds, clientNames }] : [];
     }));
     setServiceOpenId((prev) => (prev ? null : prev));
+    if (primaryId === id) setPrimaryId(null);
     if (profileId === id) {
       setProfileOpen(false);
       setProfileId(null);
@@ -732,11 +753,14 @@ export default function App() {
             <TodayPanel
               users={users}
               activeUserId={activeUserId}
+              primaryId={primaryId}
+              options={options}
               hasChart={Boolean(astrolabe)}
               onOpenClient={openClient}
               onNewClient={newClient}
               onOpenServices={() => setSection('services')}
               onOpenLibrary={() => setSection('library')}
+              onPrimaryChange={setPrimaryId}
             />
           )}
 
@@ -824,7 +848,6 @@ export default function App() {
 
           {section === 'library' && (
             <LibraryPage
-              onOpenCalendar={() => setCalendarOpen(true)}
               onOpenData={() => { setSettingsTab('data'); setSettingsOpen(true); }}
             />
           )}
@@ -940,8 +963,6 @@ export default function App() {
         onExportStars={exportStarDB}
         onClose={() => setSettingsOpen(false)}
       />
-
-      {calendarOpen && <CalendarSheet onClose={() => setCalendarOpen(false)} />}
 
       <OutputSheet
         open={exportOpen}

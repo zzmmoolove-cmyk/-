@@ -1050,3 +1050,93 @@ html[data-theme='mystic'] .sidebar {
   .settings-rows { grid-template-columns: 1fr 1fr 1fr; }
   .library-head-actions { width: 100%; }
 }
+
+/* —— 今日：主客户 + 万年历流日 —— */
+.primary-section {
+  padding: 13px 14px;
+  border: 1px solid var(--border);
+  border-radius: 11px;
+  background: var(--panel);
+}
+.primary-row { display: flex; align-items: center; gap: 8px; }
+.primary-row select {
+  flex: 1;
+  min-width: 0;
+  padding: 9px 10px;
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  background: var(--panel-2);
+  color: var(--text);
+  font-size: 13px;
+}
+.primary-row .btn { width: auto; flex: 0 0 auto; }
+.primary-meta { display: flex; align-items: center; gap: 9px; margin-top: 9px; padding-top: 9px; border-top: 1px dashed var(--border); }
+.primary-meta b { display: block; font-size: 12.5px; color: var(--accent-soft); }
+.primary-meta em { display: block; margin-top: 2px; font-style: normal; font-size: 10.5px; color: var(--text-dim); }
+.primary-hint { margin: 8px 0 0; font-size: 11px; }
+
+.daily-section {
+  margin-bottom: 24px;
+  padding: 14px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--panel);
+}
+.daily-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; margin-bottom: 10px; }
+.daily-head p { margin: 0; font-size: 11px; line-height: 1.6; color: var(--text-dim); }
+.daily-date {
+  width: auto !important;
+  flex: 0 0 auto;
+  padding: 7px 9px !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 7px;
+  background: var(--panel-2) !important;
+  color: var(--text) !important;
+  font-size: 12px;
+}
+.daily-grid { display: grid; grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.25fr); gap: 12px; align-items: stretch; }
+.daily-calendar, .daily-fortune {
+  min-width: 0;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  background: rgba(0, 0, 0, 0.08);
+}
+.daily-cal-top { display: flex; flex-direction: column; gap: 3px; padding-bottom: 8px; margin-bottom: 7px; border-bottom: 1px solid var(--border); }
+.daily-cal-top b { font-family: var(--font-display); font-size: 18px; letter-spacing: 1px; color: var(--accent-soft); }
+.daily-cal-top span { font-size: 11px; color: var(--text-dim); }
+.daily-cal-rows { display: flex; flex-direction: column; gap: 5px; }
+.daily-cal-rows div { display: flex; gap: 8px; font-size: 11px; line-height: 1.55; }
+.daily-cal-rows span { flex: 0 0 30px; color: var(--text-dim); }
+.daily-cal-rows b { font-weight: 500; color: var(--text); }
+.daily-yiji { margin-top: 8px; padding-top: 7px; border-top: 1px dashed var(--border); }
+.daily-yiji p { display: flex; gap: 7px; margin: 4px 0; font-size: 11px; line-height: 1.65; color: var(--text); }
+.daily-yiji em { flex: 0 0 auto; font-style: normal; font-weight: 700; }
+.daily-yiji em.yi { color: var(--ok); }
+.daily-yiji em.ji { color: var(--danger); }
+.daily-fortune { display: flex; flex-direction: column; }
+.daily-fortune-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
+.daily-fortune-head h3 { margin: 2px 0 0; font-family: var(--font-display); font-size: 19px; letter-spacing: 1.5px; color: var(--accent-soft); }
+.daily-level { display: inline-block; margin-left: 5px; padding: 1px 7px; border-radius: 999px; border: 1px solid var(--border); font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', sans-serif; font-size: 10px; vertical-align: middle; }
+.daily-level.good { color: var(--ok); border-color: rgba(99, 179, 150, 0.45); }
+.daily-level.careful { color: var(--danger); border-color: rgba(224, 120, 120, 0.45); }
+.daily-level.flat { color: var(--warn); border-color: rgba(214, 170, 90, 0.35); }
+.daily-theme { margin: 7px 0 8px; font-size: 11.5px; line-height: 1.7; color: var(--text-dim); }
+.daily-mutagens { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 4px; }
+.hw { display: inline-block; padding: 2px 6px; border: 1px solid var(--border); border-radius: 4px; background: var(--panel-2); font-size: 10.5px; color: var(--text); }
+.hw.hua-禄 { color: var(--ok); border-color: rgba(99, 179, 150, 0.3); }
+.hw.hua-权 { color: #8ea7ff; border-color: rgba(142, 167, 255, 0.3); }
+.hw.hua-科 { color: #8fd0df; border-color: rgba(143, 208, 223, 0.3); }
+.hw.hua-忌 { color: var(--danger); border-color: rgba(224, 120, 120, 0.35); }
+.daily-advice { margin-top: 8px; padding-top: 7px; border-top: 1px dashed var(--border); }
+.daily-advice .notes { margin: 3px 0 0; padding-left: 16px; }
+.daily-advice .notes li { margin: 3px 0; font-size: 11.5px; line-height: 1.7; color: var(--text); }
+.daily-fortune-empty { display: flex; flex-direction: column; justify-content: center; min-height: 180px; }
+.daily-fortune-empty h3 { margin: 3px 0 5px; font-family: var(--font-display); font-size: 18px; letter-spacing: 1px; color: var(--accent-soft); }
+.daily-fortune-empty .btn { width: auto; margin-top: 9px; }
+
+@media (max-width: 800px) {
+  .daily-grid { grid-template-columns: 1fr; }
+  .daily-head { flex-direction: column; }
+  .daily-date { width: 100% !important; }
+}
