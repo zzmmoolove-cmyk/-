@@ -1,6 +1,9 @@
+import { useMemo } from 'react';
 import type { ReadingRecord, ServiceRecord, UserRecord } from '../types';
 import { encodeChart } from '../lib/chartcode';
 import ServiceRecordList from './ServiceRecordList';
+import { buildBaziProfile } from '../lib/bazi';
+import { buildAstroPerson, sunSignOfDate } from '../lib/astroSynastry';
 
 async function copyText(text: string) {
   try {
@@ -36,6 +39,24 @@ export default function ClientProfileSheet({
   const mine = readings.filter((r) => r.clientId === user.id);
   const myServices = services.filter((s) => s.clientIds.includes(user.id));
 
+  const bazi = useMemo(() => {
+    try { return buildBaziProfile(user.payload, user.name, user.payload.gender); } catch { return null; }
+  }, [user]);
+
+  const astro = useMemo(() => {
+    try {
+      return buildAstroPerson({
+        name: user.name,
+        date: user.payload.birthday,
+        time: user.payload.clockTime || '12:00',
+        longitude: user.payload.longitude,
+        latitude: user.payload.latitude ?? 30,
+        useTrueSolar: user.payload.useTrueSolar,
+        sign: sunSignOfDate(user.payload.birthday).sign,
+      });
+    } catch { return null; }
+  }, [user]);
+
   return (
     <div className="modal-backdrop" onClick={onClose}>
       <div className="client-sheet" onClick={(e) => e.stopPropagation()}>
@@ -54,6 +75,29 @@ export default function ClientProfileSheet({
             <div><span>历法</span><b>{user.payload.birthdayType === 'lunar' ? '农历' : '公历'}</b></div>
             <div><span>经度</span><b>{user.payload.longitude}°E</b></div>
             <div><span>备注</span><b>{user.note || '—'}</b></div>
+          </div>
+
+          <div className="sheet-section">
+            <div className="sheet-section-head">
+              <h3>三系统档案</h3>
+              <span className="dim">紫微 / 八字 / 星座</span>
+            </div>
+            <div className="profile-three">
+              {bazi && (
+                <div>
+                  <em>八字</em>
+                  <b>日主 {bazi.dayMaster}{bazi.dayMasterEl} · {bazi.strength}</b>
+                  <span>用神初判 {bazi.usefulGods.join('、') || '—'}｜{bazi.pillars.map((p) => `${p.stem}${p.branch}`).join(' ')}</span>
+                </div>
+              )}
+              {astro && (
+                <div>
+                  <em>星座</em>
+                  <b>太阳{astro.sun.sign} · 上升{astro.rising.sign}</b>
+                  <span>下降{astro.descendant.sign}｜{astro.note}</span>
+                </div>
+              )}
+            </div>
           </div>
 
           <div className="sheet-section">

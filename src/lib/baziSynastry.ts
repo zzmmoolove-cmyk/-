@@ -2,6 +2,7 @@
 // 只用主气，不纳藏干/旺衰/用神/大运，属于结构层参考。
 
 import type { Astrolabe } from '../types';
+import type { BaziProfile } from './bazi';
 
 export type BaziPillar = { stem: string; branch: string; stemEl: Element; branchEl: Element };
 export type Element = '木' | '火' | '土' | '金' | '水';
@@ -136,9 +137,36 @@ function buildInteractions(a: BaziPerson, b: BaziPerson): BaziInteraction[] {
   return out;
 }
 
+function personFromProfile(p: BaziProfile): BaziPerson {
+  return {
+    name: p.name,
+    gender: p.gender,
+    pillars: p.pillars.map((x) => ({
+      stem: x.stem,
+      branch: x.branch,
+      stemEl: STEM_EL[x.stem] ?? '土',
+      branchEl: BRANCH_EL[x.branch] ?? '土',
+    })),
+    dayMaster: p.dayMaster,
+    dayMasterEl: p.dayMasterEl,
+    counts: p.counts,
+    missing: p.missing,
+    spouseStar: p.spouseStar,
+    spouseStars: p.spouseStars,
+  };
+}
+
+export function compareBaziProfiles(a: BaziProfile, b: BaziProfile): BaziSynastry {
+  return compareBaziPeople(personFromProfile(a), personFromProfile(b));
+}
+
 export function compareBazi(a: Astrolabe, b: Astrolabe, aName: string, bName: string): BaziSynastry {
   const pa = buildPerson(aName, a.gender === '女' ? '女' : '男', a.chineseDate);
   const pb = buildPerson(bName, b.gender === '女' ? '女' : '男', b.chineseDate);
+  return compareBaziPeople(pa, pb);
+}
+
+function compareBaziPeople(pa: BaziPerson, pb: BaziPerson): BaziSynastry {
   const relations = (() => {
     const ae = pa.dayMasterEl;
     const be = pb.dayMasterEl;

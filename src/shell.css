@@ -1501,3 +1501,62 @@ html[data-theme='mystic'] .sidebar {
 .ideal-b-details > summary em { font-style: normal; font-size: 9.5px; color: var(--text-dim); }
 .ideal-b-details[open] > summary { border-bottom: 1px solid var(--border); }
 .ideal-b-details .ideal-b-card { margin: 0; border: 0; background: transparent; }
+
+/* —— 八字详盘：藏干/十神/长生/纳音/空亡/神煞 —— */
+.bazi-rich { margin: 10px 0; }
+.bazi-rich-person { margin: 8px 0; padding: 10px 12px; border: 1px solid var(--border); border-radius: 8px; background: var(--panel-2); }
+.bazi-rich-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 7px 12px; }
+.bazi-rich-head b { font-size: 13px; color: var(--accent-soft); }
+.bazi-rich-head span { font-size: 10.5px; color: var(--text); }
+.bazi-rich-head em { font-style: normal; font-size: 9.5px; color: var(--text-dim); }
+.bazi-rich-summary { margin: 4px 0 6px; font-size: 9.5px; color: var(--text-dim); }
+.bazi-rich-table { display: flex; flex-direction: column; gap: 3px; }
+.bazi-rich-row { display: grid; grid-template-columns: 34px 54px 1fr 1.2fr 0.7fr 0.7fr 0.8fr 0.8fr; gap: 5px; align-items: baseline; padding: 4px 5px; border-top: 1px dashed var(--border); font-size: 9.5px; color: var(--text-dim); }
+.bazi-rich-row b { font-family: var(--font-display); font-size: 13px; color: var(--text); }
+.bazi-rich-label { color: var(--accent); }
+.bazi-rich-foot { margin: 6px 0 0; padding-top: 5px; border-top: 1px dashed var(--border); font-size: 9px; line-height: 1.55; color: var(--text-dim); }
+
+@media (max-width: 900px) {
+  .bazi-rich-row { grid-template-columns: 30px 44px 1fr 1fr; }
+  .bazi-rich-row > span:nth-child(n+5) { grid-column: span 1; }
+  .bazi-rich-row > span:nth-child(3),
+  .bazi-rich-row > span:nth-child(4) { grid-column: span 1; }
+}
+
+/* —— 今日三系统 —— */
+.daily-three-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 10px; }
+.daily-three-card { min-width: 0; padding: 10px 11px; border: 1px solid var(--border); border-radius: 8px; background: var(--panel-2); }
+.daily-three-card.ziwei { border-top: 2px solid var(--accent); }
+.daily-three-card.bazi { border-top: 2px solid #9bc7b4; }
+.daily-three-card.astro { border-top: 2px solid #b8a9e8; }
+.daily-three-label { font-size: 9px; letter-spacing: 2px; color: var(--text-dim); }
+.daily-three-card b { display: block; margin: 4px 0; font-size: 12px; line-height: 1.45; color: var(--accent-soft); }
+.daily-three-card p { margin: 0; font-size: 10.5px; line-height: 1.65; color: var(--text); }
+.daily-three-card em { display: block; margin-top: 5px; font-style: normal; font-size: 9px; line-height: 1.5; color: var(--text-dim); }
+
+@media (max-width: 760px) {
+  .daily-three-grid { grid-template-columns: 1fr; }
+}
+
+/* —— 投资：三系统交叉 —— */
+.investment-three { margin-top: 12px; }
+.investment-three-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.investment-three-grid > div { padding: 10px 12px; border: 1px solid var(--border); border-radius: 8px; background: var(--panel-2); }
+.investment-three-grid em { font-style: normal; font-size: 9px; letter-spacing: 1.5px; color: var(--accent); }
+.investment-three-grid b { display: block; margin: 3px 0 4px; font-size: 12px; color: var(--text); }
+.investment-three-grid p { margin: 0; font-size: 10.5px; line-height: 1.65; color: var(--text-dim); }
+.investment-three-grid .investment-cross { grid-column: 1 / -1; border-left: 2px solid var(--accent); }
+.investment-cross p { color: var(--text); }
+
+@media (max-width: 700px) {
+  .investment-three-grid { grid-template-columns: 1fr; }
+  .investment-three-grid .investment-cross { grid-column: auto; }
+}
+
+/* —— 客户档案：三系统摘要 —— */
+.profile-three { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.profile-three > div { padding: 7px 9px; border: 1px solid var(--border); border-radius: 6px; background: var(--panel-2); }
+.profile-three em { font-style: normal; font-size: 8.5px; letter-spacing: 1.5px; color: var(--accent); }
+.profile-three b { display: block; margin: 2px 0; font-size: 11px; color: var(--text); }
+.profile-three span { display: block; font-size: 9px; line-height: 1.5; color: var(--text-dim); }
+@media (max-width: 600px) { .profile-three { grid-template-columns: 1fr; } }

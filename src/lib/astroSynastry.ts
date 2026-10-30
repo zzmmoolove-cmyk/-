@@ -2,13 +2,16 @@
 // 上升按北纬 30°、北京时间近似；精确上升需要出生地纬度与准确出生时间。
 
 import { zodiacCompatibility } from './synastry';
+import { trueSolarTimeMinutes, formatMinutes } from './truesolar';
 
 export type AstroBirth = {
   name: string;
   date: string;
   time: string;
   longitude: number;
-  sign: string;
+  latitude?: number;
+  useTrueSolar?: boolean;
+  sign?: string;
 };
 
 export type AstroSign = {
@@ -89,7 +92,7 @@ function julianDay(y: number, m: number, d: number, utHours: number): number {
 }
 
 /** 近似上升：北纬 30°、北京时间（UTC+8）。 */
-function approximateRising(date: string, time: string, longitude: number): AstroSign {
+function approximateRising(date: string, time: string, longitude: number, latitude = 30): AstroSign {
   const [y, m, d] = date.split('-').map(Number);
   const [hh, mm] = (time || '12:00').split(':').map(Number);
   if (!y || !m || !d) return SIGNS[0];
@@ -100,7 +103,7 @@ function approximateRising(date: string, time: string, longitude: number): Astro
   const lst = ((gmst + longitude) % 360 + 360) % 360;
   const theta = (lst * Math.PI) / 180;
   const eps = (23.4392911 * Math.PI) / 180;
-  const phi = (30 * Math.PI) / 180;
+  const phi = (Math.max(-66, Math.min(66, latitude)) * Math.PI) / 180;
   let asc = (Math.atan2(Math.cos(theta), -(Math.sin(theta) * Math.cos(eps) + Math.tan(phi) * Math.sin(eps))) * 180) / Math.PI;
   asc = ((asc % 360) + 360) % 360;
   return SIGNS[Math.floor(asc / 30) % 12] ?? SIGNS[0];
@@ -128,9 +131,23 @@ function elementBonus(a: AstroSign, b: AstroSign): number {
   return 62;
 }
 
-function buildPerson(input: AstroBirth): AstroPerson {
-  const sun = signOf(input.sign);
-  const rising = approximateRising(input.date, input.time, input.longitude);
+export function buildAstroPerson(input: AstroBirth): AstroPerson {
+  const sun = signOf(input.sign || sunSignOfDate(input.date).sign);
+  let date = input.date;
+  let time = input.time || '12:00';
+  let corrected = false;
+  if (input.useTrueSolar) {
+    const [y, m, d] = date.split('-').map(Number);
+    const [hh, mm] = time.split(':').map(Number);
+    if (y && m && d) {
+      const base = new Date(y, m - 1, d);
+      const dt = new Date(base.getTime() + trueSolarTimeMinutes((hh || 12) * 60 + (mm || 0), input.longitude, base) * 60000);
+      date = `${dt.getFullYear()}-${String(dt.getMonth() + 1).padStart(2, '0')}-${String(dt.getDate()).padStart(2, '0')}`;
+      time = formatMinutes(dt.getHours() * 60 + dt.getMinutes());
+      corrected = true;
+    }
+  }
+  const rising = approximateRising(date, time, input.longitude, input.latitude);
   const descendant = opposite(rising);
   const sunHouse = ((SIGNS.findIndex((s) => s.sign === sun.sign) - SIGNS.findIndex((s) => s.sign === rising.sign) + 12) % 12) + 1;
   return {
@@ -140,13 +157,13 @@ function buildPerson(input: AstroBirth): AstroPerson {
     descendant,
     sunHouse,
     descendantHouse: 7,
-    note: `${input.time || '12:00'} · 经度 ${input.longitude}°E · 上升近似`,
+    note: `${time}${corrected ? '（真太阳时校正）' : ''} · 经度 ${input.longitude}°E / 纬度 ${input.latitude ?? 30}°N · 上升近似`,
   };
 }
 
 export function compareAstro(a: AstroBirth, b: AstroBirth): AstroSynastry {
-  const pa = buildPerson(a);
-  const pb = buildPerson(b);
+  const pa = buildAstroPerson(a);
+  const pb = buildAstroPerson(b);
   const sunSun = zodiacCompatibility(pa.sun.sign, pb.sun.sign);
   const risingRising = aspect(pa.rising, pb.rising);
   const aSunBRising = aspect(pa.sun, pb.rising);
@@ -193,6 +210,53 @@ export function compareAstro(a: AstroBirth, b: AstroBirth): AstroSynastry {
     advice,
     summary: `${pa.name} 太阳${pa.sun.sign} / 上升${pa.rising.sign} / 下降${pa.descendant.sign}；${pb.name} 太阳${pb.sun.sign} / 上升${pb.rising.sign} / 下降${pb.descendant.sign}。${clamped >= 72 ? '星座结构偏顺，适合把吸引力落到日常相处。' : '星座结构有张力，先处理节奏差异，再谈长期。'}`,
     caveat: '上升为近似值；未校正出生地纬度与真太阳时。示例名人盘按午时占位，不能当作真实上升。',
+  };
+}
+
+export function sunSignOfDate(date: string): AstroSign {
+  const [, m, d] = date.split('-').map(Number);
+  const md = (m || 1) * 100 + (d || 1);
+  const ranges: [number, number, number][] = [
+    [321, 419, 0], [420, 520, 1], [521, 620, 2], [621, 722, 3],
+    [723, 822, 4], [823, 922, 5], [923, 1022, 6], [1023, 1121, 7],
+    [1122, 1221, 8], [1222, 1231, 9], [101, 119, 9], [120, 218, 10],
+    [219, 320, 11],
+  ];
+  const hit = ranges.find(([start, end]) => md >= start && md <= end);
+  return SIGNS[hit?.[2] ?? 0] ?? SIGNS[0];
+}
+
+export type AstroDaily = {
+  transitSun: AstroSign;
+  natalSun: AstroSign;
+  natalRising: AstroSign;
+  aspect: AstroAspect;
+  summary: string;
+  advice: string[];
+};
+
+export function astroDaily(input: AstroBirth, date: string): AstroDaily {
+  const person = buildAstroPerson(input);
+  const transit = sunSignOfDate(date);
+  const aspectToSun = aspect(person.sun, transit);
+  const aspectToRising = aspect(person.rising, transit);
+  return {
+    transitSun: transit,
+    natalSun: person.sun,
+    natalRising: person.rising,
+    aspect: aspectToSun,
+    summary: `今日太阳在${transit.sign}，与本命太阳${person.sun.sign}形成${aspectToSun.label}，与本命上升${person.rising.sign}形成${aspectToRising.label}。`,
+    advice: [
+      aspectToSun.score >= 78
+        ? '今天适合把想说的话说清楚：太阳相位顺，表达更容易被接住。'
+        : aspectToSun.score <= 60
+          ? '今天容易在表达方式上被误会：重要沟通先写下来，再说；别用情绪代替事实。'
+          : '今天表达节奏中性：先确认对方状态，再谈重要话题。',
+      aspectToRising.score >= 78
+        ? '外在节奏顺：适合见人、推进合作、把关系里的事摆到台面上。'
+        : '外在节奏需要缓冲：减少临时起意的社交，把精力留给真正重要的人。',
+      '星座日运只看太阳过境与本命太阳/上升，不包含月亮、行运全盘，不能当情感判决。',
+    ],
   };
 }
 

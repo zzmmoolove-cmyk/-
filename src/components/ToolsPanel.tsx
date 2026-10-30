@@ -38,6 +38,7 @@ export default function ToolsPanel({
 }) {
   const [tool, setTool] = useState<ToolKey>('naming');
   const defaultSurname = userName ? Array.from(userName)[0] : '';
+  const activeClient = users.find((u) => u.id === activeUserId);
   const saveForCurrent = (draft: ServiceDraft) => onSaveService?.({
     ...draft,
     clientIds: activeUserId ? [activeUserId] : [],
@@ -64,7 +65,7 @@ export default function ToolsPanel({
       )}
       {tool === 'dates' && <DateSelectTool astrolabe={astrolabe} userLabel={userLabel} onSaveService={saveForCurrent} />}
       {tool === 'investment' && (
-        <InvestmentTool astrolabe={astrolabe} raw={raw} userLabel={userLabel} onSaveService={saveForCurrent} />
+        <InvestmentTool astrolabe={astrolabe} raw={raw} client={activeClient} userLabel={userLabel} onSaveService={saveForCurrent} />
       )}
       {tool === 'synastry' && (
         <SynastryTool

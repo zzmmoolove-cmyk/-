@@ -53,6 +53,8 @@ export type BirthInput = {
   useTrueSolar: boolean;
   /** 出生地经度（真太阳时用） */
   longitude: number;
+  /** 出生地纬度（上升星座用；随城市自动带入） */
+  latitude?: number;
 };
 
 export type ChartOptions = {

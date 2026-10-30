@@ -53,6 +53,7 @@ const DEFAULT_INPUT: BirthInput = {
   fixLeap: true,
   useTrueSolar: false,
   longitude: 116.41,
+  latitude: 39.91,
 };
 
 const NEW_USER_INPUT: BirthInput = { ...DEFAULT_INPUT, birthday: '', clockTime: '' };
@@ -154,6 +155,7 @@ const inputFromPayload = (p: BirthInput & ChartOptions): BirthInput => ({
   fixLeap: p.fixLeap,
   useTrueSolar: p.useTrueSolar,
   longitude: p.longitude,
+  latitude: p.latitude ?? 30,
 });
 
 const optionsFromPayload = (p: BirthInput & ChartOptions): ChartOptions => ({

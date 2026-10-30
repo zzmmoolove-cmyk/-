@@ -2,6 +2,8 @@ import { useMemo, useState } from 'react';
 import type { ChartOptions, UserRecord } from '../types';
 import { solarToCalendar } from '../lib/calendar';
 import { computeDailyFortune } from '../lib/daily';
+import { buildBaziProfile, baziDaily } from '../lib/bazi';
+import { buildAstroPerson, astroDaily, sunSignOfDate } from '../lib/astroSynastry';
 
 function todayIso(): string {
   const d = new Date();
@@ -27,12 +29,53 @@ export default function DailyFortune({
   }, [date]);
   const fortune = useMemo(() => (user ? computeDailyFortune(user, date, options) : null), [user, date, options]);
 
+  const baziProfile = useMemo(() => {
+    if (!user) return null;
+    try {
+      return buildBaziProfile(user.payload, user.name, user.payload.gender);
+    } catch {
+      return null;
+    }
+  }, [user]);
+
+  const baziDay = useMemo(() => (baziProfile ? baziDaily(baziProfile, date) : null), [baziProfile, date]);
+
+  const astroPerson = useMemo(() => {
+    if (!user) return null;
+    try {
+      return buildAstroPerson({
+        name: user.name,
+        date: user.payload.birthday,
+        time: user.payload.clockTime || '12:00',
+        longitude: user.payload.longitude,
+        latitude: user.payload.latitude ?? 30,
+        useTrueSolar: user.payload.useTrueSolar,
+        sign: sunSignOfDate(user.payload.birthday).sign,
+      });
+    } catch {
+      return null;
+    }
+  }, [user]);
+
+  const astroDay = useMemo(
+    () => (user && astroPerson ? astroDaily({
+      name: user.name,
+      date: user.payload.birthday,
+      time: user.payload.clockTime || '12:00',
+      longitude: user.payload.longitude,
+      latitude: user.payload.latitude ?? 30,
+      useTrueSolar: user.payload.useTrueSolar,
+      sign: sunSignOfDate(user.payload.birthday).sign,
+    }, date) : null),
+    [user, astroPerson, date],
+  );
+
   return (
     <section className="daily-section">
       <div className="daily-head">
         <div>
-          <div className="today-section-title" style={{ marginBottom: 3 }}>万年历 · 流日</div>
-          <p>选日期，同时看黄历与主客户的流日触发；只做当天提醒，不断长期吉凶。</p>
+          <div className="today-section-title" style={{ marginBottom: 3 }}>三系统今日 · 万年历</div>
+          <p>紫微流日 + 八字日柱 + 星座过境，同一日期交叉看；只做当天提醒，不预测市场或长期吉凶。</p>
         </div>
         <input type="date" className="daily-date" value={date} onChange={(e) => setDate(e.target.value)} />
       </div>
@@ -117,6 +160,29 @@ export default function DailyFortune({
           )}
         </div>
       </div>
+
+      {user && fortune && baziDay && astroDay && baziProfile && (
+        <div className="daily-three-grid">
+          <article className="daily-three-card ziwei">
+            <div className="daily-three-label">紫微</div>
+            <b>{fortune.level} · 流日命宫{fortune.scopePalace}</b>
+            <p>{fortune.advice[0] ?? '按自己的节奏走。'}</p>
+            <em>{fortune.theme}</em>
+          </article>
+          <article className="daily-three-card bazi">
+            <div className="daily-three-label">八字</div>
+            <b>{baziDay.dayPillar} · {baziDay.tenGod}</b>
+            <p>{baziDay.advice}</p>
+            <em>{baziProfile.strength} · 用神初判 {baziProfile.usefulGods.join('、') || '—'} · {baziDay.relation}</em>
+          </article>
+          <article className="daily-three-card astro">
+            <div className="daily-three-label">星座</div>
+            <b>太阳入{astroDay.transitSun.sign} · {astroDay.aspect.label}</b>
+            <p>{astroDay.advice[0]}</p>
+            <em>本命太阳{astroDay.natalSun.sign} / 上升{astroDay.natalRising.sign}（近似）</em>
+          </article>
+        </div>
+      )}
     </section>
   );
 }

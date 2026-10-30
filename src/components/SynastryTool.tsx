@@ -4,7 +4,8 @@ import type { Astrolabe, BirthInput, ChartOptions, ServiceDraft, UserProfile, Us
 import { buildAstrolabe } from '../lib/buildChart';
 import { compareCharts, idealPartnerProfile, synastryText } from '../lib/synastry';
 import { compareAstro, astroSynastryText, type AstroBirth, type AstroSynastry } from '../lib/astroSynastry';
-import { compareBazi, baziSynastryText, type BaziSynastry } from '../lib/baziSynastry';
+import { compareBaziProfiles, baziSynastryText, type BaziSynastry } from '../lib/baziSynastry';
+import { buildBaziProfile, type BaziProfile } from '../lib/bazi';
 import QuickClientSheet from './QuickClientSheet';
 import IdealBProfile from './IdealBProfile';
 import SynastryBreakdown from './SynastryBreakdown';
@@ -234,6 +235,8 @@ export default function SynastryTool({
       date,
       time: aRecord?.payload.clockTime || '12:00',
       longitude: aRecord?.payload.longitude ?? 116.41,
+      latitude: aRecord?.payload.latitude ?? 30,
+      useTrueSolar: aRecord?.payload.useTrueSolar,
       sign: astrolabe.sign,
     };
   }, [astrolabe, aRecord, userName]);
@@ -245,6 +248,8 @@ export default function SynastryTool({
       date: bRecord.payload.birthday,
       time: bRecord.payload.clockTime,
       longitude: bRecord.payload.longitude,
+      latitude: bRecord.payload.latitude ?? 30,
+      useTrueSolar: bRecord.payload.useTrueSolar,
       sign: bChart.sign,
     };
   }, [bChart, bRecord]);
@@ -254,9 +259,32 @@ export default function SynastryTool({
     [aBirth, bBirth],
   );
 
+  const aBaziDetail = useMemo<BaziProfile | null>(() => {
+    if (!astrolabe) return null;
+    if (aRecord) return buildBaziProfile(aRecord.payload, userName || aRecord.name, aRecord.payload.gender);
+    const m = astrolabe.solarDate.match(/(\d{4})-(\d{1,2})-(\d{1,2})/);
+    if (!m) return null;
+    return buildBaziProfile({
+      birthday: `${m[1]}-${m[2].padStart(2, '0')}-${m[3].padStart(2, '0')}`,
+      clockTime: '12:00',
+      gender: astrolabe.gender === '女' ? '女' : '男',
+      birthdayType: 'solar',
+      isLeapMonth: false,
+      fixLeap: true,
+      useTrueSolar: false,
+      longitude: 116.41,
+      latitude: 30,
+    }, userName || '你');
+  }, [astrolabe, aRecord, userName]);
+
+  const bBaziDetail = useMemo<BaziProfile | null>(
+    () => (bRecord ? buildBaziProfile(bRecord.payload, bRecord.name, bRecord.payload.gender) : null),
+    [bRecord],
+  );
+
   const bazi = useMemo<BaziSynastry | null>(
-    () => (astrolabe && bChart ? compareBazi(astrolabe, bChart, userName || '你', bRecord?.name || '对方') : null),
-    [astrolabe, bChart, userName, bRecord],
+    () => (aBaziDetail && bBaziDetail ? compareBaziProfiles(aBaziDetail, bBaziDetail) : null),
+    [aBaziDetail, bBaziDetail],
   );
 
   const overall = result
@@ -442,7 +470,9 @@ export default function SynastryTool({
           )}
 
           {board === 'astro' && astroResult && <AstroSynastryBoard data={astroResult} />}
-          {board === 'bazi' && bazi && <BaziSynastryBoard data={bazi} />}
+          {board === 'bazi' && bazi && (
+            <BaziSynastryBoard data={bazi} aDetail={aBaziDetail} bDetail={bBaziDetail} />
+          )}
 
           <div className="tool-actions">
             <button className="btn" onClick={() => downloadCard(result, userName || '你', bRecord.name, overall, overallGrade)}>保存分享卡</button>

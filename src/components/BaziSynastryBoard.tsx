@@ -1,4 +1,5 @@
 import type { BaziPerson, BaziSynastry } from '../lib/baziSynastry';
+import type { BaziProfile } from '../lib/bazi';
 
 const LABELS = ['年柱', '月柱', '日柱', '时柱'];
 
@@ -20,7 +21,43 @@ function PersonRow({ p }: { p: BaziPerson }) {
   );
 }
 
-export default function BaziSynastryBoard({ data }: { data: BaziSynastry }) {
+function RichPerson({ profile }: { profile: BaziProfile }) {
+  return (
+    <div className="bazi-rich-person">
+      <div className="bazi-rich-head">
+        <b>{profile.name}</b>
+        <span>日主 {profile.dayMaster}{profile.dayMasterEl} · {profile.strength}</span>
+        <em>用神初判：{profile.usefulGods.join('、') || '—'}</em>
+      </div>
+      <p className="bazi-rich-summary">神煞：{profile.shenSha.join('、') || '—'}｜空亡：{profile.pillars[2]?.xunKong || '—'}</p>
+      <div className="bazi-rich-table">
+        {profile.pillars.map((p) => (
+          <div key={p.label} className="bazi-rich-row">
+            <span className="bazi-rich-label">{p.label}</span>
+            <b>{p.stem}{p.branch}</b>
+            <span>藏干 {p.hidden.join('') || '—'}</span>
+            <span>副星 {p.hiddenTenGods.join('、') || '—'}</span>
+            <span>星运 {p.starFortune}</span>
+            <span>自坐 {p.selfSeat}</span>
+            <span>纳音 {p.naYin}</span>
+            <span>空亡 {p.xunKong || '—'}</span>
+          </div>
+        ))}
+      </div>
+      <p className="bazi-rich-foot">胎元 {profile.taiYuan} · 命宫 {profile.mingGong} · 身宫 {profile.shenGong}｜{profile.usefulNote}</p>
+    </div>
+  );
+}
+
+export default function BaziSynastryBoard({
+  data,
+  aDetail,
+  bDetail,
+}: {
+  data: BaziSynastry;
+  aDetail?: BaziProfile | null;
+  bDetail?: BaziProfile | null;
+}) {
   return (
     <section className="bazi-board">
       <div className="board-head">
@@ -37,6 +74,14 @@ export default function BaziSynastryBoard({ data }: { data: BaziSynastry }) {
         <PersonRow p={data.a} />
         <PersonRow p={data.b} />
       </div>
+
+      {(aDetail || bDetail) && (
+        <div className="bazi-rich">
+          <div className="tool-subhead"><h4>藏干 · 十神 · 十二长生 · 纳音 · 空亡 · 神煞</h4><span>lunar-typescript 详盘</span></div>
+          {aDetail && <RichPerson profile={aDetail} />}
+          {bDetail && <RichPerson profile={bDetail} />}
+        </div>
+      )}
 
       <div className="bazi-meta">
         <span>缺失：{data.a.name} {data.a.missing.join('、') || '无'}｜{data.b.name} {data.b.missing.join('、') || '无'}</span>

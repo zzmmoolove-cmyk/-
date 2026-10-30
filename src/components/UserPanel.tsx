@@ -85,6 +85,7 @@ export default function UserPanel({
   const [cityQuery, setCityQuery] = useState(initialCity?.name ?? '');
   const [cityOpen, setCityOpen] = useState(false);
   const [longitude, setLongitude] = useState(initial.longitude);
+  const [latitude, setLatitude] = useState(initial.latitude ?? initialCity?.latitude ?? 30);
   const [codeInput, setCodeInput] = useState('');
   const [codeMsg, setCodeMsg] = useState<string | null>(null);
 
@@ -146,6 +147,7 @@ export default function UserPanel({
       fixLeap,
       useTrueSolar,
       longitude,
+      latitude,
     };
     return input;
   };
@@ -167,13 +169,14 @@ export default function UserPanel({
     setCityName(c.name);
     setCityQuery(c.name);
     setLongitude(c.longitude);
+    setLatitude(c.latitude);
     setCityOpen(false);
   };
 
   const copyCode = async () => {
     try {
       const input = parseForm();
-      const code = encodeChart({ ...(input ?? { birthday, clockTime, gender, birthdayType, isLeapMonth, fixLeap, useTrueSolar, longitude }), ...options });
+      const code = encodeChart({ ...(input ?? { birthday, clockTime, gender, birthdayType, isLeapMonth, fixLeap, useTrueSolar, longitude, latitude }), ...options });
       await navigator.clipboard.writeText(code);
       setCodeMsg('✓ 安星码已复制');
     } catch {
@@ -196,6 +199,7 @@ export default function UserPanel({
       fixLeap: decoded.fixLeap,
       useTrueSolar: decoded.useTrueSolar,
       longitude: decoded.longitude,
+      latitude: decoded.latitude ?? 30,
     };
     const opts: ChartOptions = {
       algorithm: decoded.algorithm,
@@ -361,81 +365,80 @@ export default function UserPanel({
       </div>
 
       <div className="field">
+        <label>出生地 <span className="dim">（经纬度一次带入，真太阳时 / 上升星座共用）</span></label>
+        <div className="city-picker">
+          <select
+            className="city-province"
+            value={province}
+            onChange={(e) => {
+              setProvince(e.target.value);
+              setCityName('');
+              setCityQuery('');
+              setCityOpen(true);
+            }}
+          >
+            <option value="">全部省份</option>
+            {PROVINCES.map((p) => (
+              <option key={p} value={p}>{p}</option>
+            ))}
+          </select>
+          <div className="city-search">
+            <input
+              value={cityQuery}
+              placeholder="输入城市，如 杭州"
+              onChange={(e) => {
+                setCityQuery(e.target.value);
+                setCityName('');
+                setCityOpen(true);
+              }}
+              onFocus={() => setCityOpen(true)}
+              onBlur={() => window.setTimeout(() => setCityOpen(false), 120)}
+            />
+            {showCityList && (
+              <div className="city-pop">
+                {cityMatches.length === 0 && <div className="city-empty">没有匹配的城市</div>}
+                {cityMatches.map((c) => (
+                  <button
+                    key={c.province + c.name}
+                    type="button"
+                    className="city-option"
+                    onMouseDown={(e) => e.preventDefault()}
+                    onClick={() => pickCity(c)}
+                  >
+                    <b>{c.name}</b>
+                    <span>{c.province === c.name ? '直辖市' : c.province} · 东经 {c.longitude}° · 北纬 {c.latitude}°</span>
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+        <div style={{ marginTop: 8 }}>
+          <label>经度</label>
+          <input
+            type="number"
+            step="0.01"
+            value={longitude}
+            onChange={(e) => {
+              setLongitude(Number(e.target.value));
+              setCityName('');
+            }}
+          />
+          <p className="hint" style={{ marginTop: 4 }}>
+            {cityName
+              ? `已选：${province === cityName ? cityName : `${province} · ${cityName}`}（东经 ${longitude}° / 北纬 ${latitude}°）`
+              : `当前经度 ${longitude}° / 纬度 ${latitude}°，可直接输入城市名搜索`}
+          </p>
+        </div>
+      </div>
+
+      <div className="field">
         <label>
           <input type="checkbox" checked={useTrueSolar} onChange={(e) => setUseTrueSolar(e.target.checked)} style={{ width: 'auto', marginRight: 6 }} />
           真太阳时校正
         </label>
+        <p className="hint" style={{ marginTop: 2 }}>勾选后按上面的经度校正出生时刻；纬度同时用于星座上升，不需要再填一次。</p>
       </div>
-
-      {useTrueSolar && (
-        <div className="field">
-          <label>出生地</label>
-          <div className="city-picker">
-            <select
-              className="city-province"
-              value={province}
-              onChange={(e) => {
-                setProvince(e.target.value);
-                setCityName('');
-                setCityQuery('');
-                setCityOpen(true);
-              }}
-            >
-              <option value="">全部省份</option>
-              {PROVINCES.map((p) => (
-                <option key={p} value={p}>{p}</option>
-              ))}
-            </select>
-            <div className="city-search">
-              <input
-                value={cityQuery}
-                placeholder="输入城市，如 杭州"
-                onChange={(e) => {
-                  setCityQuery(e.target.value);
-                  setCityName('');
-                  setCityOpen(true);
-                }}
-                onFocus={() => setCityOpen(true)}
-                onBlur={() => window.setTimeout(() => setCityOpen(false), 120)}
-              />
-              {showCityList && (
-                <div className="city-pop">
-                  {cityMatches.length === 0 && <div className="city-empty">没有匹配的城市</div>}
-                  {cityMatches.map((c) => (
-                    <button
-                      key={c.province + c.name}
-                      type="button"
-                      className="city-option"
-                      onMouseDown={(e) => e.preventDefault()}
-                      onClick={() => pickCity(c)}
-                    >
-                      <b>{c.name}</b>
-                      <span>{c.province === c.name ? '直辖市' : c.province} · 东经 {c.longitude}°</span>
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-          </div>
-          <div style={{ marginTop: 8 }}>
-            <label>经度</label>
-            <input
-              type="number"
-              step="0.01"
-              value={longitude}
-              onChange={(e) => {
-                setLongitude(Number(e.target.value));
-                setCityName('');
-              }}
-            />
-            <p className="hint" style={{ marginTop: 4 }}>
-              {cityName
-                ? `已选：${province === cityName ? cityName : `${province} · ${cityName}`}（东经 ${longitude}°）`
-                : `当前经度 ${longitude}°，可直接输入城市名搜索`}
-            </p>
-          </div>
-        </div>
-      )}
 
       <div className="hint">
         推算为 <b>{timeInfo.label || '—'}</b>

@@ -32,6 +32,7 @@ export default function QuickClientSheet({
         fixLeap: true,
         useTrueSolar: false,
         longitude: 116.41,
+        latitude: 39.91,
       },
       { name: name.trim(), relation, note: '' },
     );
