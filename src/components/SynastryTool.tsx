@@ -3,9 +3,13 @@ import { astro } from 'iztro';
 import type { Astrolabe, BirthInput, ChartOptions, ServiceDraft, UserProfile, UserRecord } from '../types';
 import { buildAstrolabe } from '../lib/buildChart';
 import { compareCharts, idealPartnerProfile, synastryText } from '../lib/synastry';
+import { compareAstro, astroSynastryText, type AstroBirth, type AstroSynastry } from '../lib/astroSynastry';
+import { compareBazi, baziSynastryText, type BaziSynastry } from '../lib/baziSynastry';
 import QuickClientSheet from './QuickClientSheet';
 import IdealBProfile from './IdealBProfile';
 import SynastryBreakdown from './SynastryBreakdown';
+import AstroSynastryBoard from './AstroSynastryBoard';
+import BaziSynastryBoard from './BaziSynastryBoard';
 
 function optionsFrom(p: UserRecord['payload']): ChartOptions {
   return {
@@ -17,7 +21,13 @@ function optionsFrom(p: UserRecord['payload']): ChartOptions {
   };
 }
 
-function downloadCard(result: ReturnType<typeof compareCharts>, aName: string, bName: string) {
+function downloadCard(
+  result: ReturnType<typeof compareCharts>,
+  aName: string,
+  bName: string,
+  overall = result.score,
+  overallGrade = result.grade,
+) {
   const canvas = document.createElement('canvas');
   canvas.width = 900;
   canvas.height = 1200;
@@ -56,7 +66,7 @@ function downloadCard(result: ReturnType<typeof compareCharts>, aName: string, b
   ctx.textAlign = 'center';
   ctx.fillStyle = '#c9a35c';
   ctx.font = '600 30px "Songti SC", "Noto Serif SC", serif';
-  ctx.fillText('紫 微 合 盘', 450, 120);
+  ctx.fillText('三 系 统 合 盘', 450, 120);
 
   ctx.fillStyle = '#f1e6cf';
   ctx.font = '700 56px "Songti SC", "Noto Serif SC", serif';
@@ -64,14 +74,14 @@ function downloadCard(result: ReturnType<typeof compareCharts>, aName: string, b
 
   ctx.fillStyle = '#e8cc93';
   ctx.font = '700 124px "Songti SC", "Noto Serif SC", serif';
-  ctx.fillText(String(result.score), 450, 470);
+  ctx.fillText(String(overall), 450, 470);
   ctx.fillStyle = 'rgba(232,204,147,.72)';
   ctx.font = '400 22px -apple-system, "PingFang SC", sans-serif';
-  ctx.fillText('契 合 度', 450, 510);
+  ctx.fillText('综 合 契 合 度', 450, 510);
 
   ctx.fillStyle = '#f1e6cf';
   ctx.font = '600 34px "Songti SC", "Noto Serif SC", serif';
-  ctx.fillText(`${result.grade} · ${result.archetype.title}`, 450, 580);
+  ctx.fillText(`${overallGrade} · ${result.archetype.title}`, 450, 580);
 
   ctx.fillStyle = 'rgba(201,163,92,.8)';
   ctx.font = '400 20px -apple-system, "PingFang SC", sans-serif';
@@ -128,7 +138,7 @@ function downloadCard(result: ReturnType<typeof compareCharts>, aName: string, b
   ctx.textAlign = 'center';
   ctx.fillStyle = 'rgba(201,163,92,.5)';
   ctx.font = '400 16px "Songti SC", "Noto Serif SC", serif';
-  ctx.fillText('紫微斗数 · 观星 · 关系结构参考', 450, 1155);
+  ctx.fillText('紫微 45% + 星座 30% + 八字 25% · 关系结构参考', 450, 1155);
 
   canvas.toBlob((blob) => {
     if (!blob) return;
@@ -165,6 +175,7 @@ export default function SynastryTool({
   const [bId, setBId] = useState<string>(candidates[0]?.id ?? '');
   const [copied, setCopied] = useState(false);
   const [quickOpen, setQuickOpen] = useState(false);
+  const [board, setBoard] = useState<'ziwei' | 'astro' | 'bazi'>('ziwei');
 
   const bRecord = candidates.find((u) => u.id === bId) ?? candidates[0];
   const bChart = useMemo(() => {
@@ -206,6 +217,80 @@ export default function SynastryTool({
     [astrolabe, userName],
   );
 
+  const aRecord = useMemo(
+    () => users.find((u) => u.id === activeUserId),
+    [users, activeUserId],
+  );
+
+  const aBirth = useMemo<AstroBirth | null>(() => {
+    if (!astrolabe) return null;
+    const date = aRecord?.payload.birthday ?? (() => {
+      const m = astrolabe.solarDate.match(/(\d{4})-(\d{1,2})-(\d{1,2})/);
+      return m ? `${m[1]}-${m[2].padStart(2, '0')}-${m[3].padStart(2, '0')}` : '';
+    })();
+    if (!date) return null;
+    return {
+      name: userName || '你',
+      date,
+      time: aRecord?.payload.clockTime || '12:00',
+      longitude: aRecord?.payload.longitude ?? 116.41,
+      sign: astrolabe.sign,
+    };
+  }, [astrolabe, aRecord, userName]);
+
+  const bBirth = useMemo<AstroBirth | null>(() => {
+    if (!bChart || !bRecord) return null;
+    return {
+      name: bRecord.name,
+      date: bRecord.payload.birthday,
+      time: bRecord.payload.clockTime,
+      longitude: bRecord.payload.longitude,
+      sign: bChart.sign,
+    };
+  }, [bChart, bRecord]);
+
+  const astroResult = useMemo<AstroSynastry | null>(
+    () => (aBirth && bBirth ? compareAstro(aBirth, bBirth) : null),
+    [aBirth, bBirth],
+  );
+
+  const bazi = useMemo<BaziSynastry | null>(
+    () => (astrolabe && bChart ? compareBazi(astrolabe, bChart, userName || '你', bRecord?.name || '对方') : null),
+    [astrolabe, bChart, userName, bRecord],
+  );
+
+  const overall = result
+    ? Math.round(
+      astroResult && bazi
+        ? result.score * 0.45 + astroResult.score * 0.3 + bazi.score * 0.25
+        : result.score,
+    )
+    : 0;
+  const overallGrade = overall >= 85 ? '高度同频' : overall >= 72 ? '同频互补' : overall >= 58 ? '可磨合' : '张力型';
+  const weakestDim = result ? [...result.dimensions].sort((a, b) => a.score - b.score)[0] : null;
+  const topAdvice = result
+    ? [
+      weakestDim ? `最需要练：${weakestDim.label} —— ${weakestDim.summary}` : '',
+      astroResult?.advice[1] ?? '',
+      bazi?.advice[0] ?? '',
+    ].filter(Boolean)
+    : [];
+
+  const buildFullText = () => {
+    if (!result || !bRecord) return '';
+    return [
+      `【综合合盘】${userName || '你'} × ${bRecord.name}`,
+      `综合参考 ${overall} · ${overallGrade}｜紫微 ${result.score} / 星座 ${astroResult?.score ?? '—'} / 八字 ${bazi?.score ?? '—'}`,
+      '综合分 = 紫微 45% + 星座 30% + 八字 25%；三系统分开看，不做单一宿命判断。',
+      '',
+      synastryText(result, userName || '你', bRecord.name),
+      '',
+      astroResult ? astroSynastryText(astroResult) : '',
+      '',
+      bazi ? baziSynastryText(bazi) : '',
+    ].filter(Boolean).join('\n');
+  };
+
   if (!astrolabe) {
     return (
       <div className="tool-empty">
@@ -246,9 +331,10 @@ export default function SynastryTool({
   }
 
   const copy = async () => {
-    if (!result || !bRecord) return;
+    const text = buildFullText();
+    if (!text) return;
     try {
-      await navigator.clipboard.writeText(synastryText(result, userName || '你', bRecord.name));
+      await navigator.clipboard.writeText(text);
       setCopied(true);
       window.setTimeout(() => setCopied(false), 1800);
     } catch {
@@ -283,52 +369,91 @@ export default function SynastryTool({
         </div>
       </div>
 
-      {ideal && <IdealBProfile ideal={ideal} />}
+      {ideal && (
+        result ? (
+          <details className="ideal-b-details">
+            <summary>
+              <span>高分 B 画像 · {ideal.title}</span>
+              <em>展开看适合你的类型</em>
+            </summary>
+            <IdealBProfile ideal={ideal} />
+          </details>
+        ) : (
+          <IdealBProfile ideal={ideal} />
+        )
+      )}
       {!bChart && <p className="hint">B 盘生成失败，请检查对方出生信息。</p>}
 
       {result && bRecord && (
         <div className="synastry-result">
-          <div className="synastry-card">
-            <div className="synastry-card-top">紫微合盘 · {result.archetype.title}</div>
+          <div className="synastry-card synastry-overview">
+            <div className="synastry-card-top">三系统合盘 · {result.archetype.title}</div>
             <div className="synastry-names">
               <span>{userName || '你'}</span>
               <em>×</em>
               <span>{bRecord.name}</span>
             </div>
-            <div className="synastry-score">{result.score}</div>
-            <div className="synastry-kws">{result.keywords.map((k) => <span key={k}>{k}</span>)}</div>
-            <div className="synastry-grade-line">{result.grade} · 加权总分</div>
+            <div className="synastry-score">{overall}</div>
+            <div className="synastry-system-scores">
+              <span>紫微 {result.score}</span>
+              <span>星座 {astroResult?.score ?? '—'}</span>
+              <span>八字 {bazi?.score ?? '—'}</span>
+            </div>
+            <div className="synastry-grade-line">{overallGrade} · 综合参考</div>
             <p className="synastry-oneline">{result.oneLine}</p>
-            <div className="synastry-card-foot">五行 {result.elements.a} × {result.elements.b} · 关系参考</div>
+            <div className="synastry-card-foot">紫微 45% · 星座 30% · 八字 25% · 关系参考</div>
           </div>
 
-          <SynastryBreakdown result={result} />
+          {topAdvice.length > 0 && (
+            <div className="synastry-top-advice">
+              <div className="inspector-eyebrow">如果只记三句话</div>
+              <ol>{topAdvice.map((a) => <li key={a}>{a}</li>)}</ol>
+            </div>
+          )}
 
-          <div className="synastry-sections">
-            {result.sections.map((s) => (
-              <section key={s.title} className="synastry-section">
-                <h4>{s.title}</h4>
-                <p>{s.body}</p>
-              </section>
-            ))}
-            <section className="synastry-section">
-              <h4>相处建议</h4>
-              <ul>
-                {result.advice.map((a) => <li key={a}>{a}</li>)}
-              </ul>
-            </section>
+          <div className="synastry-tabs">
+            <button className={board === 'ziwei' ? 'active' : ''} onClick={() => setBoard('ziwei')}>
+              <b>紫微</b><span>{result.score} · 命盘相合</span>
+            </button>
+            <button className={board === 'astro' ? 'active' : ''} onClick={() => setBoard('astro')} disabled={!astroResult}>
+              <b>星座</b><span>{astroResult?.score ?? '—'} · 太阳/上升/下降</span>
+            </button>
+            <button className={board === 'bazi' ? 'active' : ''} onClick={() => setBoard('bazi')} disabled={!bazi}>
+              <b>八字</b><span>{bazi?.score ?? '—'} · 日主/夫妻宫</span>
+            </button>
           </div>
+
+          {board === 'ziwei' && (
+            <>
+              <SynastryBreakdown result={result} />
+              <div className="synastry-sections">
+                {result.sections.map((s) => (
+                  <section key={s.title} className="synastry-section">
+                    <h4>{s.title}</h4>
+                    <p>{s.body}</p>
+                  </section>
+                ))}
+                <section className="synastry-section">
+                  <h4>紫微相处建议</h4>
+                  <ul>{result.advice.map((a) => <li key={a}>{a}</li>)}</ul>
+                </section>
+              </div>
+            </>
+          )}
+
+          {board === 'astro' && astroResult && <AstroSynastryBoard data={astroResult} />}
+          {board === 'bazi' && bazi && <BaziSynastryBoard data={bazi} />}
 
           <div className="tool-actions">
-            <button className="btn" onClick={() => downloadCard(result, userName || '你', bRecord.name)}>保存分享卡</button>
-            <button className="btn ghost" onClick={copy}>{copied ? '✓ 已复制' : '复制合盘文案'}</button>
+            <button className="btn" onClick={() => downloadCard(result, userName || '你', bRecord.name, overall, overallGrade)}>保存分享卡</button>
+            <button className="btn ghost" onClick={copy}>{copied ? '✓ 已复制' : '复制三系统文案'}</button>
             <button
               className="btn ghost"
               onClick={() => onSaveService?.({
                 type: 'synastry',
                 title: `${userName || '你'} × ${bRecord.name} · 合盘`,
-                summary: `${result.grade} · ${result.score} 分 · ${result.archetype.title} · ${result.oneLine}`,
-                detail: synastryText(result, userName || '你', bRecord.name),
+                summary: `综合 ${overall} · 紫微 ${result.score} / 星座 ${astroResult?.score ?? '—'} / 八字 ${bazi?.score ?? '—'} · ${result.archetype.title}`,
+                detail: buildFullText(),
                 clientIds: [activeUserId, bRecord.id].filter((x): x is string => Boolean(x)),
                 clientNames: [userName || '你', bRecord.name],
               })}
@@ -337,7 +462,7 @@ export default function SynastryTool({
             </button>
           </div>
           <p className="tool-note">
-            分数看的是结构匹配与张力，不是感情好坏；低分也可能代表高吸引。合盘是关系参考，不替代沟通、心理咨询或法律意见。
+            紫微、星座、八字是三种不同的象征系统；综合分是三系统加权，不是感情判决，也不替代真实沟通、心理咨询或法律意见。星座上升为近似值，八字未纳藏干/旺衰/大运。
           </p>
           {quickOpen && (
             <QuickClientSheet

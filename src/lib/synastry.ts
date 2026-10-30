@@ -165,7 +165,7 @@ function relationSentence(rel: WuxingRelation): string {
   }
 }
 
-function zodiacCompatibility(aSign: string, bSign: string): ZodiacInfo {
+export function zodiacCompatibility(aSign: string, bSign: string): ZodiacInfo {
   const ai = ZODIAC_SIGNS.findIndex((s) => s.name === aSign);
   const bi = ZODIAC_SIGNS.findIndex((s) => s.name === bSign);
   if (ai < 0 || bi < 0) {

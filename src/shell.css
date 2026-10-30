@@ -1406,3 +1406,98 @@ html[data-theme='mystic'] .sidebar {
 }
 .investment-framework span { flex: 0 0 auto; color: var(--accent); font-weight: 700; }
 .investment-framework p { margin: 0; }
+
+/* —— 合盘三系统 —— */
+.synastry-system-scores { display: flex; flex-wrap: wrap; justify-content: center; gap: 5px; margin-top: 5px; }
+.synastry-system-scores span { padding: 2px 7px; border: 1px solid var(--border); border-radius: 99px; background: var(--panel-2); font-size: 10px; color: var(--text-dim); }
+.synastry-top-advice { margin: 10px 0; padding: 10px 12px; border-left: 2px solid var(--accent); border-radius: 0 7px 7px 0; background: var(--panel-2); }
+.synastry-top-advice ol { margin: 5px 0 0; padding-left: 18px; }
+.synastry-top-advice li { margin: 3px 0; font-size: 11.5px; line-height: 1.65; color: var(--text); }
+.synastry-tabs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin: 12px 0; }
+.synastry-tabs button { padding: 8px 10px; border: 1px solid var(--border); border-radius: 8px; background: var(--panel-2); color: var(--text); text-align: left; cursor: pointer; }
+.synastry-tabs button.active { border-color: var(--accent); background: var(--surface-hover); }
+.synastry-tabs button:disabled { opacity: .4; cursor: not-allowed; }
+.synastry-tabs b { display: block; font-size: 13px; color: var(--accent-soft); }
+.synastry-tabs span { display: block; margin-top: 2px; font-size: 9.5px; color: var(--text-dim); }
+.board-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 10px; }
+.board-head h4 { margin: 3px 0 4px; font-family: var(--font-display); font-size: 21px; letter-spacing: 1.5px; color: var(--accent-soft); }
+.board-head p { margin: 0; font-size: 11.5px; line-height: 1.7; color: var(--text-dim); }
+.board-score { flex: 0 0 auto; text-align: right; }
+.board-score b { display: block; font-family: var(--font-display); font-size: 32px; line-height: 1; color: var(--accent-soft); }
+.board-score span { display: block; margin-top: 3px; font-size: 10px; color: var(--text-dim); }
+
+.astro-board, .bazi-board { padding: 13px 14px; border: 1px solid var(--border); border-radius: 10px; background: var(--panel); }
+.astro-people { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 10px 0; }
+.astro-person { padding: 10px 12px; border: 1px solid var(--border); border-radius: 8px; background: var(--panel-2); }
+.astro-person-name { font-size: 11px; color: var(--text-dim); }
+.astro-big-sign { margin: 2px 0 6px; font-family: var(--font-display); font-size: 24px; letter-spacing: 1px; color: var(--accent-soft); }
+.astro-sign-row { display: flex; align-items: baseline; gap: 6px; margin: 3px 0; font-size: 11px; }
+.astro-sign-row span { flex: 0 0 28px; color: var(--text-dim); }
+.astro-sign-row b { color: var(--text); }
+.astro-sign-row em { font-style: normal; font-size: 9.5px; color: var(--text-dim); }
+.astro-note { margin: 6px 0 0; font-size: 9px; color: var(--text-dim); }
+.astro-aspects { margin-top: 10px; }
+.astro-aspect { padding: 6px 0; border-bottom: 1px dashed var(--border); }
+.astro-aspect:last-child { border-bottom: 0; }
+.astro-aspect-top { display: flex; justify-content: space-between; gap: 8px; font-size: 11px; }
+.astro-aspect-top b { color: var(--text); }
+.astro-aspect-top span { color: var(--accent-soft); }
+.astro-aspect-bar, .bazi-bar { height: 3px; margin: 4px 0; border-radius: 99px; background: rgba(255,255,255,.06); overflow: hidden; }
+.astro-aspect-bar i, .bazi-bar i { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, var(--accent), var(--accent-soft)); }
+.astro-aspect p { margin: 2px 0 0; font-size: 10px; line-height: 1.6; color: var(--text-dim); }
+.astro-advice, .bazi-advice { margin-top: 10px; padding-top: 8px; border-top: 1px dashed var(--border); }
+.astro-advice ul, .bazi-advice ul { margin: 4px 0 0; padding-left: 17px; }
+.astro-advice li, .bazi-advice li { margin: 3px 0; font-size: 11px; line-height: 1.65; color: var(--text); }
+
+.bazi-pillars { margin: 8px 0; padding: 9px 10px; border: 1px solid var(--border); border-radius: 8px; background: var(--panel-2); }
+.bazi-pillar-head { display: grid; grid-template-columns: 140px repeat(4, 1fr); gap: 5px; padding-bottom: 4px; border-bottom: 1px solid var(--border); font-size: 9px; color: var(--text-dim); }
+.bazi-person-row { display: grid; grid-template-columns: 140px repeat(4, 1fr); gap: 5px; align-items: stretch; padding-top: 6px; }
+.bazi-person-name b { display: block; font-size: 12px; color: var(--accent-soft); }
+.bazi-person-name span { display: block; margin-top: 2px; font-size: 9.5px; color: var(--text-dim); }
+.bazi-pillar { padding: 4px 6px; border: 1px solid var(--border); border-radius: 5px; background: var(--panel); }
+.bazi-pillar.day-pillar { border-color: rgba(201, 163, 92, 0.45); }
+.bazi-pillar em { display: block; font-style: normal; font-size: 8px; color: var(--text-dim); }
+.bazi-pillar b { display: block; margin: 1px 0; font-family: var(--font-display); font-size: 16px; color: var(--text); }
+.bazi-pillar span { display: block; font-size: 8.5px; color: var(--text-dim); }
+.bazi-meta { display: flex; flex-wrap: wrap; gap: 6px 12px; margin: 6px 0; font-size: 9.5px; color: var(--text-dim); }
+.bazi-interactions { margin-top: 9px; }
+.bazi-tags { display: flex; flex-wrap: wrap; gap: 4px; }
+.bazi-tag { padding: 2px 6px; border: 1px solid var(--border); border-radius: 4px; font-size: 9.5px; }
+.bazi-tag.good { color: var(--ok); border-color: rgba(99, 179, 150, 0.35); }
+.bazi-tag.bad { color: var(--danger); border-color: rgba(224, 120, 120, 0.35); }
+.bazi-dimensions { margin-top: 10px; }
+.bazi-dim { padding: 5px 0; border-bottom: 1px dashed var(--border); }
+.bazi-dim:last-child { border-bottom: 0; }
+.bazi-dim-top { display: flex; justify-content: space-between; gap: 6px; font-size: 10.5px; }
+.bazi-dim-top b { color: var(--text); }
+.bazi-dim-top span { color: var(--text-dim); font-size: 9.5px; }
+.bazi-dim p { margin: 2px 0 0; font-size: 10px; line-height: 1.55; color: var(--text-dim); }
+
+@media (max-width: 760px) {
+  .synastry-tabs { grid-template-columns: 1fr; }
+  .astro-people { grid-template-columns: 1fr; }
+  .bazi-pillar-head, .bazi-person-row { grid-template-columns: 90px repeat(4, 1fr); }
+  .bazi-pillar b { font-size: 13px; }
+}
+
+.ideal-b-details {
+  margin: 10px 0;
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  background: var(--panel);
+}
+.ideal-b-details > summary {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 9px 12px;
+  cursor: pointer;
+  font-size: 11px;
+  color: var(--accent-soft);
+  list-style: none;
+}
+.ideal-b-details > summary::-webkit-details-marker { display: none; }
+.ideal-b-details > summary em { font-style: normal; font-size: 9.5px; color: var(--text-dim); }
+.ideal-b-details[open] > summary { border-bottom: 1px solid var(--border); }
+.ideal-b-details .ideal-b-card { margin: 0; border: 0; background: transparent; }
