@@ -21,7 +21,7 @@ type ViewKey = 'chart' | 'card' | 'summary' | 'report';
 
 const VIEWS: { key: ViewKey; label: string }[] = [
   { key: 'chart', label: '命盘' },
-  { key: 'card', label: '宫位卡' },
+  { key: 'card', label: '十二宫' },
   { key: 'summary', label: '综述' },
   { key: 'report', label: '运限报告' },
 ];

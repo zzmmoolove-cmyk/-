@@ -111,7 +111,7 @@ export default function ClientProfileSheet({
                   <button key={r.id} className="reading-record" onClick={() => onOpenReading(r)}>
                     <div>
                       <b>{r.rangeLabel}</b>
-                      <span>{r.palace} · {r.view === 'card' ? '宫位卡' : r.view === 'summary' ? '综述' : r.view === 'report' ? '运限报告' : '命盘'}</span>
+                      <span>{r.palace} · {r.view === 'card' ? '十二宫' : r.view === 'summary' ? '综述' : r.view === 'report' ? '运限报告' : '命盘'}</span>
                     </div>
                     <em>{r.createdAt}</em>
                   </button>

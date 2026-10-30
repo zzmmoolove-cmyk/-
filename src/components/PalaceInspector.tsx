@@ -40,8 +40,8 @@ export default function PalaceInspector({
           </div>
         </div>
         <div className="inspector-head-side">
-          <button className="inspector-card-link" onClick={onExpand} title="展开完整宫位卡">
-            宫位卡 <span>↗</span>
+          <button className="inspector-card-link" onClick={onExpand} title="展开完整十二宫报告">
+            十二宫 <span>↗</span>
           </button>
           <span className={`inspector-score ${snap.score.value >= 0 ? 'plus' : 'minus'}`}>
             {snap.score.value >= 0 ? '+' : ''}{snap.score.value}

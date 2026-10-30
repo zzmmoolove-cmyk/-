@@ -66,7 +66,7 @@ export default function PalaceReportPanel({
     <div className="panel report-panel">
       <div className="report-head">
         <h2>
-          宫位卡 <span className="badge">v1.0</span> · {snapshot.palace.label}
+          十二宫 <span className="badge">v1.0</span> · {snapshot.palace.label}
           <span className="dim">　{snapshot.palace.stem}{snapshot.palace.branch}</span>
           {snapshot.palace.isBody && <span className="badge badge-body">身宫</span>}
         </h2>
@@ -93,7 +93,7 @@ export default function PalaceReportPanel({
         <section className="scope-weight-card">
           <div className="scope-weight-head">
             <div>
-              <div className="inspector-eyebrow">本限宫位卡 · 加权</div>
+              <div className="inspector-eyebrow">本限十二宫 · 加权</div>
               <h3>本命之后，再看当前选中的运限层</h3>
             </div>
             <div className="scope-weight-total"><b>{weighted.total}</b><span>{weighted.label}</span></div>
