@@ -19,6 +19,7 @@ import ToolsPanel from './components/ToolsPanel';
 import ReadingWorkspace from './components/ReadingWorkspace';
 import TodayPanel from './components/TodayPanel';
 import SidebarToday from './components/SidebarToday';
+import DraggableClientPill from './components/DraggableClientPill';
 import ClientListPanel from './components/ClientListPanel';
 import ClientProfileSheet from './components/ClientProfileSheet';
 import ServiceRecordList from './components/ServiceRecordList';
@@ -692,15 +693,6 @@ export default function App() {
           </div>
         </div>
 
-        <button className="top-client" onClick={() => setSwitcherOpen(true)}>
-          <span className="top-avatar">{Array.from(topProfile?.name || '客')[0]}</span>
-          <span>
-            <b>{topProfile?.name || '选择客户'}</b>
-            <em>{topProfile ? `${topProfile.relation}${activeUserId ? '' : ' · 主客户'}` : '按客户工作'}</em>
-          </span>
-          {topState && <span className={`top-state ${activeUserId && !dirty ? 'saved' : 'dirty'}`}>{topState}</span>}
-        </button>
-
         <div className="topbar-spacer" />
 
         <div className="topbar-actions">
@@ -711,6 +703,14 @@ export default function App() {
           </button>
         </div>
       </header>
+
+      <DraggableClientPill
+        name={topProfile?.name}
+        relation={topProfile?.relation}
+        state={topState}
+        isPrimary={Boolean(primary && (activeUserId ? primary.id === activeUserId : true))}
+        onOpen={() => setSwitcherOpen(true)}
+      />
 
       <div className="app-body">
         <aside className="sidebar">

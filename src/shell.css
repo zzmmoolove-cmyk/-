@@ -1815,3 +1815,24 @@ html[data-theme='mystic'] .sidebar {
 
 .today-back { width: auto; margin: 0 0 8px; padding: 3px 7px; border: 1px solid var(--border); border-radius: 4px; background: transparent; color: var(--text-dim); font-size: 10px; cursor: pointer; }
 .today-back:hover { border-color: var(--accent); color: var(--accent-soft); }
+
+/* —— 可拖动当前客户浮窗 —— */
+.client-pill-float {
+  position: fixed;
+  z-index: 45;
+  margin: 0;
+  cursor: grab;
+  user-select: none;
+  touch-action: none;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(10px);
+}
+.client-pill-float:hover { border-color: var(--accent); }
+.client-pill-float.dragging { cursor: grabbing; box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4); }
+.client-pill-grip { margin-left: 1px; padding-left: 6px; border-left: 1px solid var(--border); font-size: 11px; color: var(--text-dim); opacity: .6; letter-spacing: 1px; }
+.client-pill-float.dragging .client-pill-grip { color: var(--accent); opacity: 1; }
+
+@media (max-width: 760px) {
+  .client-pill-float { max-width: calc(100vw - 24px); }
+  .client-pill-grip { display: none; }
+}
